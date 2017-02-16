@@ -1,0 +1,708 @@
+<export><workspace name="1-json-load-mlw17"><query name="loadCustomerData" focus="false" active="true" content-source="as:6240101570028256752:" mode="javascript">declareUpdate();
+var docs =
+    [{
+  "customer_id": 1,
+  "first_name": "Eric",
+  "last_name": "Hill",
+  "email": "ehill0@salon.com",
+  "department": "Music",
+  "billing_address": {
+    "street": "2096 Village Green Street",
+    "city": "Baton Rouge",
+    "state": "Louisiana",
+    "zip": "70820",
+    "latitude": "30.3795",
+    "longitude": "-91.1671"
+  },
+  "shipping_address": {
+    "street": "2693 Aberg Hill",
+    "city": "Buffalo",
+    "state": "New York",
+    "zip": "14233",
+    "latitude": "42.7684",
+    "longitude": "-78.8871"
+  },
+  "region": "scelerisque"
+}, {
+  "customer_id": 2,
+  "first_name": "Shawn",
+  "last_name": "Castillo",
+  "email": "scastillo1@ox.ac.uk",
+  "department": "Automotive",
+  "billing_address": {
+    "street": "49 Mallard Place",
+    "city": "Milwaukee",
+    "state": "Wisconsin",
+    "zip": "53205",
+    "latitude": "43.0528",
+    "longitude": "-87.9353"
+  },
+  "shipping_address": {
+    "street": "0 Delaware Park",
+    "city": "Fresno",
+    "state": "California",
+    "zip": "93778",
+    "latitude": "36.7464",
+    "longitude": "-119.6397"
+  },
+  "region": "ultrices"
+}, {
+  "customer_id": 3,
+  "first_name": "Lori",
+  "last_name": "Alvarez",
+  "email": "lalvarez2@msu.edu",
+  "department": "Toys",
+  "billing_address": {
+    "street": "32417 Tennyson Road",
+    "city": "Beaumont",
+    "state": "Texas",
+    "zip": "77713",
+    "latitude": "30.085",
+    "longitude": "-94.2607"
+  },
+  "shipping_address": {
+    "street": "8 Prentice Road",
+    "city": "Van Nuys",
+    "state": "California",
+    "zip": "91411",
+    "latitude": "34.1781",
+    "longitude": "-118.4574"
+  },
+  "region": "augue"
+}/*, {
+  "customer_id": 4,
+  "first_name": "Wayne",
+  "last_name": "Burke",
+  "email": "wburke3@t-online.de",
+  "department": "Outdoors",
+  "billing_address": {
+    "street": "9084 Iowa Avenue",
+    "city": "Carlsbad",
+    "state": "California",
+    "zip": "92013",
+    "latitude": "33.0169",
+    "longitude": "-116.846"
+  },
+  "shipping_address": {
+    "street": "7 Farragut Alley",
+    "city": "Oakland",
+    "state": "California",
+    "zip": "94611",
+    "latitude": "37.8471",
+    "longitude": "-122.2223"
+  },
+  "region": "quisque"
+}, {
+  "customer_id": 5,
+  "first_name": "Todd",
+  "last_name": "Morrison",
+  "email": "tmorrison4@china.com.cn",
+  "department": "Automotive",
+  "billing_address": {
+    "street": "3 Transport Hill",
+    "city": "Chicago",
+    "state": "Illinois",
+    "zip": "60674",
+    "latitude": "41.8119",
+    "longitude": "-87.6873"
+  },
+  "shipping_address": {
+    "street": "09975 Hoard Junction",
+    "city": "Rochester",
+    "state": "Minnesota",
+    "zip": "55905",
+    "latitude": "44.0225",
+    "longitude": "-92.4668"
+  },
+  "region": "purus"
+}, {
+  "customer_id": 6,
+  "first_name": "Susan",
+  "last_name": "Rodriguez",
+  "email": "srodriguez5@cpanel.net",
+  "department": "Computers",
+  "billing_address": {
+    "street": "90 Clemons Pass",
+    "city": "New York City",
+    "state": "New York",
+    "zip": "10131",
+    "latitude": "40.7808",
+    "longitude": "-73.9772"
+  },
+  "shipping_address": {
+    "street": "11485 Hovde Center",
+    "city": "Waterloo",
+    "state": "Iowa",
+    "zip": "50706",
+    "latitude": "42.4156",
+    "longitude": "-92.2703"
+  },
+  "region": "justo"
+}, {
+  "customer_id": 7,
+  "first_name": "Raymond",
+  "last_name": "Barnes",
+  "email": "rbarnes6@icq.com",
+  "department": "Games",
+  "billing_address": {
+    "street": "00179 Farwell Plaza",
+    "city": "London",
+    "state": "Kentucky",
+    "zip": "40745",
+    "latitude": "37.1376",
+    "longitude": "-84.1156"
+  },
+  "shipping_address": {
+    "street": "62 Bluestem Pass",
+    "city": "Atlanta",
+    "state": "Georgia",
+    "zip": "30368",
+    "latitude": "33.8444",
+    "longitude": "-84.474"
+  },
+  "region": "sem"
+}, {
+  "customer_id": 8,
+  "first_name": "Chris",
+  "last_name": "Ross",
+  "email": "cross7@ustream.tv",
+  "department": "Jewelery",
+  "billing_address": {
+    "street": "206 Packers Hill",
+    "city": "Rochester",
+    "state": "New York",
+    "zip": "14683",
+    "latitude": "43.286",
+    "longitude": "-77.6843"
+  },
+  "shipping_address": {
+    "street": "780 Hanson Trail",
+    "city": "Springfield",
+    "state": "Illinois",
+    "zip": "62794",
+    "latitude": "39.7495",
+    "longitude": "-89.606"
+  },
+  "region": "vestibulum"
+}, {
+  "customer_id": 9,
+  "first_name": "Thomas",
+  "last_name": "Hill",
+  "email": "thill8@e-recht24.de",
+  "department": "Computers",
+  "billing_address": {
+    "street": "198 Anhalt Junction",
+    "city": "Arlington",
+    "state": "Virginia",
+    "zip": "22212",
+    "latitude": "38.8808",
+    "longitude": "-77.113"
+  },
+  "shipping_address": {
+    "street": "42693 Fuller Point",
+    "city": "Savannah",
+    "state": "Georgia",
+    "zip": "31422",
+    "latitude": "31.9714",
+    "longitude": "-81.0716"
+  },
+  "region": "sagittis"
+}, {
+  "customer_id": 10,
+  "first_name": "Judith",
+  "last_name": "Lane",
+  "email": "jlane9@newyorker.com",
+  "department": "Shoes",
+  "billing_address": {
+    "street": "8408 Pennsylvania Street",
+    "city": "Charlotte",
+    "state": "North Carolina",
+    "zip": "28230",
+    "latitude": "35.26",
+    "longitude": "-80.8042"
+  },
+  "shipping_address": {
+    "street": "41 Thackeray Point",
+    "city": "Washington",
+    "state": "District of Columbia",
+    "zip": "20540",
+    "latitude": "38.8874",
+    "longitude": "-77.0047"
+  },
+  "region": "adipiscing"
+}*/
+    ];
+
+
+for (i = 0; i &lt; docs.length; i++) { 
+    var doc = docs[i];
+    var uri = fn.concat("/customer-",i+1,".json")
+    xdmp.documentInsert(uri,doc,[],"customer")
+}; </query><query name="loadOrderData" focus="false" active="true" content-source="as:6240101570028256752:" mode="javascript">declareUpdate();
+var docs = 
+[{
+  "id": 1,
+  "order_date": "2016-07-01",
+  "ship_date": "2016-07-06 02:59:29 UTC",
+  "customer_id": 3,
+  "payment_terms": "PIA",
+  "order_lines": {
+    "order_line": [
+      {
+        "product": 3,
+        "quantity": 45,
+        "unit_price": 94.19,
+        "discount": 0.84,
+        "total": 3560.38,
+        "notes": null
+      },
+      {
+        "product": 1,
+        "quantity": 49,
+        "unit_price": 89.47,
+        "discount": 0.5,
+        "total": 2192.02,
+        "notes": null
+      },
+      {
+        "product": 1,
+        "quantity": 12,
+        "unit_price": 28.07,
+        "discount": 0.78,
+        "total": 262.74,
+        "notes": "Nulla justo. Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis. Sed ante. Vivamus tortor."
+      }
+    ]
+  },
+  "notes": null,
+  "status": null
+}, {
+  "id": 2,
+  "order_date": "2016-05-16",
+  "ship_date": "2016-05-21 01:28:59 UTC",
+  "customer_id": 1,
+  "payment_terms": "PIA",
+  "order_lines": {
+    "order_line": [
+      {
+        "product": 3,
+        "quantity": 86,
+        "unit_price": 48.72,
+        "discount": 0.88,
+        "total": 3687.13,
+        "notes": null
+      },
+      {
+        "product": 1,
+        "quantity": 84,
+        "unit_price": 22.37,
+        "discount": 0.45,
+        "total": 845.59,
+        "notes": null
+      },
+      {
+        "product": 1,
+        "quantity": 34,
+        "unit_price": 58.73,
+        "discount": 0.18,
+        "total": 359.43,
+        "notes": "Integer pede justo, lacinia eget, tincidunt eget, tempus vel, pede. Morbi porttitor lorem id ligula. Suspendisse ornare consequat lectus. In est risus, auctor sed, tristique in, tempus sit amet, sem."
+      }
+    ]
+  },
+  "notes": null,
+  "status": null
+}, {
+  "id": 3,
+  "order_date": "2016-09-10",
+  "ship_date": "2016-09-15 13:15:38 UTC",
+  "customer_id": 2,
+  "payment_terms": "net90",
+  "order_lines": {
+    "order_line": [
+      {
+        "product": 2,
+        "quantity": 34,
+        "unit_price": 5.19,
+        "discount": 0.57,
+        "total": 100.58,
+        "notes": null
+      },
+      {
+        "product": 3,
+        "quantity": 87,
+        "unit_price": 75.86,
+        "discount": 0.64,
+        "total": 4223.88,
+        "notes": null
+      },
+      {
+        "product": 2,
+        "quantity": 95,
+        "unit_price": 14.78,
+        "discount": 0.24,
+        "total": 336.98,
+        "notes": "Maecenas pulvinar lobortis est. Phasellus sit amet erat. Nulla tempus."
+      },
+      {
+        "product": 2,
+        "quantity": 30,
+        "unit_price": 56.36,
+        "discount": 0.48,
+        "total": 811.58,
+        "notes": "Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros."
+      },
+      {
+        "product": 5,
+        "quantity": 93,
+        "unit_price": 40.59,
+        "discount": 0.36,
+        "total": 1358.95,
+        "notes": "Suspendisse potenti. Nullam porttitor lacus at turpis. Donec posuere metus vitae ipsum. Aliquam non mauris."
+      }
+    ]
+  },
+  "notes": null,
+  "status": "in progress"
+}
+ /*, {
+  "id": 4,
+  "order_date": "2016-07-21",
+  "ship_date": "2016-07-26 19:44:10 UTC",
+  "customer_id": 3,
+  "payment_terms": "COD",
+  "order_lines": {
+    "order_line": [
+      {
+        "product": 4,
+        "quantity": 96,
+        "unit_price": 51.1,
+        "discount": 0.91,
+        "total": 4464.1,
+        "notes": null
+      },
+      {
+        "product": 1,
+        "quantity": 26,
+        "unit_price": 41.09,
+        "discount": 0.47,
+        "total": 502.12,
+        "notes": null
+      }
+    ]
+  },
+  "notes": null,
+  "status": null
+}, {
+  "id": 5,
+  "order_date": "2016-07-08",
+  "ship_date": "2016-07-13 17:16:55 UTC",
+  "customer_id": 2,
+  "payment_terms": "net30",
+  "order_lines": {
+    "order_line": [
+      {
+        "product": 5,
+        "quantity": 92,
+        "unit_price": 65.72,
+        "discount": 0.47,
+        "total": 2841.73,
+        "notes": "Duis consequat dui nec nisi volutpat eleifend. Donec ut dolor. Morbi vel lectus in quam fringilla rhoncus. Mauris enim leo, rhoncus sed, vestibulum sit amet, cursus id, turpis. Integer aliquet, massa id lobortis convallis, tortor risus dapibus augue, vel accumsan tellus nisi eu orci. Mauris lacinia sapien quis libero. Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum. Integer a nibh. In quis justo."
+      },
+      {
+        "product": 5,
+        "quantity": 67,
+        "unit_price": 8.7,
+        "discount": 0.94,
+        "total": 547.93,
+        "notes": null
+      },
+      {
+        "product": 2,
+        "quantity": 65,
+        "unit_price": 85.79,
+        "discount": 0.08,
+        "total": 446.11,
+        "notes": null
+      }
+    ]
+  },
+  "notes": "Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui. Maecenas tristique, est et tempus semper, est quam pharetra magna, ac consequat metus sapien ut nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Mauris viverra diam vitae quam. Suspendisse potenti. Nullam porttitor lacus at turpis. Donec posuere metus vitae ipsum. Aliquam non mauris. Morbi non lectus. Aliquam sit amet diam in magna bibendum imperdiet.",
+  "status": null
+}, {
+  "id": 6,
+  "order_date": "2016-09-28",
+  "ship_date": "2016-10-03 21:22:28 UTC",
+  "customer_id": 3,
+  "payment_terms": "net90",
+  "order_lines": {
+    "order_line": [
+      {
+        "product": 3,
+        "quantity": 63,
+        "unit_price": 36.81,
+        "discount": 0.73,
+        "total": 1692.89,
+        "notes": null
+      },
+      {
+        "product": 3,
+        "quantity": 46,
+        "unit_price": 75.47,
+        "discount": 0.61,
+        "total": 2117.69,
+        "notes": null
+      },
+      {
+        "product": 3,
+        "quantity": 24,
+        "unit_price": 50.0,
+        "discount": 0.35,
+        "total": 420.0,
+        "notes": null
+      }
+    ]
+  },
+  "notes": null,
+  "status": null
+}, {
+  "id": 7,
+  "order_date": "2016-03-28",
+  "ship_date": "2016-04-02 06:17:42 UTC",
+  "customer_id": 2,
+  "payment_terms": "net30",
+  "order_lines": {
+    "order_line": [
+      {
+        "product": 1,
+        "quantity": 18,
+        "unit_price": 41.94,
+        "discount": 0.29,
+        "total": 218.93,
+        "notes": null
+      }
+    ]
+  },
+  "notes": null,
+  "status": "in progress"
+}, {
+  "id": 8,
+  "order_date": "2016-11-28",
+  "ship_date": "2016-12-03 07:47:55 UTC",
+  "customer_id": 2,
+  "payment_terms": "PIA",
+  "order_lines": {
+    "order_line": [
+      {
+        "product": 2,
+        "quantity": 20,
+        "unit_price": 46.35,
+        "discount": 0.01,
+        "total": 9.27,
+        "notes": null
+      },
+      {
+        "product": 5,
+        "quantity": 82,
+        "unit_price": 67.76,
+        "discount": 0.51,
+        "total": 2833.72,
+        "notes": "Pellentesque at nulla. Suspendisse potenti. Cras in purus eu magna vulputate luctus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus vestibulum sagittis sapien. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam vel augue."
+      },
+      {
+        "product": 4,
+        "quantity": 24,
+        "unit_price": 73.82,
+        "discount": 0.82,
+        "total": 1452.78,
+        "notes": "Quisque porta volutpat erat."
+      },
+      {
+        "product": 1,
+        "quantity": 36,
+        "unit_price": 83.05,
+        "discount": 0.92,
+        "total": 2750.62,
+        "notes": "Morbi porttitor lorem id ligula. Suspendisse ornare consequat lectus. In est risus, auctor sed, tristique in, tempus sit amet, sem. Fusce consequat. Nulla nisl. Nunc nisl. Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa."
+      },
+      {
+        "product": 5,
+        "quantity": 35,
+        "unit_price": 83.17,
+        "discount": 0.22,
+        "total": 640.41,
+        "notes": "Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros."
+      }
+    ]
+  },
+  "notes": null,
+  "status": "shipped"
+}, {
+  "id": 9,
+  "order_date": "2016-02-09",
+  "ship_date": "2016-02-14 12:02:26 UTC",
+  "customer_id": 2,
+  "payment_terms": "PIA",
+  "order_lines": {
+    "order_line": [
+      {
+        "product": 2,
+        "quantity": 71,
+        "unit_price": 66.54,
+        "discount": 0.74,
+        "total": 3496.01,
+        "notes": null
+      }
+    ]
+  },
+  "notes": null,
+  "status": null
+}, {
+  "id": 10,
+  "order_date": "2016-10-19",
+  "ship_date": "2016-10-24 05:42:19 UTC",
+  "customer_id": 3,
+  "payment_terms": "net30",
+  "order_lines": {
+    "order_line": [
+      {
+        "product": 2,
+        "quantity": 67,
+        "unit_price": 76.35,
+        "discount": 0.61,
+        "total": 3120.42,
+        "notes": "Mauris enim leo, rhoncus sed, vestibulum sit amet, cursus id, turpis. Integer aliquet, massa id lobortis convallis, tortor risus dapibus augue, vel accumsan tellus nisi eu orci. Mauris lacinia sapien quis libero. Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum. Integer a nibh. In quis justo. Maecenas rhoncus aliquam lacus. Morbi quis tortor id nulla ultrices aliquet. Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo."
+      },
+      {
+        "product": 5,
+        "quantity": 46,
+        "unit_price": 29.29,
+        "discount": 0.93,
+        "total": 1253.03,
+        "notes": null
+      },
+      {
+        "product": 1,
+        "quantity": 55,
+        "unit_price": 38.22,
+        "discount": 0.85,
+        "total": 1786.79,
+        "notes": null
+      },
+      {
+        "product": 1,
+        "quantity": 54,
+        "unit_price": 84.14,
+        "discount": 0.32,
+        "total": 1453.94,
+        "notes": "Nulla ut erat id mauris vulputate elementum. Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy. Maecenas tincidunt lacus at velit. Vivamus vel nulla eget eros elementum pellentesque. Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla."
+      },
+      {
+        "product": 5,
+        "quantity": 9,
+        "unit_price": 75.82,
+        "discount": 0.78,
+        "total": 532.26,
+        "notes": "Sed accumsan felis. Ut at dolor quis odio consequat varius."
+      }
+    ]
+  },
+  "notes": "Nulla facilisi. Cras non velit nec nisi vulputate nonummy. Maecenas tincidunt lacus at velit. Vivamus vel nulla eget eros elementum pellentesque. Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla.",
+  "status": null
+}*/
+];
+
+for (i = 0; i &lt; docs.length; i++) { 
+    var doc = docs[i];
+    var uri = fn.concat("/order-",i+1,".json")
+    xdmp.documentInsert(uri,doc,[],"order")
+}; </query><query name="loadProductData" focus="false" active="true" content-source="as:6240101570028256752:" mode="javascript">declareUpdate();
+var docs =
+[{
+  "id": 1,
+  "name": "Y-find",
+  "sku": "176178176-6",
+  "category": "at",
+  "related_products": {
+    "related_product": [
+      {
+        "product_name": "porta",
+        "relationship": "upgrade"
+      },
+      {
+        "product_name": "consequat",
+        "relationship": "required"
+      }
+    ]
+  }
+}, {
+  "id": 2,
+  "name": "Vagram",
+  "sku": "510521021-2",
+  "category": "molestie",
+  "related_products": {
+    "related_product": [
+      {
+        "product_name": "bibendum",
+        "relationship": "complement"
+      }
+    ]
+  }
+}, {
+  "id": 3,
+  "name": "Prodder",
+  "sku": "746409162-0",
+  "category": "dui",
+  "related_products": {
+    "related_product": [
+      {
+        "product_name": "eros",
+        "relationship": "required"
+      },
+      {
+        "product_name": "fusce",
+        "relationship": "upgrade"
+      },
+      {
+        "product_name": "praesent",
+        "relationship": "substitute"
+      }
+    ]
+  }
+}, {
+  "id": 4,
+  "name": "Voyatouch",
+  "sku": "232078927-8",
+  "category": "tellus",
+  "related_products": {
+    "related_product": [
+      {
+        "product_name": "odio",
+        "relationship": "upgrade"
+      }
+    ]
+  }
+}, {
+  "id": 5,
+  "name": "Job",
+  "sku": "530152208-6",
+  "category": "tincidunt",
+  "related_products": {
+    "related_product": [
+      {
+        "product_name": "sed",
+        "relationship": "complement"
+      },
+      {
+        "product_name": "sollicitudin",
+        "relationship": "complement"
+      }
+    ]
+  }
+}];
+
+for (i = 0; i &lt; docs.length; i++) { 
+    var doc = docs[i];
+    var uri = fn.concat("/product-",i+1,".json")
+    xdmp.documentInsert(uri,doc,[],"product")
+};</query><query name="collectionCount" focus="true" active="true" content-source="as:6240101570028256752:" mode="javascript">// TBD</query></workspace></export>

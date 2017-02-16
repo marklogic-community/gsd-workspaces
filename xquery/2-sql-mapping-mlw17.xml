@@ -1,0 +1,284 @@
+<export><workspace name="2-sql-mapping-mlw17"><query name="terminology" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+import module namespace functx = "http://www.functx.com" at "/MarkLogic/functx/functx-1.0-nodoc-2007-01.xqy";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+
+let $sql-terms := ("database", "partition", "table", "index", "row", "column", "join", "primary key")
+let $marklogic-terms := ("database","forest","collection (or directory)", "index", "document", "element or attribute", "embedding or linking", "document URI")
+return
+
+(
+fn:concat(functx:pad-string-to-length("SQL Term"," ",20),"MarkLogic Term"),
+"----------------------------------------------",
+for $term at $idx in $sql-terms
+return     
+   fn:concat (functx:pad-string-to-length($term," ",20),
+           $marklogic-terms[$idx] ))
+           
+         
+ 
+ </query><query name="notNecessarySQL" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">(:
+
+SQL Statement:
+
+       CREATE TABLE USERS (a 
+            Number
+            , b 
+            Number
+        )
+            
+MarkLogic XQuery Expression: NOT NECESSARY.
+
+-------------------------------------------------------
+SQL Statement:
+
+      ALTER TABLE users ADD ...
+
+MarkLogic XQuery Expression: NOT NECESSARY.
+-------------------------------------------------------
+
+SQL Statement:
+
+      CREATE INDEX myindexname ON users(name) 
+
+MarkLogic XQuery Expression: NOT NECESSARY.
+-------------------------------------------------------
+
+SQL Statement:
+
+CREATE INDEX myindexname 
+ ON users(name, ts DESC) 
+ 
+MarkLogic XQuery Expression: NOT NECESSARY.
+
+:)
+
+"These SQL statements are not necessary in MarkLogic."</query><query name="select*" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+(: SELECT * 
+   FROM customer 
+:)
+
+/customer
+
+
+</query><query name="selectAttributes" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+(: SELECT customer_id, last_name 
+   FROM customers 
+:)
+
+/customer/(customer_id|last_name)</query><query name="select*-where" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+(: SELECT * 
+   FROM customers 
+   WHERE customer_id = 2 
+:)
+
+/customer[customer_id = 2]
+</query><query name="selectAttributesWhere" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+(: SELECT customer_id,last_name 
+   FROM customers 
+   WHERE customer_id = 2 
+:)
+
+/customer[customer_id = 2]/(customer_id|last_name)
+</query><query name="select*-where-order-by" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+(: SELECT * FROM orders 
+   WHERE status= in progress 
+   ORDER BY order_date 
+:)
+
+for $order in /order[status = "in progress"]
+order by $order/order_date (: descending :) (:ascending is default:)
+return $order</query><query name="select*-where-GT" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+
+(: SELECT * 
+   FROM customers 
+   WHERE customer_id &gt; 2  (:maybe replace, add "age" to customer records? :)
+:)
+
+/customer[customer_id &gt; 2]</query><query name="select*-where-NE" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+(: SELECT * 
+   FROM  products
+   WHERE category != "interdum"
+:)
+
+/product[category != "interdum"]</query><query name="select*-LIKE-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+(: SELECT * 
+    FROM products 
+    WHERE name LIKE "%Domainer%"
+:)
+
+(: text substring, matches "Domainer" :)
+/product[fn:contains(name, "ain")],
+
+(: full word match :)
+/product[cts:contains(name, "Domainer")]  </query><query name="select*-LIKE-2" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+(: SELECT * 
+    FROM products 
+    WHERE name LIKE "Dom%"
+:)
+
+(: assumes trailing wildcard searches enabled :)
+
+/product[cts:contains(name, "Dom*")]  </query><query name="select*-AND-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+
+(: SELECT * 
+   FROM products 
+   WHERE id &gt; 1 AND id &lt;= 3
+:)
+
+/product[id &gt; 1 and id &lt;= 3]</query><query name="select*-AND-2" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+(:
+SELECT * FROM orders 
+ WHERE status = 'in progress' AND
+       payment_terms ='PIA'
+:)
+
+/order[status = "in progress"][payment_terms = "PIA"]</query><query name="select*-OR" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+(: SELECT * 
+   FROM products 
+   WHERE id=1 or id=2 
+:)
+
+/product[id = 1 or id = 2],
+
+("=========================================================================="),
+
+(: SELECT * 
+   FROM products 
+   WHERE id=1 or name='Biodex' 
+:)
+
+/product[id = 1 or name = "Biodex"]
+
+</query><query name="select*-LIMIT" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+(: SELECT * 
+   FROM products 
+   LIMIT 1
+:)
+
+(/product)[1], 
+
+("=========================================================================="),
+
+
+(: SELECT * 
+   FROM products 
+   LIMIT 2 SKIP 3 
+:)
+
+(/product)[4 to 5]</query><query name="select-JOIN" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+(:
+Show me the orders that have an order line that includes a particular sku #
+
+SELECT order_id 
+ FROM orders o, order_line_items li 
+ WHERE li.order_id=o.order_id 
+ AND   li.product=4  (: this could be a sku :)
+:)
+
+/order[order_lines/order_line/product = 4]/id ,
+
+("=========================================================================="),
+
+(:
+Show me the name of the customer from a particular order 
+
+SELECT customer.last_name 
+FROM customers,orders 
+WHERE orders.id="1"
+AND   orders.custid=customer.id 
+          
+ 
+:)
+
+/customer[customer_id = fn:collection("order")/order[id=1]/customer_id]/last_name</query><query name="select-DISTINCT" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+(:
+SELECT DISTINCT last_name 
+FROM users
+:)
+
+(: standard :)
+fn:distinct-values(/customer/last_name),      
+
+("=========================================================================="),
+
+(: optimized :) (:assumes range index on last_name:)
+cts:element-values(xs:QName("last_name"))  </query><query name="select-COUNT" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+
+(:estimate vs. count:)
+
+(:
+SELECT COUNT(*) 
+FROM products
+:)
+
+xdmp:estimate(/product),
+
+(:
+SELECT COUNT(*) 
+FROM products 
+WHERE id &gt; 3
+:)
+
+fn:count(/product[id &gt; 3]),
+
+(:
+SELECT COUNT(sku) 
+FROM products
+:)
+
+xdmp:estimate(/product/sku)
+
+</query><query name="explain-SELECT" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+(:
+EXPLAIN SELECT * FROM customers WHERE id=3
+:)
+
+xdmp:plan(/customer[customer_id = 3])</query><query name="UPDATE" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+(:
+UPDATE customers 
+SET zip=94911 
+WHERE customer_id=1
+:)
+
+xdmp:node-replace(/customer[customer_id = 1]/billing_address/zip, &lt;zip&gt;94911&lt;/zip&gt;)
+
+(:
+
+UPDATE users 
+SET a=a+2 
+WHERE b='q'
+
+for $a in /user[b = 'q']/a
+return node-replace($a, &lt;a&gt;{$a + 2}&lt;/a&gt;)
+
+:)</query><query name="DELETE" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+
+(:
+DELETE FROM orders 
+WHERE status="in progress"
+:)
+
+let $orders := /order[status="in progress"]
+let $uris := for $o in $orders return xdmp:node-uri($o)
+return  xdmp:document-delete($uris)
+
+(: xdmp:collection-delete("collection-name") :)</query></workspace></export>
