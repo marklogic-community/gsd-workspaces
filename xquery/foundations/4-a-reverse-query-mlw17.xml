@@ -1,0 +1,77 @@
+<export><workspace name="4-a-reverse-query-mlw17"><query name="2. Reverse query contains" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+let $query :=
+&lt;query&gt;
+    &lt;cts:element-value-query&gt;
+      &lt;cts:element&gt;breed&lt;/cts:element&gt;
+      &lt;cts:text xml:lang="en"&gt;bernese mountain dog&lt;/cts:text&gt;
+    &lt;/cts:element-value-query&gt;
+&lt;/query&gt;
+
+let $doc := &lt;dog&gt;
+              &lt;breed&gt;Bernese Mountain Dog&lt;/breed&gt;
+              &lt;name&gt;Oslo&lt;/name&gt;
+              &lt;gender&gt;male&lt;/gender&gt;
+              &lt;dob&gt;2004-08-06&lt;/dob&gt;
+              &lt;notes&gt;The Bernese Mountain Dog, called in German the Berner Sennenhund, is a large-sized breed of dog, 
+                      one of the four breeds of Sennenhund-type dogs from the Swiss Alps
+              &lt;/notes&gt;
+            &lt;/dog&gt;
+
+return  cts:contains($query, cts:reverse-query($doc))
+
+ 
+</query><query name="3. Insert queries and docs" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+let $query :=
+    &lt;query&gt;
+     {cts:and-query((
+                     cts:element-value-query(xs:QName("gender"),"male"),
+                     cts:element-word-query(xs:QName("notes"),"mountain dog")
+                    ))
+     }
+    &lt;/query&gt;
+    
+let $dogs :=
+  &lt;dogs&gt;
+     &lt;dog&gt;
+           &lt;breed&gt;Bernese Mountain Dog&lt;/breed&gt;
+           &lt;name&gt;Oslo&lt;/name&gt;
+           &lt;gender&gt;male&lt;/gender&gt;
+           &lt;dob&gt;2004-08-06&lt;/dob&gt;
+           &lt;notes&gt;The Bernese Mountain Dog, called in German the Berner Sennenhund, is a large-sized breed of dog, 
+                  one of the four breeds of Sennenhund-type dogs from the Swiss Alps
+           &lt;/notes&gt;
+      &lt;/dog&gt;
+      &lt;dog&gt;
+           &lt;breed&gt;Newfoundlad&lt;/breed&gt;
+           &lt;name&gt;Geneva&lt;/name&gt;
+           &lt;gender&gt;female&lt;/gender&gt;
+           &lt;dob&gt;2004-11-01&lt;/dob&gt;
+           &lt;notes&gt;The Newfoundland dog is a large working dog. They can be either black, brown, or white-and-black. 
+                  However, in Canada, the country of their origin, the only correct colours are either black or Landseer
+           &lt;/notes&gt;
+      &lt;/dog&gt;
+      &lt;dog&gt;
+           &lt;breed&gt;Greater Swiss Mountain Dog&lt;/breed&gt;
+           &lt;name&gt;Titan&lt;/name&gt;
+           &lt;gender&gt;male&lt;/gender&gt;
+           &lt;dob&gt;2004-109-12&lt;/dob&gt;
+           &lt;notes&gt;The Greater Swiss Mountain Dog is a dog breed which was developed in the Swiss Alps. 
+                  The name Sennenhund refers to people called Senn or Senner, dairymen and herders in the Swiss Alps
+           &lt;/notes&gt;
+      &lt;/dog&gt;
+  &lt;/dogs&gt;
+  
+return (xdmp:document-insert("/query-1.xml", $query, (), "queries"),
+        for $dog at $idx in $dogs/*
+        let $uri := fn:concat("/dog-",$idx,".xml")
+        return xdmp:document-insert($uri, $dog, (), "dogs"))</query><query name="4. Reverse query" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+let $dogs := fn:collection("dogs")
+  return cts:search(/query, cts:reverse-query($dogs))</query><query name="1. Serializing Queries" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+
+let $query := &lt;xml-element&gt;{cts:word-query("hello")}&lt;/xml-element&gt;
+
+return $query</query></workspace></export>

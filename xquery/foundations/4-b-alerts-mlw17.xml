@@ -1,0 +1,42 @@
+<export><workspace name="4-b-alerts-mlw17"><query name="1. Config" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+import module namespace alert = "http://marklogic.com/xdmp/alert" at "/MarkLogic/alert.xqy";
+
+let $config := alert:make-config(
+      "my-alert-config-uri",
+      "My Alerting App",
+      "Alerting config for my app",
+        &lt;alert:options/&gt; )
+return
+alert:config-insert($config)</query><query name="2. Action" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+import module namespace alert = "http://marklogic.com/xdmp/alert" at "/MarkLogic/alert.xqy";
+
+let $action := alert:make-action(
+    "xdmp:log", 
+    "log to ErrorLog.txt",
+    xdmp:modules-database(),
+    xdmp:modules-root(), 
+    "/alert-action.xqy",
+    &lt;alert:options/&gt; )
+return
+alert:action-insert("my-alert-config-uri", $action)</query><query name="3. Rule" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+import module namespace alert = "http://marklogic.com/xdmp/alert" at "/MarkLogic/alert.xqy";
+
+let $rule := alert:make-rule(
+    "simple", 
+    "hello world rule",
+    0, (: equivalent to xdmp:user(xdmp:get-current-user()) :)
+    cts:word-query("hello world"),
+    "xdmp:log",
+    &lt;alert:options/&gt; )
+return
+alert:rule-insert("my-alert-config-uri", $rule)</query><query name="4. Invoke" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+import module namespace alert = "http://marklogic.com/xdmp/alert" at "/MarkLogic/alert.xqy";
+
+alert:invoke-matching-actions("my-alert-config-uri", 
+      &lt;doc&gt;hello world&lt;/doc&gt;, &lt;options/&gt;)</query><query name="Insert Action Module" focus="true" active="true" content-source="13486273823798900624:0:Apps" mode="xquery">xquery version "1.0-ml";
+
+let $code := 
+'xquery version "1.0-ml";
+xdmp:log(fn:concat("====================================================&gt;&gt;",xdmp:get-current-user(), " was alerted"))'
+
+return xdmp:document-insert("/alert-action.xqy", text{$code})</query></workspace></export>
