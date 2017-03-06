@@ -1,0 +1,95 @@
+<export><workspace name="7-query-triples-mlw17"><query name="SPARQL" focus="false" active="true" content-source="as:6240101570028256752:" mode="sparql">PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
+PREFIX ids: &lt;http://marklogic.com/example/products/&gt; 
+PREFIX taxo: &lt;http://marklogic.com/example/taxonomies/&gt; 
+PREFIX xs: &lt;http:///www.w3.org/2001/&gt; 
+
+SELECT 
+ ?s ?p ?o
+WHERE
+{
+  ?s ?p ?o
+}
+LIMIT 10</query><query name="Embedded SPARQL" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">sem:sparql('PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
+PREFIX ids: &lt;http://marklogic.com/example/products/&gt; 
+PREFIX taxo: &lt;http://marklogic.com/example/taxonomies/&gt; 
+PREFIX xs: &lt;http:///www.w3.org/2001/&gt; 
+
+SELECT 
+ ?s ?p ?o
+WHERE
+{
+  ?s ?p ?o
+}
+LIMIT 10')
+</query><query name=" Optic XQY" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+op:from-triples(
+   op:pattern( op:col("s"), op:col("p"), op:col("o"))
+   )
+=&gt;op:limit(10)
+=&gt;op:result()</query><query name="cts" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+
+cts:triples()[1 to 10]</query><query name="SPARQL" focus="false" active="true" content-source="as:6240101570028256752:" mode="sparql">PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
+PREFIX ids: &lt;http://marklogic.com/example/products/&gt; 
+PREFIX taxo: &lt;http://marklogic.com/example/taxonomies/&gt; 
+PREFIX xs: &lt;http:///www.w3.org/2001/&gt; 
+
+SELECT 
+ ?name ?sku
+WHERE
+{
+  ?s a :Product ;
+     :name ?name ;
+     :sku ?sku .
+}
+LIMIT 10</query><query name="Embedded SPARQL" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">sem:sparql('PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
+PREFIX ids: &lt;http://marklogic.com/example/products/&gt; 
+PREFIX taxo: &lt;http://marklogic.com/example/taxonomies/&gt; 
+PREFIX xs: &lt;http:///www.w3.org/2001/&gt; 
+
+SELECT 
+ ?name ?sku
+WHERE
+{
+  ?s a :Product ;
+     :name ?name ;
+     :sku ?sku .
+}
+LIMIT 10')</query><query name="Optic XQY" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+let $o := op:prefixer("http://marklogic.com/example/ontology/") 
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+
+return
+op:from-triples( (
+   op:pattern( op:col("p"), $rdf("type"), $o("Product") ),
+   op:pattern( op:col("p"), $o("name"), op:col("name") ),
+   op:pattern( op:col("p"), $o("sku"),  op:col("sku"))
+   ))
+=&gt;op:select(( "name", "sku" ) )
+=&gt;op:limit(10)
+=&gt;op:result()</query><query name="cts" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+import module namespace sem = "http://marklogic.com/semantics" at "/MarkLogic/semantics.xqy";
+
+let $o := function($n) { sem:iri("http://marklogic.com/example/ontology/"|| $n)}
+for $triple in 
+  cts:triples( (), 
+  ($o("name"), $o("sku")), 
+  ())[1 to 20]
+where exists(
+  cts:triples(sem:triple-subject($triple), 
+             sem:iri("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), 
+             $o("Product")))
+order by sem:triple-subject($triple)
+return $triple</query><query name="README" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">(:
+
+This workspace has the most basic queries conceivable
+replicated using SPARQL, SPARQL-in a programming language, Optic (XQuery version), 
+and using cts:triples() directly.
+
+:)</query></workspace></export>

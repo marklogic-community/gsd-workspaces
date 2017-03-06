@@ -1,0 +1,286 @@
+<export><workspace name="6-load-triples-mlw17"><query name="Load-Customer-Data" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">import module namespace sem = "http://marklogic.com/semantics" at "/MarkLogic/semantics.xqy";
+
+let $triples := sem:rdf-parse('
+
+@prefix taxo: &lt;http://marklogic.com/example/taxonomies/&gt; .
+@prefix xs: &lt;http:///www.w3.org/2001/&gt; .
+@prefix : &lt;http://marklogic.com/example/ontology/&gt; .
+@prefix ids: &lt;http://marklogic.com/example/customers/&gt; .
+
+ids:1 a :Customer ;
+    :customerId "1"^^xs:long ;
+    :firstName "Ernest" ;
+    :lastName "Reyes" ;
+    :email "ereyes0@utexas.edu" ;
+    :department "Outdoors" ;
+    :region "viverra" ;
+    :billingAddress ids:10 ;
+    :shippingAddress ids:11 .
+
+ids:10 a :BillingAddress ;
+     :street "1 Dakota Avenue" ;
+     :city "Richmond" ;
+     :state "Virginia" ;
+     :zip "23237" ;
+     :latitude "37.4011"^^xs:decimal ;
+     :longitude "-77.4615"^^xs:decimal .
+      
+ids:11 a :ShippingAddress ;
+     :street "43 Hintze Center" ;
+     :city "Richmond" ;
+     :state "California" ;
+     :zip "94807" ;
+     :latitude "37.7772"^^xs:decimal ;
+     :longitude "-121.9554"^^xs:decimal .
+
+ids:2 a :Customer ;
+     :customerId "2" ;
+     :firstName "Fred" ;
+     :lastName "Williams" ;
+     :email "fwilliams1@berkeley.edu" ;
+     :department "Music" ;
+     :region "donec" ;
+     :billingAddress ids:12 ;
+     :shippingAddress ids:13 .
+
+ids:12 a :BillingAddress ;
+    :street "5517 Mccormick Place" ;
+    :city "Fort Worth" ;
+    :state "Texas" ;
+    :zip "76110" ;
+    :latitude "32.7065"^^xs:decimal ;
+    :longitude "-97.3375"^^xs:decimal .
+
+ids:13 a :ShippingAddress ;
+    :street "68911 Stang Hill" ;
+    :city "Las Vegas" ;
+    :state "Nevada" ;
+    :zip "89120" ;
+    :latitude "36.0914"^^xs:decimal ;
+    :longitude "-115.0885"^^xs:decimal .
+
+ids:3 a :Customer ;
+    :customerId "3"^^xs:long ;
+    :firstName "Bruce" ;
+    :lastName "Nichols" ;
+    :email "bnichols2@shareasale.com" ;
+    :department "Baby" ;
+    :region "accumsan" ;
+    :billingAddress ids:14 ;
+    :shippingAddress ids:15 .
+
+ids:14 a :BillingAddress ;
+    :street "703 Golf View Parkway" ;
+    :city "Hartford" ;
+    :state "Connecticut" ;
+    :zip "06140" ;
+    :latitude "41.7918"^^xs:decimal ;
+    :longitude "-72.7188"^^xs:decimal .
+
+ids:15 a :ShippingAddress ;
+    :street "3239 Vera Trail" ;
+    :city "Palm Bay" ;
+    :state "Florida" ;
+    :zip "32909" ;
+    :latitude "27.9694"^^xs:decimal ;
+    :longitude "-80.6473"^^xs:decimal .
+', "turtle")
+return sem:graph-insert(sem:iri("http://marklogic.com/example/graphs/customers"), $triples)
+</query><query name="Load-Order-Data" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+import module namespace sem = "http://marklogic.com/semantics" at "/MarkLogic/semantics.xqy";
+
+let $triples := sem:rdf-parse('
+@prefix : &lt;http://marklogic.com/example/ontology/&gt; . 
+@prefix prods: &lt;http://marklogic.com/example/products/&gt; . 
+@prefix ids: &lt;http://marklogic.com/example/orders/&gt; . 
+@prefix cids: &lt;http://marklogic.com/example/customers/&gt; . 
+@prefix taxo: &lt;http://marklogic.com/example/taxonomies/&gt; .
+@prefix xs: &lt;http:///www.w3.org/2001/&gt; .
+
+
+ids:1 a :Order ;
+    :id "1"^^xs:long ;
+    :order_date "2016-06-20" ;
+    :ship_date "2016-06-25 06:09:29 UTC"^^xs:dateTime ;
+    :customer cids:3 ;
+    :paymentTerms "COD" ;
+    :orderLine ids:ll, ids:12, ids:13 .
+
+ids:11 a :OrderLine ;
+    :product prods:4 ;
+    :quantity "88"^^xs:long ;
+    :unitPrice "37.26"^^xs:decimal ;
+    :discount "0.02"^^xs:decimal ;
+    :total "65.58"^^xs:decomal ;
+    :status taxo:in-progress ;
+    :notes "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl. Aenean lectus. Pellentesque eget nunc." .
+
+ids:12 a :OrderLine ;
+    :product prods:2 ;
+    :quantity "72"^^xs:long ;
+    :unitPrice "55.92"^^xs:decimal ;
+    :discount "0.98"^^xs:decimal ;
+    :total "3945.72"^^xs:decimal ;
+    :notes "Nulla tellus." .
+
+ids:13 a :OrderLine ;
+    :product prods:3 ;
+    :quantity "23"^^xs:long ;
+    :unitPrice "44.36"^^xs:decimal ;
+    :discount "0.27"^^xs:decimal ;
+    :total "275.48"^^xs:decimal ;
+    :notes "" .
+
+:ids a :Order ;
+    :id "2"^^xs:long ;
+    :order_date "2016-11-11" ;
+    :ship_date "2016-11-16 00:54:48 UTC" ;
+    :customerId cids:2 ;
+    :paymentTerms "net30" ;
+    :orderLine ids:20, ids:21 ;
+    :notes "" ;
+    :status taxo:new .
+
+ids:21 a :OrderLine ;
+    :product prods:1 ;
+    :quantity "38"^^xs:long ;
+    :unitPrice "9.52"^^xs:decimal ;
+    :discount "0.76"^^xs:decimal ;
+    :total "274.94"^^xs:decimal ;
+    :notes "Nulla tempus. Vivamus in felis eu sapien cursus vestibulum. Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem. Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit. Donec diam neque, vestibulum eget, vulputate ut, ultrices vel, augue." .
+
+ids:22 a :OrderLine ;
+    :product prods:5 ;
+    :quantity "41"^^xs:long ;
+    :unitPrice "91.9"^^xs:decimal ;
+    :discount "0.15"^^xs:decimal ;
+    :total "565.19"^^xs:decimal ;
+    :notes "Vivamus in felis eu sapien cursus vestibulum. Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem. Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit." .
+
+:ids:3 a :Order ;
+    :id "3"^^xs:long ;
+    :order_date "2016-04-04"^^xs:date ;
+    :ship_date "2016-04-09 07:04:23"^^xs:dateTime ;
+    :customerId cids:3 ;
+    :paymentTerms taxo:PIA ;
+    :orderLine ids:31, ids:32, ids:33 ;
+    :notes "" ;
+    :status taxo:in-progress .
+
+ids:31 a :OrderLine ;
+    :product prods:4 ;
+    :quantity "32"^^xs:long ;
+    :unitPrice "12.22"^^xs:decimal ;
+    :discount "0.33"^^xs:decimal ;
+    :total "129.04"^^xs:decimal ;
+    :notes "Fusce lacus purus, aliquet at, feugiat non, pretium quis, lectus. Suspendisse potenti. In eleifend quam a odio. In hac habitasse platea dictumst. Maecenas ut massa quis augue luctus tincidunt. Nulla mollis molestie lorem. Quisque ut erat. Curabitur gravida nisi at nibh." .
+
+ids:32 a :OrderLine ;
+   :product prods:5 ;
+   :quantity "98"^^xs:long ;
+   :unitPrice "57.53"^^xs:decimal ;
+   :discount "0.04"^^xs:decimal ;
+   :total "225.52"^^xs:decimal ;
+   :notes "" .
+
+ids:33 a :OrderLine ;
+   :product prods:2 ;
+   :quantity "87"^^xs:long ;
+   :unitPrice "59.81" ;
+   :discount "0.89" ;
+   :total "4631.09" ;
+   :notes "" .
+', "turtle")
+return ($triples
+,
+sem:graph-insert(sem:iri("http://marklogic.com/example/graphs/orders"), $triples))</query><query name="Load-Product-Data" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+import module namespace sem = "http://marklogic.com/semantics" at "/MarkLogic/semantics.xqy";
+
+(: note here, relatedTo points to bnodes that we don't know much about.  A refinement to these triples would be to model
+   ProductRelations, which would have a reference to a product and the enum as a type :)
+let $triples := sem:rdf-parse('
+
+@prefix : &lt;http://marklogic.com/example/ontology/&gt; . 
+@prefix ids: &lt;http://marklogic.com/example/products/&gt; . 
+@prefix taxo: &lt;http://marklogic.com/example/taxonomies/&gt; .
+@prefix xs: &lt;http:///www.w3.org/2001/&gt; .
+
+ids:1 a :Product ;
+  :id    "1"^^xs:long ;
+  :name  "Regrant"^^xs:string ;
+  :sku   "664229048-8"^^xs:string ;
+  :category taxo:interdum ;
+  :relatedTo [
+       :name "massa" ;
+       :relationship taxo:substitute ;
+     ],
+     [
+       :name "ac" ;
+       :relationship taxo:required ;
+     ] ,
+     [ :name "hac" ;
+       :relationship "upgrade" ;
+     ] .
+ids:2 a :Product ;
+    :id "2"^^xs:long ;
+    :name "Biodex"^^xs:string ;
+    :sku "949037899-2"^^xs:string ;
+    :category taxo:mi ;
+    :relatedTo [
+        :name "dapibus" ;
+        :relationship taxo:complement ;
+    ],
+    [
+        :name "est" ;
+        :relationship taxo:required ;
+    ],
+    [
+        :name "nulla" ;
+        :relationship taxo:upgrade ;
+    ] .
+ids:3 a :Product ;
+    :id "3"^^xs:long ;
+    :name "Sonair"^^xs:string ;
+    :sku "317294048-9"^^xs:string ;
+    :category taxo:mauris ;
+    :relatedTo [
+        :name "turpis"^^xs:string ;
+        :relationship taxo:complement ;
+    ],
+    [
+        :name "nam"^^xs:string ;
+        :relationship taxo:upgrade ;
+    ],
+    [
+        :name "eget"^^xs:string ;
+        :relationship taxo:complement ;
+    ] .
+ids:4 a :Product ;
+    :id "4"^^xs:long ;
+    :name "Zaam-Dox"^^xs:string ;
+    :sku "405785176-3"^^xs:string ;
+    :category taxo:proin ;
+    :relatedTo [
+        :name "feugiat"^^xs:string ;
+        :relationship taxo:substitute ;
+    ] .
+ids:5 a :Product ;
+    :id "5"^^xs:long ;
+    :name "Domainer"^^xs:string ;
+    :sku "189152305-8"^^xs:string ;
+    :category "quis";
+    :relatedTo [
+        :name "metus"^^xs:string ;
+        :relationship taxo:upgrade ;
+    ],
+    [
+        :name "sit"^^xs:string ;
+        :relationship taxo:upgrade ;
+    ] .
+', "turtle")
+return
+(
+$triples
+,sem:graph-insert(sem:iri("http://marklogic.com/example/graphs/products"), $triples)
+       )      </query></workspace></export>
