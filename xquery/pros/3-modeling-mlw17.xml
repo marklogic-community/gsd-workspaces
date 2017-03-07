@@ -1,4 +1,4 @@
-<export><workspace name="3-Modeling"><query name="Semantically-enhanced model descriptor" focus="false" listorder="2" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+<export><workspace name="3-modeling-mlw17"><query name="Semantically-enhanced model descriptor" focus="false" listorder="2" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 let $full-model :=
 &lt;es:model&gt;
