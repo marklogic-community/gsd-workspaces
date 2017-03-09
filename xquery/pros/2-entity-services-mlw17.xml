@@ -1,0 +1,552 @@
+<export><workspace name="2-entity-services-mlw17"><query name="Model" focus="false" listorder="2" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+
+let $full-model :=
+&lt;es:model&gt;
+  &lt;es:info&gt;
+    &lt;es:title&gt;ECommerce&lt;/es:title&gt;
+    &lt;es:version&gt;0.0.1&lt;/es:version&gt;
+    &lt;es:description&gt;A model to describe the Customers, Products, and Orders in an ECommerce Scenario&lt;/es:description&gt;
+    &lt;es:base-uri&gt;http://marklogic.com/example/ontology/&lt;/es:base-uri&gt;
+  &lt;/es:info&gt;
+  &lt;es:definitions&gt;
+    &lt;Customer&gt;
+      &lt;es:properties&gt;
+        &lt;id&gt;
+          &lt;es:datatype&gt;int&lt;/es:datatype&gt;
+          &lt;es:description&gt;An integer to uniquely identify customers.&lt;/es:description&gt;
+        &lt;/id&gt;
+        &lt;firstName&gt;
+          &lt;es:datatype&gt;string&lt;/es:datatype&gt;
+          &lt;es:description&gt;The given name of the customer.&lt;/es:description&gt;
+        &lt;/firstName&gt;
+        &lt;lastName&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;es:description&gt;The surname of the customer.&lt;/es:description&gt;&lt;/lastName&gt;
+        &lt;email&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;es:description&gt;The customer's email address, used for contacting&lt;/es:description&gt;&lt;/email&gt;
+        &lt;ssn&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;es:description&gt;The customer's social security number (PII!)&lt;/es:description&gt;&lt;/ssn&gt;
+        &lt;phone&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;es:description&gt;The customer's phone number.&lt;/es:description&gt;&lt;/phone&gt;
+        &lt;billTo&gt;&lt;es:ref&gt;#/definitions/Address&lt;/es:ref&gt;&lt;es:description&gt;Customers address for getting billing information.&lt;/es:description&gt;&lt;/billTo&gt;
+        &lt;shipTo&gt;&lt;es:ref&gt;#/definitions/Address&lt;/es:ref&gt;&lt;es:description&gt;Customer's physical address for receiving our products.&lt;/es:description&gt;&lt;/shipTo&gt;
+        &lt;segment&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;es:description&gt;A customer segment, for marketing differentiation.&lt;/es:description&gt;&lt;/segment&gt;
+        &lt;region&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;es:description&gt;Region of the country that the customer lives in, for marketing and support communication.&lt;/es:description&gt;&lt;/region&gt;
+      &lt;/es:properties&gt;
+      &lt;es:primary-key&gt;id&lt;/es:primary-key&gt;
+    &lt;/Customer&gt;
+    &lt;Address&gt;
+      &lt;es:properties&gt;
+         &lt;street&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/street&gt;
+         &lt;city&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/city&gt;
+         &lt;state&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/state&gt;
+         &lt;zip&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/zip&gt;
+         &lt;latitude&gt;&lt;es:datatype&gt;decimal&lt;/es:datatype&gt;&lt;/latitude&gt;
+         &lt;longitude&gt;&lt;es:datatype&gt;decimal&lt;/es:datatype&gt;&lt;/longitude&gt;
+      &lt;/es:properties&gt;
+    &lt;/Address&gt;
+    &lt;Order&gt;
+      &lt;es:properties&gt;
+        &lt;id&gt;&lt;es:datatype&gt;int&lt;/es:datatype&gt;&lt;/id&gt;
+        &lt;orderDate&gt;&lt;es:datatype&gt;date&lt;/es:datatype&gt;&lt;/orderDate&gt;
+        &lt;shipDate&gt;&lt;es:datatype&gt;dateTime&lt;/es:datatype&gt;&lt;/shipDate&gt;
+        &lt;customer&gt;&lt;es:ref&gt;#/definitions/Customer&lt;/es:ref&gt;&lt;/customer&gt;
+        &lt;paymentTerms&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;es:description&gt;Terms of payment.  Really an enum, may be 'COD' or...&lt;/es:description&gt;&lt;/paymentTerms&gt;   &lt;!-- really an enum --&gt;
+        &lt;orderLines&gt;&lt;es:datatype&gt;array&lt;/es:datatype&gt;&lt;es:items&gt;&lt;es:ref&gt;#/definitions/OrderLine&lt;/es:ref&gt;&lt;/es:items&gt;&lt;/orderLines&gt;
+      &lt;/es:properties&gt;
+      &lt;es:primary-key&gt;id&lt;/es:primary-key&gt;
+      &lt;es:range-index&gt;orderDate&lt;/es:range-index&gt;
+      &lt;es:range-index&gt;shipDate&lt;/es:range-index&gt;
+      &lt;es:range-index&gt;paymentTerms&lt;/es:range-index&gt;
+      &lt;es:required&gt;customer&lt;/es:required&gt;
+    &lt;/Order&gt;
+    &lt;OrderLine&gt;
+      &lt;es:properties&gt;
+        &lt;product&gt;&lt;es:ref&gt;#/definitions/Product&lt;/es:ref&gt;&lt;/product&gt;
+        &lt;quantity&gt;&lt;es:datatype&gt;int&lt;/es:datatype&gt;&lt;/quantity&gt;
+        &lt;unitPrice&gt;&lt;es:datatype&gt;decimal&lt;/es:datatype&gt;&lt;/unitPrice&gt;
+        &lt;discount&gt;&lt;es:datatype&gt;float&lt;/es:datatype&gt;&lt;/discount&gt;
+        &lt;total&gt;&lt;es:datatype&gt;decimal&lt;/es:datatype&gt;&lt;/total&gt;
+        &lt;notes&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/notes&gt;
+      &lt;/es:properties&gt;
+      &lt;es:word-lexicon&gt;notes&lt;/es:word-lexicon&gt;
+      &lt;es:range-index&gt;total&lt;/es:range-index&gt;
+    &lt;/OrderLine&gt;
+    &lt;Product&gt;
+      &lt;es:properties&gt;
+        &lt;name&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/name&gt;
+        &lt;sku&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/sku&gt;
+        &lt;category&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;!-- enum --&gt;&lt;/category&gt;
+        &lt;relatedProduct&gt;&lt;es:datatype&gt;array&lt;/es:datatype&gt;&lt;es:items&gt;&lt;es:ref&gt;#/definitions/ProductRelation&lt;/es:ref&gt;&lt;/es:items&gt;&lt;/relatedProduct&gt;
+      &lt;/es:properties&gt;
+      &lt;es:primary-key&gt;sku&lt;/es:primary-key&gt;
+      &lt;es:range-index&gt;name&lt;/es:range-index&gt; 
+    &lt;/Product&gt;
+    &lt;ProductRelation&gt;
+      &lt;es:properties&gt;
+        &lt;product&gt;&lt;es:ref&gt;#/definitions/Product&lt;/es:ref&gt;&lt;/product&gt;
+        &lt;relationship&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/relationship&gt;
+      &lt;/es:properties&gt;
+    &lt;/ProductRelation&gt;
+  &lt;/es:definitions&gt;
+&lt;/es:model&gt;
+return xdmp:document-insert("/full-model.xml", $full-model, xdmp:default-permissions(), "http://marklogic.com/entity-services/models")</query><query name="Generate-Test-Instances" focus="false" listorder="3" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+
+for $test-instance at $i in doc("/full-model.xml")=&gt;es:model-from-xml()=&gt;es:model-get-test-instances()
+let $uri := "/instance/"|| fn:local-name($test-instance) || "/" || $i
+return xdmp:document-insert($uri, $test-instance, xdmp:default-permissions(), ("test-instances"))</query><query name="Setup-Instance-Converter" focus="false" listorder="4" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">let $edited-module := text { "
+(: This buffer was created by running
+   xdmp:save('/share/instance.xqy', doc('/full-model.xml')=&gt;es:model-from-xml()=&gt;es:instance-converter-generate() )
+   and then editing the results :)
+
+xquery version '1.0-ml';
+
+
+module namespace eCommerce
+    = 'http://marklogic.com/tutorial-data/ECommerce-0.0.1';
+
+import module namespace es = 'http://marklogic.com/entity-services'
+    at '/MarkLogic/entity-services/entity-services.xqy';
+
+declare option xdmp:mapping 'false';
+
+
+declare function eCommerce:extract-instance-Customer(
+    $source as node()?
+) as map:map
+{
+    let $source-node := eCommerce:init-source($source, 'Customer')
+
+    let $instance := json:object()
+        =&gt;eCommerce:add-attachments($source-node, $source)
+        =&gt;map:with('$type', 'Customer')
+    return
+    if (empty($source-node/*))
+    then $instance=&gt;map:with('$ref', $source-node/text())
+    else
+    $instance
+    =&gt;   map:with('id',                     xs:int($source-node/customer_id))
+    =&gt;es:optional('firstName',              xs:string($source-node/first_name))
+    =&gt;es:optional('lastName',               xs:string($source-node/last_name))
+    =&gt;es:optional('email',                  xs:string($source-node/email)) 
+    =&gt;es:optional('ssn',                    xs:string($source-node/ssn))
+    =&gt;es:optional('phone',                  xs:string($source-node/phone))
+    =&gt;es:optional('department',             xs:string($source-node/department))
+    =&gt;es:optional('billTo',                 eCommerce:extract-instance-Address($source-node/billing_address))
+    =&gt;es:optional('shipTo',                 eCommerce:extract-instance-Address($source-node/shipping_address))
+    =&gt;es:optional('segment',                xs:string($source-node/segment))
+    =&gt;es:optional('region',                 xs:string($source-node/region))
+};
+
+
+
+declare function eCommerce:extract-instance-Address(
+    $source as node()?
+) as map:map
+{
+    let $source-node := eCommerce:init-source($source, 'Address')
+
+    let $instance := json:object()
+        =&gt;eCommerce:add-attachments($source-node, $source)
+        =&gt;map:with('$type', 'Address')
+    return
+
+    if (empty($source-node/*))
+         then $instance=&gt;map:with('$ref', $source-node/text())
+     else
+     $instance
+     =&gt;es:optional('street',                 xs:string($source-node/street))
+     =&gt;es:optional('city',                   xs:string($source-node/city))
+     =&gt;es:optional('state',                  xs:string($source-node/state))
+     =&gt;es:optional('zip',                    xs:string($source-node/zip))
+     =&gt;es:optional('latitude',               xs:decimal($source-node/latitude))
+     =&gt;es:optional('longitude',              xs:decimal($source-node/longitude))
+ };
+
+
+ declare function eCommerce:extract-instance-Order(
+     $source as node()?
+ ) as map:map
+ {
+     let $source-node := eCommerce:init-source($source, 'Order')
+
+     let $instance := json:object()
+         =&gt;eCommerce:add-attachments($source-node, $source)
+         =&gt;map:with('$type', 'Order')
+     return
+     if (empty($source-node/*))
+     then $instance=&gt;map:with('$ref', $source-node/text())
+     else
+     $instance
+     =&gt;   map:with('id',                     xs:int($source-node/id))
+     =&gt;es:optional('orderDate',             xs:date($source-node/order_date))
+     =&gt;es:optional('shipDate',              xdmp:parse-dateTime('[Y]-[M]-[D] [H]:[m]:[s]', $source-node/ship_date))
+     (: The following property is a local reference.  :)
+     =&gt;   map:with('customer',               eCommerce:extract-instance-Customer($source-node/customer_id))
+     =&gt;es:optional('paymentTerms',           xs:string($source-node/payment_terms))
+     (: The following property is a local reference.  :)
+     =&gt;es:optional('orderLines',             es:extract-array($source-node/order_lines/order_line, eCommerce:extract-instance-OrderLine#1))
+ };
+
+ declare function eCommerce:extract-instance-OrderLine(
+     $source as node()?
+ ) as map:map
+ {
+     let $source-node := eCommerce:init-source($source, 'OrderLine')
+
+     let $instance := json:object()
+         =&gt;eCommerce:add-attachments($source-node, $source)
+         =&gt;map:with('$type', 'OrderLine')
+     return
+     if (empty($source-node/*))
+     then $instance=&gt;map:with('$ref', $source-node/text())
+     else
+     $instance
+          (: The following property is a local reference.  :)
+     =&gt;es:optional('product',                eCommerce:extract-instance-Product($source-node/product))
+     =&gt;es:optional('quantity',               xs:int($source-node/quantity))
+     =&gt;es:optional('unitPrice',              xs:decimal($source-node/unitPrice))
+     =&gt;es:optional('discount',               xs:float($source-node/discount))
+     =&gt;es:optional('total',                  xs:decimal($source-node/total))
+     =&gt;es:optional('notes',                  xs:string($source-node/notes))
+ };
+
+ declare function eCommerce:extract-instance-Product(
+     $source as node()?
+ ) as map:map
+ {
+     let $source-node := eCommerce:init-source($source, 'Product')
+
+     let $instance := json:object()
+         =&gt;eCommerce:add-attachments($source-node, $source)
+         =&gt;map:with('$type', 'Product')
+
+     return
+     if (empty($source-node/*))
+     then $instance=&gt;map:with('$ref', $source-node/text())
+     else
+     $instance
+     =&gt;es:optional('name',                   xs:string($source-node/name))
+     =&gt;   map:with('sku',                    xs:string($source-node/sku))
+     =&gt;es:optional('category',               xs:string($source-node/category))
+     (: The following property is a local reference.  :)
+     =&gt;es:optional('relatedProduct',         es:extract-array($source-node/related_products/related_product, eCommerce:extract-instance-ProductRelation#1))
+ };
+
+ declare function eCommerce:extract-instance-ProductRelation(
+     $source as node()?
+ ) as map:map
+ {
+     let $source-node := eCommerce:init-source($source, 'ProductRelation')
+
+     let $instance := json:object()
+         =&gt;eCommerce:add-attachments($source-node, $source)
+         =&gt;map:with('$type', 'ProductRelation')
+
+     return
+
+     if (empty($source-node/*))
+     then $instance=&gt;map:with('$ref', $source-node/text())
+     else
+
+     $instance
+     (: The following property is a local reference.  :)
+     =&gt;es:optional('product',                eCommerce:extract-instance-Product($source-node/product_name))
+     =&gt;es:optional('relationship',           xs:string($source-node/relationship))
+     };
+
+
+
+
+
+(:~
+ : Turns an entity instance into an XML structure.
+ : This out-of-the box implementation traverses a map structure
+ : and turns it deterministically into an XML tree.
+ : Using this function as-is should be sufficient for most use
+ : cases, and will play well with other generated artifacts.
+ : @param $entity-instance A map:map instance returned from one of the extract-instance
+ :    functions.
+ : @return An XML element that encodes the instance.
+ :)
+declare function eCommerce:instance-to-canonical-xml(
+    $entity-instance as map:map
+) as element()
+{
+    (: Construct an element that is named the same as the Entity Type :)
+    element { map:get($entity-instance, '$type') }  {
+        if ( map:contains($entity-instance, '$ref') )
+        then map:get($entity-instance, '$ref')
+        else
+            for $key in map:keys($entity-instance)
+            let $instance-property := map:get($entity-instance, $key)
+            where ($key castable as xs:NCName)
+            return
+                typeswitch ($instance-property)
+                (: This branch handles embedded objects.  You can choose to prune
+                   an entity's representation of extend it with lookups here. :)
+                case json:object+
+                    return
+                        for $prop in $instance-property
+                        return element { $key } { eCommerce:instance-to-canonical-xml($prop) }
+                (: An array can also treated as multiple elements :)
+                case json:array
+                    return
+                        for $val in json:array-values($instance-property)
+                        return
+                            if ($val instance of json:object)
+                            then element { $key } {
+                                attribute datatype { 'array' },
+                                eCommerce:instance-to-canonical-xml($val) }
+                            else element { $key } {
+                                attribute datatype { 'array' },
+                                $val }
+                (: A sequence of values should be simply treated as multiple elements :)
+                case item()+
+                    return
+                        for $val in $instance-property
+                        return element { $key } { $val }
+                                        default return element { $key } { $instance-property }
+    }
+};
+
+
+(:
+ : Wraps a canonical instance (returned by instance-to-canonical-xml())
+ : within an envelope patterned document, along with the source
+ : document, which is stored in an attachments section.
+ : @param $entity-instance an instance, as returned by an extract-instance
+ : function
+ : @return A document which wraps both the canonical instance and source docs.
+ :)
+declare function eCommerce:instance-to-envelope(
+    $entity-instance as map:map
+) as document-node()
+{
+    document {
+        element es:envelope {
+            element es:instance {
+                element es:info {
+                    element es:title { map:get($entity-instance,'$type') },
+                    element es:version { '0.0.1' }
+                },
+                eCommerce:instance-to-canonical-xml($entity-instance)
+            },
+            element es:attachments {
+                map:get($entity-instance, '$attachments')
+            }
+        }
+    }
+};
+
+
+declare private function eCommerce:init-source(
+    $source as node()*,
+    $entity-type-name as xs:string
+) as node()*
+{
+    if ( ($source instance of document-node())
+        or (exists
+            ($source/element()[fn:node-name(.) eq xs:QName($entity-type-name)] )))
+    then $source/node()
+    else $source
+};
+
+
+declare private function eCommerce:add-attachments(
+    $instance as json:object,
+    $source-node as node()*,
+    $source as node()*
+) as json:object
+{
+    $instance
+    =&gt;map:with('$attachments',
+        typeswitch($source-node)
+        case object-node() return xdmp:quote($source)
+        case array-node() return xdmp:quote($source)
+        default return $source)
+};
+"
+}
+
+return xdmp:invoke-function(function() { 
+  xdmp:document-insert("/ext/extractions.xqy", $edited-module) }, 
+  map:map()=&gt;map:with("database", xdmp:database("Modules"))
+  )
+</query><query name="harmonize" focus="false" listorder="5" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+import module namespace my = "http://marklogic.com/tutorial-data/ECommerce-0.0.1" at "/ext/extractions.xqy";
+ 
+for $envelope at $i in 
+(
+collection("customer") ! my:extract-instance-Customer(.) =&gt;my:instance-to-envelope(),
+collection("order") ! my:extract-instance-Order(.)=&gt;my:instance-to-envelope(),
+collection("product") ! my:extract-instance-Product(.)=&gt;my:instance-to-envelope()
+
+)
+return
+xdmp:document-insert("/envelope-" || $i || ".xml", $envelope, xdmp:default-permissions(), "envelopes");
+
+import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+(/es:envelope[es:instance/Order])[1]
+</query><query name="Setup-TDE" focus="false" listorder="6" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+
+let $et := doc("/full-model.xml")=&gt;es:model-from-xml()=&gt;es:extraction-template-generate()
+
+return
+
+xdmp:invoke-function(
+   function() { xdmp:document-insert("/e-Commerce.xml", $et, xdmp:default-permissions(), "http://marklogic.com/xdmp/tde") },
+   map:map()=&gt;map:with("database", xdmp:database("Schemas")))
+</query><query name="full join" focus="false" listorder="10" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="sql">SELECT * from 
+ECommerce.Order l,
+ECommerce.Order_orderLines ol,
+ECommerce.Customer c,
+ECommerce.Product p
+WHERE l.customer = c.id
+and c.firstName like 'B%'
+AND ol.id = l.id
+ORDER BY c.id</query><query name="Model Query" focus="false" listorder="13" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX es: &lt;http://marklogic.com/entity-services#&gt;
+
+SELECT ?s ?p ?o WHERE { 
+  ?s a es:Model ;
+#       ?p ?o
+}
+</query><query name="Type Query" focus="false" listorder="14" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX es: &lt;http://marklogic.com/entity-services#&gt;
+
+SELECT ?s ?p ?o
+WHERE { 
+  ?s a es:EntityType ;
+#       ?p ?o
+}
+</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">(:
+
+This workspace explore data modeling with Entity Services.
+
+You will create a model for Customers, Products, and other entities
+that underly the data already seen.
+
+Using that model, you will make an ingestion script to create canonical
+instances of this model from source documents, and then see how
+generated artifacts can speed development against these models.
+
+:)</query><query name="Customers" focus="false" listorder="11" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="sql">SELECT * from 
+ECommerce.Customer c
+WHERE c.firstName like '%'
+ORDER BY c.id
+</query><query name="Addresses" focus="false" listorder="12" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="sql">SELECT billTo, shipTo from ECommerce.Customer</query><query name="Instance Query" focus="false" listorder="16" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX ecommerce: &lt;http://marklogic.com/example/ontology/ECommerce-0.0.1/&gt; 
+
+SELECT ?s ?p ?o
+WHERE { 
+   ?s a ecommerce:Customer; 
+#       ?p ?o .
+   
+}
+</query><query name="Doc Retrieval" focus="false" listorder="17" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX es: &lt;http://marklogic.com/entity-services#&gt;
+PREFIX fn: &lt;http://www.w3.org/2005/xpath-functions#&gt;
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+PREFIX cts: &lt;http://marklogic.com/cts#&gt;
+
+SELECT ?doc
+WHERE { 
+  ?s rdfs:isDefinedBy ?o .
+  BIND (fn:doc(?o) as ?doc) 
+  FILTER (cts:contains(?doc, cts:and-query(("Baby","Bruce"))))
+}</query><query name="Property Query" focus="false" listorder="15" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX es: &lt;http://marklogic.com/entity-services#&gt;
+
+SELECT ?s ?p ?o 
+WHERE 
+{ 
+  ?s a es:Property ;
+#       ?p ?o
+}</query><query name="Optic Model" focus="false" listorder="18" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+let $es := op:prefixer("http://marklogic.com/entity-services#")
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+
+return
+op:from-triples( (
+   op:pattern( op:col("s"), $rdf("type"), $es("Model") ),
+   op:pattern( op:col("s"), op:col("p"), op:col("o") )
+   ) )
+=&gt;op:result()</query><query name="Optic Type" focus="false" listorder="19" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+let $es := op:prefixer("http://marklogic.com/entity-services#")
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+
+return
+op:from-triples( (
+   op:pattern( op:col("s"), $rdf("type"), $es("EntityType") ),
+   op:pattern( op:col("s"), op:col("p"), op:col("o") )
+   ) )
+=&gt;op:result()</query><query name="Optic Property" focus="false" listorder="20" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+let $es := op:prefixer("http://marklogic.com/entity-services#")
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+
+return
+op:from-triples( (
+   op:pattern( op:col("s"), $rdf("type"), $es("Property") ),
+   op:pattern( op:col("s"), op:col("p"), op:col("o") )
+   ) )
+=&gt;op:result()</query><query name="Optic Documents" focus="false" listorder="21" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy";
+
+let $es := op:prefixer("http://marklogic.com/entity-services#")
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+let $fn := op:prefixer("http://www.w3.org/2005/xpath-functions#")
+let $rdfs := op:prefixer("http://www.w3.org/2000/01/rdf-schema#")
+let $cts := op:prefixer("http://marklogic.com/cts#")
+let $result := 
+ op:from-triples( (
+   op:pattern( op:col("s"), $rdfs("isDefinedBy"), op:col("doc") )
+   ) )=&gt;op:select("doc")=&gt;op:result()
+
+return $result ! fn:doc(map:get(., "doc"))//firstName
+</query><query name="Setup-Indexes" focus="false" listorder="7" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+
+let $props := doc("/full-model.xml")=&gt;es:model-validate()=&gt;es:database-properties-generate()
+let $quoted := xdmp:quote($props)
+  =&gt;replace("%%DATABASE%%", "Documents")
+  =&gt;replace("%%SCHEMAS_DATABASE%%", "Schemas")
+  =&gt;replace("OrderLine", "Order/orderLines/OrderLine")
+
+return
+(
+$quoted,
+xdmp:http-put("http://localhost:8002/manage/v2/databases/Documents/properties",
+   &lt;options xmlns="xdmp:http"&gt;
+       &lt;authentication method="digest"&gt;
+         &lt;username&gt;admin&lt;/username&gt;
+         &lt;password&gt;admin&lt;/password&gt;
+       &lt;/authentication&gt;
+       &lt;headers&gt;
+         &lt;content-type&gt;application/json&lt;/content-type&gt;
+       &lt;/headers&gt;
+     &lt;/options&gt;
+     , text { $quoted })
+)</query><query name="Lexicons" focus="false" listorder="8" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">let $values-fn := function($path-range-index) {
+cts:values(
+  cts:path-reference(
+    $path-range-index, 
+    (), 
+    map:entry("es", "http://marklogic.com/entity-services")))
+}
+return
+
+(: All the values in the Order/orderDate property (xs:date)
+:)
+$values-fn("//es:instance/Order/orderDate")
+
+
+(: All the values in the Order/shipDate property (xs:dateTime)
+$values-fn("//es:instance/Order/shipDate")
+:)
+
+(: All the values in the OrderLine/total property
+$values-fn("//es:instance/Order/orderLines/OrderLine/total")
+:)
+</query><query name="Aggregates" focus="false" listorder="9" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">let $agg-fn := function($path-range-index) {
+cts:sum-aggregate(
+  cts:path-reference(
+    $path-range-index, 
+    (), 
+    map:entry("es", "http://marklogic.com/entity-services")))
+}
+
+return
+$agg-fn("//es:instance/Order/orderLines/OrderLine/total")</query></workspace></export>
