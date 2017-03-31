@@ -1,4 +1,5 @@
-<export><workspace name="1-xml-load-mlw17"><query name="load-customer-data" focus="false" listorder="2" taborder="" active="false" database="369696519400586114" server="3092011375014892023" database-name="Documents" server-name="App-Services" mode="xquery">let $doc :=
+<?xml version="1.0" encoding="UTF-8"?>
+<export><workspace name="1-xml-load-mlw17"><query active="false" focus="false" mode="xquery" name="load-customer-data">let $doc :=
 &lt;dataset&gt;
   &lt;record&gt;
     &lt;customer_id&gt;1&lt;/customer_id&gt;
@@ -87,7 +88,7 @@ return
        return xdmp:document-insert($uri, &lt;customer&gt;{$d/node()}&lt;/customer&gt;, (), ("as-is","customer")),
 "You have inserted three customer records into the database.  
 They come from a hypothetical 'upstream system'.
-To view one, use the 'Explore' button and find '/customer-1.xml'.")</query><query name="load-order-data" focus="false" listorder="3" taborder="" active="false" database="369696519400586114" server="3092011375014892023" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+To view one, use the 'Explore' button and find '/customer-1.xml'.")</query><query active="false" focus="false" mode="xquery" name="load-order-data">xquery version "1.0-ml";
 declare namespace html = "http://www.w3.org/1999/xhtml";
 let $doc :=
 &lt;dataset&gt;
@@ -404,7 +405,7 @@ return
        return xdmp:document-insert($uri, &lt;order&gt;{$d/node()}&lt;/order&gt;, (), ("as-is","order")),
 "You have inserted three order records into the database.  
 They come from a hypothetical 'upstream system'.
-To view one, use the 'Explore' button and find '/order-1.xml'")</query><query name="load-product-data" focus="false" listorder="4" taborder="" active="false" database="369696519400586114" server="3092011375014892023" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+To view one, use the 'Explore' button and find '/order-1.xml'")</query><query active="false" focus="false" mode="xquery" name="load-product-data">xquery version "1.0-ml";
 declare namespace html = "http://www.w3.org/1999/xhtml";
 let $doc :=
 &lt;dataset&gt;
@@ -509,14 +510,14 @@ return (for $d at $idx in $docs
 "You have inserted five product records into the database.  
 They come from a hypothetical 'upstream system'.
 To view one, use the 'Explore' button and find '/product-1.xml'.")
-       </query><query name="collection-count" focus="false" listorder="5" taborder="" active="false" database="369696519400586114" server="3092011375014892023" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+       </query><query active="false" focus="false" mode="xquery" name="collection-count">xquery version "1.0-ml";
 (:
 : A simple script to return the collections 
  : loaded into the system with their counts.
 :)
 
 for $c in cts:collections()
-return fn:concat($c," : ",fn:count(fn:collection($c)))</query><query name="clear database" focus="false" listorder="6" taborder="" active="false" database="369696519400586114" server="3092011375014892023" database-name="Documents" server-name="App-Services" mode="xquery">(: WARNING 
+return fn:concat($c," : ",fn:count(fn:collection($c)))</query><query active="false" focus="false" mode="xquery" name="clear database">(: WARNING 
  : This script deletes all the documents in the database.
  : Sometimes you just want to clean up and start over.
  : A blunt tool, which sometimes is just what you want.
@@ -526,8 +527,8 @@ return fn:concat($c," : ",fn:count(fn:collection($c)))</query><query name="clear
  : but cannot run on a very large database becuase it is a single 
  : transaction.
 for $d in collection() return xdmp:document-delete(base-uri($d))
-:)</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="369696519400586114" server="3092011375014892023" database-name="Documents" server-name="App-Services" mode="xquery">(:
+:)</query><query active="true" focus="true" mode="xquery" name="Intro">"
  This workspace simply contains the very first data to be loaded into the workshop.
  After running all the tabs (except 'clear database') you will have several customers
  orders, and products, in a form that will metamorphasize over the course of the workshop.
-:)</query></workspace></export>
+"</query></workspace></export>
