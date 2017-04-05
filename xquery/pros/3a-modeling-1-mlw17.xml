@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<export><workspace name="3a-modeling-1-mlw17"><query active="false" focus="false" mode="xquery" name="Refactor to Reference Type">(: this model extends the domain to include another domain type, a customer Segment. :) 
+<export><workspace name="3a-modeling-1-mlw17"><query active="true" focus="false" mode="xquery" name="Model">(: this model extends the domain to include another domain type, a customer Segment. :) 
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 let $model :=
@@ -21,6 +21,7 @@ let $model :=
         &lt;phone&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;es:description&gt;The customer's phone number.&lt;/es:description&gt;&lt;/phone&gt;
         &lt;billTo&gt;&lt;es:ref&gt;#/definitions/Address&lt;/es:ref&gt;&lt;es:description&gt;Customers address for getting billing information.&lt;/es:description&gt;&lt;/billTo&gt;
         &lt;shipTo&gt;&lt;es:ref&gt;#/definitions/Address&lt;/es:ref&gt;&lt;es:description&gt;Customer's physical address for receiving our products.&lt;/es:description&gt;&lt;/shipTo&gt;
+        &lt;!-- this is the line which defines a reference rather than the string from version 0.0.1 --&gt;
         &lt;segment&gt;&lt;es:ref&gt;#/definitions/Segment&lt;/es:ref&gt;&lt;es:description&gt;A customer segment, for marketing differentiation.&lt;/es:description&gt;&lt;/segment&gt;
         &lt;region&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;es:description&gt;Region of the country that the customer lives in, for marketing and support communication.&lt;/es:description&gt;&lt;/region&gt;
       &lt;/es:properties&gt;
@@ -96,7 +97,7 @@ let $model :=
 return  (xdmp:document-insert("/extended-model.xml", $model, xdmp:default-permissions(), "http://marklogic.com/entity-services/models"),
 "You have now inserted the XML model in this tab info the database.  Here we validate it and show its JSON representation and its triples:",
 es:model-validate($model),
-cts:triples((), (), (), (), (), cts:document-query("/extended-model.xml")))</query><query active="false" focus="false" mode="xquery" name="instance converter">(: This instance converter module accomodates the new Segment entity type :)
+cts:triples((), (), (), (), (), cts:document-query("/extended-model.xml")))</query><query active="true" focus="false" mode="xquery" name="instance converter">(: This instance converter module accomodates the new Segment entity type :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 let $edited-module := text { "
@@ -402,17 +403,17 @@ declare private function eCommerce:add-attachments(
 }
 
 return xdmp:invoke-function(function() { 
-  xdmp:document-insert("/ext/extractions-2.xqy", $edited-module) }, 
+  xdmp:document-insert("/ext/extractions-0.0.2.xqy", $edited-module) }, 
   map:map()=&gt;map:with("database", xdmp:database("Modules"))
   ),
   
 "You have inserted an instance converter module into the modules database.
  It can be used by importing it from transforms or other integration code like this:
- import module namespace my = 'http://marklogic.com/tutorial-data/ECommerce-0.0.2' at '/ext/extractions-2.xqy';
-"</query><query active="false" focus="false" mode="xquery" name="harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+ import module namespace my = 'http://marklogic.com/tutorial-data/ECommerce-0.0.2' at '/ext/extractions-0.0.2.xqy';
+"</query><query active="true" focus="false" mode="xquery" name="harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 import module namespace my = "http://marklogic.com/example/ontology/ECommerce-0.0.2"
-  at "/ext/extractions-2.xqy";
+  at "/ext/extractions-0.0.2.xqy";
  
 for $envelope at $i in 
 (
@@ -421,7 +422,7 @@ collection("order")    ! my:extract-instance-Order(.)    =&gt;my:instance-to-env
 collection("product")  ! my:extract-instance-Product(.)  =&gt;my:instance-to-envelope()
 )
 return
-xdmp:document-insert("/envelope-" || $i || ".xml", $envelope, xdmp:default-permissions(), "envelopes");
+xdmp:document-insert("/envelope-0.0.2" || $i || ".xml", $envelope, xdmp:default-permissions(), "envelopes");
 "You have just run extraction code to create envelopes from the upstream source documents like this:",
 (//*:instance[*:info/*:version="0.0.2"]/Product)[1]
 ;
@@ -541,12 +542,14 @@ ECommerce.Customer c, ECommerce.Segment s
 WHERE c.segment = s.code
 </query><query active="false" focus="false" mode="sql" name="Addresses">select * from ECommerce.Address</query><query active="false" focus="false" mode="sql" name="Address Join">SELECT firstName, lastName, zip 
 FROM ECommerce.Customer c, ECommerce.Address a
-WHERE c.billTo = a.hash</query><query active="true" focus="false" mode="xquery" name="Intro">(:
+WHERE c.billTo = a.hash</query><query active="true" focus="false" mode="xquery" name="Intro">"
  This workspace concentrates on how to refactor or change a model, and also
  how to extend a model with triples.
  
- First, we consider how to change an entity services model over time, by
+ We consider how to change an entity services model over time, by
  turning a string property into its own entity type.
  
- We also extract related products from sparse data into products of their own right.
- :)</query></workspace></export>
+ Also in this workspace we change the harmonizations to extract related products
+ from sparse data into instances, whereas in version 0.0.1 we dropped them on the floor
+ as degenerate cases.
+"</query></workspace></export>

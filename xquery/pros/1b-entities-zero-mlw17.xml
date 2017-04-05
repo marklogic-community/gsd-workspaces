@@ -239,7 +239,7 @@ return xdmp:invoke-function(function() {
 ,
 "You have inserted an instance converter module into the modules database.
  It can be used by importing it from transforms or other integration code like this:
- import module namespace my = 'http://marklogic.com/tutorial-data/ECommerce-0.0.0' at '/ext/extractions.xqy';
+ import module namespace my = 'http://marklogic.com/tutorial-data/ECommerce-0.0.0' at '/ext/extractions-0.0.0.xqy';
 "</query><query active="false" focus="false" mode="xquery" name="harmonize">(: This query runs code in the instnace converter, harmonizing your source documents into canonical envelopes :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 import module namespace my = "http://marklogic.com/tutorial-data/ECommerce-0.0.0" at "/ext/extractions.xqy";
@@ -251,11 +251,11 @@ collection("order") ! my:extract-instance-Order(.)=&gt;my:instance-to-envelope()
 collection("product") ! my:extract-instance-Product(.)=&gt;my:instance-to-envelope()
 )
 return
-xdmp:document-insert("/envelope-" || $i || ".xml", $envelope, xdmp:default-permissions(), "envelopes");
+xdmp:document-insert("/envelope-0.0.0-" || $i || ".xml", $envelope, xdmp:default-permissions(), ("0.0.0","envelopes"));
 
 "You have run extraction code to create envelopes from the upstream source documents like this:",
 (/*:envelope[*:instance/Product])[1]
-</query><query active="false" focus="false" mode="xquery" name="Setup-TDE">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+</query><query active="true" focus="true" mode="xquery" name="Setup-TDE">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 import module namespace tde = "http://marklogic.com/xdmp/tde" at "/MarkLogic/tde.xqy";
 
 let $et := doc("/model-zero.xml")=&gt;es:model-from-xml()=&gt;es:extraction-template-generate()
@@ -269,7 +269,7 @@ tde:template-insert("/e-Commerce.tdex", $et)
  the schemas database.  It will be used to create triples and rows from the envelope
  documents.  Here is the template:",
 $et) 
-</query><query active="true" focus="true" mode="xquery" name="Intro">"
+</query><query active="true" focus="false" mode="xquery" name="Intro">"
 This workspace starts to explore data modeling with Entity Services.
 
 You'll declare a model with entities Customers, Products and their

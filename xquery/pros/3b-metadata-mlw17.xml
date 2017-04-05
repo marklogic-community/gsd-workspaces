@@ -1,2 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<export><workspace name="3b-metadata-mlw17"><query active="true" focus="true" mode="javascript" name="Query 1">'use strict';&#xd;&#xd;</query></workspace></export>
+<export><workspace name="3b-metadata-mlw17"><query active="true" focus="true" mode="xquery" name="Intro">"
+
+This workspace considers metadata.
+
+Metadata is used to enable data governance, documentation and quality.
+Metadata about models can be used to cite sources of data, history of the model,
+stakeholders, or any number of other aspects of data management used to contextualize
+the model or the data conforming to it.  It might also describe equvalencies
+aor differences among models.  There is no limit really.
+
+Metadata about instances could cite source systems and decisions about value origins,
+confidence scores, or editorial.
+
+In 
+"</query></workspace></export>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export><workspace name="5a-optic-mlw17"><query active="true" focus="false" mode="xquery" name="Intro">"
+This workspace provides examples of the Optic API, which is new in MarkLogic 9.
+
+This API provides all of the query operators familiar to SQL or SPARQL developers,
+but in within a programming language.
+
+MarkLogic 9 provides the same Optic API in JavaScript, XQuery, and Java, so queries
+that you write can be easily ported from one language to another, and will run the
+same in any of the host languages, and regardless of whether the executing platform
+is MarkLogic enode or a client-side system.
+
+"</query><query active="true" focus="false" mode="xquery" name="Your Models">(: This is an Optic query, crafted to report on the models in your database. 
+ :)
+import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+let $es := op:prefixer("http://marklogic.com/entity-services#")
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+
+(: Thes variables will be used to assemble the various joins I need :)
+let $model := op:col("model")
+let $type := op:col("type")
+let $property := op:col("property")
+let $property2 := op:col("property2")
+
+(: The entity services graph connects models to types to properties :)
+return
+(: The first from-triples block contains columns I expect in each row. :)
+op:from-triples( (
+   (: from the model, get its metadata :)
+   op:pattern( $model, $rdf("type"), $es("Model") ),
+   op:pattern( $model, $es("definitions"), $type),
+   op:pattern( $model, $es("version"), op:col("version")),
+   op:pattern( $model, $es("title"), op:col("modelTitle")),
+
+   (: from the type, get the primary key and all the property objects :)
+   op:pattern( $type, $es("title"), op:col("typeTitle")),
+   op:pattern( $type, $es("primaryKey"), op:col("pk")),
+   op:pattern( $type, $es("property"), $property),
+   op:pattern( $property, $rdf("type"), $es("Property")),
+   op:pattern( $property, $es("title"), op:col("propertyLabel"))
+   ))
+(: join to information about relationships.  outer join because not every property is a relationship :)
+=&gt;op:join-left-outer(
+    (: we need a union to get 'ref' from both arrays and singleton references. :)
+    op:union(
+      op:from-triples( (
+        op:pattern( $property2, $es("items"), op:col("items")),
+        op:pattern( op:col("items"), $es("ref"), op:col("referent")))),
+      op:from-triples( (
+        op:pattern( $property2, $es("ref"), op:col("referent")))))
+    (: join the referent from either items or directly in order to find the name of the propety :) 
+    =&gt;op:join-inner(
+      op:from-triples( (op:pattern( op:col("referent"), $es("title"), op:col("relationshipWith"))) ), 
+      op:on(op:col("referent"), op:col("referent") )), 
+    op:on($property, $property2))
+(: =&gt;op:where( op:eq(op:col("version"), "0.0.0")) :)
+=&gt;op:order-by("version")
+=&gt;op:select( ("modelTitle", "version", "typeTitle", "propertyLabel", "relationshipWith"))
+=&gt;op:result()</query><query active="true" focus="false" mode="xquery" name="title,version">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+let $es := op:prefixer("http://marklogic.com/entity-services#")
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+let $model := op:col("model")
+let $type := op:col("type")
+return
+op:from-triples( (
+   (: from the model, get its metadata :)
+   op:pattern( $model, $rdf("type"), $es("Model") ),
+   op:pattern( $model, $es("version"), op:col("version")),
+   op:pattern( $model, $es("title"), op:col("modelTitle"))
+))
+=&gt;op:join-left-outer(
+   op:from-triples(
+     op:pattern( $model, $es("description"), op:col("description"))
+   ))
+=&gt;op:order-by("version")
+=&gt;op:select( ("modelTitle", "version", "description"))
+=&gt;op:where-distinct()
+=&gt;op:result()</query><query active="true" focus="false" mode="xquery" name="counting instanaces">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+let $es := op:prefixer("http://marklogic.com/entity-services#")
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+let $type := op:col("type")
+return
+op:from-triples( (
+   (: from the model, get its metadata :)
+   op:pattern( $type, $rdf("type"), $es("EntityType") ),
+   op:pattern( $type, $es("version"), op:col("version")),
+   op:pattern( $type, $es("title"), op:col("typeTitle"))
+))
+=&gt;op:join-inner(
+  op:from-triples((
+    op:pattern( op:col("instanceIri"), $rdf("type"), $type)
+    ))
+    =&gt;op:group-by($type, op:count("ct")))
+=&gt;op:order-by("version")
+=&gt;op:select( ("typeTitle", "version", "ct"))
+=&gt;op:where-distinct()
+=&gt;op:result()</query><query active="true" focus="true" mode="xquery" name="Views">xquery version "1.0-ml";&#xd;</query></workspace></export>
