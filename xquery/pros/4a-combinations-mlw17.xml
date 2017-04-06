@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export><workspace name="4a-combinations-mlw17"><query active="true" focus="true" mode="xquery" name="Intro">"
+This workspace explores various use cases and techniques for combining the options you have for
+querying documents and data in MarkLogic.
+
+Since there are different kinds of indexes and query languages in MarkLogic, sometimes you will
+want to manage various aspects of your data in different modes, and hence the combination of APIs
+and query languages may provide simplicity and performance boosts for your use cases.
+
+"</query></workspace></export>

@@ -1,6 +1,7 @@
-<export><workspace name="2-entity-services-mlw17"><query name="Model" focus="false" listorder="2" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+<?xml version="1.0" encoding="UTF-8"?>
+<export><workspace name="2a-entity-services-mlw17"><query active="true" focus="false" mode="xquery" name="Model">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
-let $full-model :=
+let $model :=
 &lt;es:model&gt;
   &lt;es:info&gt;
     &lt;es:title&gt;ECommerce&lt;/es:title&gt;
@@ -85,13 +86,19 @@ let $full-model :=
     &lt;/ProductRelation&gt;
   &lt;/es:definitions&gt;
 &lt;/es:model&gt;
-return xdmp:document-insert("/full-model.xml", $full-model, xdmp:default-permissions(), "http://marklogic.com/entity-services/models")</query><query name="Generate-Test-Instances" focus="false" listorder="3" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+return (xdmp:document-insert("/model.xml", $model, xdmp:default-permissions(), "http://marklogic.com/entity-services/models"),
+"You have now inserted the XML model in this tab info the database.  Here I validate it and show its JSON representation and its triples:",
+es:model-validate($model),
+cts:triples( (), (), (), (), (),cts:document-query("/model.xml")))</query><query active="false" focus="false" mode="xquery" name="Generate-Test-Instances">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
-for $test-instance at $i in doc("/full-model.xml")=&gt;es:model-from-xml()=&gt;es:model-get-test-instances()
+for $test-instance at $i in doc("/model.xml")=&gt;es:model-from-xml()=&gt;es:model-get-test-instances()
 let $uri := "/instance/"|| fn:local-name($test-instance) || "/" || $i
-return xdmp:document-insert($uri, $test-instance, xdmp:default-permissions(), ("test-instances"))</query><query name="Setup-Instance-Converter" focus="false" listorder="4" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">let $edited-module := text { "
+return 
+xdmp:document-insert($uri, $test-instance, xdmp:default-permissions(), ("test-instances")),
+"You have generates some tests intances from your model using es:model-get-test-instances.
+ Here is one of them:", doc('/instance/Customer/1')</query><query active="true" focus="false" mode="xquery" name="Setup-Instance-Converter">let $edited-module := text { "
 (: This buffer was created by running
-   xdmp:save('/share/instance.xqy', doc('/full-model.xml')=&gt;es:model-from-xml()=&gt;es:instance-converter-generate() )
+   xdmp:save('/share/instance.xqy', doc('/model.xml')=&gt;es:model-from-xml()=&gt;es:instance-converter-generate() )
    and then editing the results :)
 
 xquery version '1.0-ml';
@@ -368,7 +375,11 @@ return xdmp:invoke-function(function() {
   xdmp:document-insert("/ext/extractions.xqy", $edited-module) }, 
   map:map()=&gt;map:with("database", xdmp:database("Modules"))
   )
-</query><query name="harmonize" focus="false" listorder="5" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+,
+"You have inserted an instance converter module into the modules database.
+ It can be used by importing it from transforms or other integration code like this:
+ import module namespace my = 'http://marklogic.com/tutorial-data/ECommerce-0.0.1' at '/ext/extractions-0.0.1.xqy';
+"</query><query active="true" focus="false" mode="xquery" name="harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 import module namespace my = "http://marklogic.com/tutorial-data/ECommerce-0.0.1" at "/ext/extractions.xqy";
  
 for $envelope at $i in 
@@ -376,45 +387,27 @@ for $envelope at $i in
 collection("customer") ! my:extract-instance-Customer(.) =&gt;my:instance-to-envelope(),
 collection("order") ! my:extract-instance-Order(.)=&gt;my:instance-to-envelope(),
 collection("product") ! my:extract-instance-Product(.)=&gt;my:instance-to-envelope()
-
 )
 return
-xdmp:document-insert("/envelope-" || $i || ".xml", $envelope, xdmp:default-permissions(), "envelopes");
+xdmp:document-insert("/envelope-0.0.1-" || $i || ".xml", $envelope, xdmp:default-permissions(), "envelopes");
 
-import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
-(/es:envelope[es:instance/Order])[1]
-</query><query name="Setup-TDE" focus="false" listorder="6" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+"You have run extraction code to create envelopes from the upstream source documents like this:",
+(/*:envelope[*:instance/Order])[1]
+</query><query active="true" focus="true" mode="xquery" name="Setup-TDE">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+import module namespace tde = "http://marklogic.com/xdmp/tde" at "/MarkLogic/tde.xqy";
 
-let $et := doc("/full-model.xml")=&gt;es:model-from-xml()=&gt;es:extraction-template-generate()
+let $et := doc("/model.xml")=&gt;es:model-from-xml()=&gt;es:extraction-template-generate()
 
 return
 
-xdmp:invoke-function(
-   function() { xdmp:document-insert("/e-Commerce.xml", $et, xdmp:default-permissions(), "http://marklogic.com/xdmp/tde") },
-   map:map()=&gt;map:with("database", xdmp:database("Schemas")))
-</query><query name="full join" focus="false" listorder="10" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="sql">SELECT * from 
-ECommerce.Order l,
-ECommerce.Order_orderLines ol,
-ECommerce.Customer c,
-ECommerce.Product p
-WHERE l.customer = c.id
-and c.firstName like 'B%'
-AND ol.id = l.id
-ORDER BY c.id</query><query name="Model Query" focus="false" listorder="13" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX es: &lt;http://marklogic.com/entity-services#&gt;
-
-SELECT ?s ?p ?o WHERE { 
-  ?s a es:Model ;
-#       ?p ?o
-}
-</query><query name="Type Query" focus="false" listorder="14" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX es: &lt;http://marklogic.com/entity-services#&gt;
-
-SELECT ?s ?p ?o
-WHERE { 
-  ?s a es:EntityType ;
-#       ?p ?o
-}
-</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">(:
-
+(
+tde:template-insert("/e-Commerce.tdex", $et)
+,
+"You have just generated an extraction template from the model and put it into
+ the schemas database.  It will be used to create triples and rows from the envelope
+ documents.  Here is the template:",
+$et) 
+</query><query active="true" focus="false" mode="xquery" name="Intro">"
 This workspace explore data modeling with Entity Services.
 
 You will create a model for Customers, Products, and other entities
@@ -423,83 +416,9 @@ that underly the data already seen.
 Using that model, you will make an ingestion script to create canonical
 instances of this model from source documents, and then see how
 generated artifacts can speed development against these models.
+"</query><query active="false" focus="false" mode="xquery" name="Setup Indexes">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy";
 
-:)</query><query name="Customers" focus="false" listorder="11" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="sql">SELECT * from 
-ECommerce.Customer c
-WHERE c.firstName like '%'
-ORDER BY c.id
-</query><query name="Addresses" focus="false" listorder="12" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="sql">SELECT billTo, shipTo from ECommerce.Customer</query><query name="Instance Query" focus="false" listorder="16" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX ecommerce: &lt;http://marklogic.com/example/ontology/ECommerce-0.0.1/&gt; 
-
-SELECT ?s ?p ?o
-WHERE { 
-   ?s a ecommerce:Customer; 
-#       ?p ?o .
-   
-}
-</query><query name="Doc Retrieval" focus="false" listorder="17" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX es: &lt;http://marklogic.com/entity-services#&gt;
-PREFIX fn: &lt;http://www.w3.org/2005/xpath-functions#&gt;
-PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
-PREFIX cts: &lt;http://marklogic.com/cts#&gt;
-
-SELECT ?doc
-WHERE { 
-  ?s rdfs:isDefinedBy ?o .
-  BIND (fn:doc(?o) as ?doc) 
-  FILTER (cts:contains(?doc, cts:and-query(("Baby","Bruce"))))
-}</query><query name="Property Query" focus="false" listorder="15" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX es: &lt;http://marklogic.com/entity-services#&gt;
-
-SELECT ?s ?p ?o 
-WHERE 
-{ 
-  ?s a es:Property ;
-#       ?p ?o
-}</query><query name="Optic Model" focus="false" listorder="18" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
-
-let $es := op:prefixer("http://marklogic.com/entity-services#")
-let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
-
-return
-op:from-triples( (
-   op:pattern( op:col("s"), $rdf("type"), $es("Model") ),
-   op:pattern( op:col("s"), op:col("p"), op:col("o") )
-   ) )
-=&gt;op:result()</query><query name="Optic Type" focus="false" listorder="19" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
-
-let $es := op:prefixer("http://marklogic.com/entity-services#")
-let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
-
-return
-op:from-triples( (
-   op:pattern( op:col("s"), $rdf("type"), $es("EntityType") ),
-   op:pattern( op:col("s"), op:col("p"), op:col("o") )
-   ) )
-=&gt;op:result()</query><query name="Optic Property" focus="false" listorder="20" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
-
-let $es := op:prefixer("http://marklogic.com/entity-services#")
-let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
-
-return
-op:from-triples( (
-   op:pattern( op:col("s"), $rdf("type"), $es("Property") ),
-   op:pattern( op:col("s"), op:col("p"), op:col("o") )
-   ) )
-=&gt;op:result()</query><query name="Optic Documents" focus="false" listorder="21" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
-import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy";
-
-let $es := op:prefixer("http://marklogic.com/entity-services#")
-let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
-let $fn := op:prefixer("http://www.w3.org/2005/xpath-functions#")
-let $rdfs := op:prefixer("http://www.w3.org/2000/01/rdf-schema#")
-let $cts := op:prefixer("http://marklogic.com/cts#")
-let $result := 
- op:from-triples( (
-   op:pattern( op:col("s"), $rdfs("isDefinedBy"), op:col("doc") )
-   ) )=&gt;op:select("doc")=&gt;op:result()
-
-return $result ! fn:doc(map:get(., "doc"))//firstName
-</query><query name="Setup-Indexes" focus="false" listorder="7" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
-
-let $props := doc("/full-model.xml")=&gt;es:model-validate()=&gt;es:database-properties-generate()
+let $props := doc("/model.xml")=&gt;es:model-validate()=&gt;es:database-properties-generate()
 let $quoted := xdmp:quote($props)
   =&gt;replace("%%DATABASE%%", "Documents")
   =&gt;replace("%%SCHEMAS_DATABASE%%", "Schemas")
@@ -507,7 +426,6 @@ let $quoted := xdmp:quote($props)
 
 return
 (
-$quoted,
 xdmp:http-put("http://localhost:8002/manage/v2/databases/Documents/properties",
    &lt;options xmlns="xdmp:http"&gt;
        &lt;authentication method="digest"&gt;
@@ -518,35 +436,8 @@ xdmp:http-put("http://localhost:8002/manage/v2/databases/Documents/properties",
          &lt;content-type&gt;application/json&lt;/content-type&gt;
        &lt;/headers&gt;
      &lt;/options&gt;
-     , text { $quoted })
-)</query><query name="Lexicons" focus="false" listorder="8" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">let $values-fn := function($path-range-index) {
-cts:values(
-  cts:path-reference(
-    $path-range-index, 
-    (), 
-    map:entry("es", "http://marklogic.com/entity-services")))
-}
-return
-
-(: All the values in the Order/orderDate property (xs:date)
-:)
-$values-fn("//es:instance/Order/orderDate")
-
-
-(: All the values in the Order/shipDate property (xs:dateTime)
-$values-fn("//es:instance/Order/shipDate")
-:)
-
-(: All the values in the OrderLine/total property
-$values-fn("//es:instance/Order/orderLines/OrderLine/total")
-:)
-</query><query name="Aggregates" focus="false" listorder="9" taborder="" active="false" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">let $agg-fn := function($path-range-index) {
-cts:sum-aggregate(
-  cts:path-reference(
-    $path-range-index, 
-    (), 
-    map:entry("es", "http://marklogic.com/entity-services")))
-}
-
-return
-$agg-fn("//es:instance/Order/orderLines/OrderLine/total")</query></workspace></export>
+     , text { $quoted })[3],
+"You have just generated a database configuration for indexing the instance data, and sent
+that configuration to the REST Management API.  Here is the payload that Entity Services created:",
+xdmp:unquote($quoted)
+)</query></workspace></export>

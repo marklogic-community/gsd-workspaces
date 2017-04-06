@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export><workspace name="1b-entities-zero-mlw17"><query active="false" focus="false" mode="xquery" name="Model">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+
+let $model :=
+&lt;es:model&gt;
+  &lt;es:info&gt;
+    &lt;es:title&gt;ECommerce&lt;/es:title&gt;
+    &lt;es:version&gt;0.0.0&lt;/es:version&gt;
+    &lt;es:description&gt;A model with just minimal entities. Customers, Products, and Orders.
+    Only the business entities are in this model, and only enough properties to give them
+    unique identity (a primary key) and relationships amone themselves.&lt;/es:description&gt;
+    &lt;es:base-uri&gt;http://marklogic.com/example/ontology/&lt;/es:base-uri&gt;
+  &lt;/es:info&gt;
+  &lt;es:definitions&gt;
+    &lt;Customer&gt;
+      &lt;es:properties&gt;
+        &lt;id&gt;
+          &lt;es:datatype&gt;int&lt;/es:datatype&gt;
+          &lt;es:description&gt;An integer to uniquely identify customers.&lt;/es:description&gt;
+        &lt;/id&gt;
+        &lt;/es:properties&gt;
+      &lt;es:primary-key&gt;id&lt;/es:primary-key&gt;
+    &lt;/Customer&gt;
+    &lt;Order&gt;
+      &lt;es:properties&gt;
+        &lt;id&gt;&lt;es:datatype&gt;int&lt;/es:datatype&gt;&lt;/id&gt;
+        &lt;customer&gt;&lt;es:ref&gt;#/definitions/Customer&lt;/es:ref&gt;&lt;/customer&gt;
+        &lt;products&gt;&lt;es:datatype&gt;array&lt;/es:datatype&gt;
+         &lt;es:items&gt;
+          &lt;es:ref&gt;#/definitions/Product&lt;/es:ref&gt;
+         &lt;/es:items&gt;
+        &lt;/products&gt;
+       &lt;/es:properties&gt;
+      &lt;es:primary-key&gt;id&lt;/es:primary-key&gt;
+    &lt;/Order&gt;
+    &lt;Product&gt;
+      &lt;es:properties&gt;
+        &lt;sku&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/sku&gt;
+      &lt;/es:properties&gt;
+      &lt;es:primary-key&gt;sku&lt;/es:primary-key&gt;
+    &lt;/Product&gt;
+  &lt;/es:definitions&gt;
+&lt;/es:model&gt;
+return (xdmp:document-insert("/model-zero.xml", $model, xdmp:default-permissions(), "http://marklogic.com/entity-services/models"),
+"You have now inserted the XML model in this tab info the database.  Here I validate it and show its JSON representation and its triples:",
+es:model-validate($model),
+cts:triples( (), (), (), (), (),cts:document-query("/model-zero.xml")))</query><query active="false" focus="false" mode="xquery" name="Generate-Test-Instances">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+
+for $test-instance at $i in doc("/model-zero.xml")=&gt;es:model-from-xml()=&gt;es:model-get-test-instances()
+let $uri := "/instance/"|| fn:local-name($test-instance) || "/" || $i
+return 
+xdmp:document-insert($uri, $test-instance, xdmp:default-permissions(), ("test-instances")),
+"You have generates some tests intances from your model using es:model-get-test-instances.
+ Here is one of them:", doc('/instance/Customer/1')</query><query active="false" focus="false" mode="xquery" name="Setup-Instance-Converter">let $edited-module := text { "
+(: This buffer was created by running
+   xdmp:save('/share/instance.xqy', doc('/model.xml')=&gt;es:model-from-xml()=&gt;es:instance-converter-generate() )
+   and then editing the results :)
+
+xquery version '1.0-ml';
+
+
+module namespace eCommerce
+    = 'http://marklogic.com/tutorial-data/ECommerce-0.0.0';
+
+import module namespace es = 'http://marklogic.com/entity-services'
+    at '/MarkLogic/entity-services/entity-services.xqy';
+
+declare option xdmp:mapping 'false';
+
+
+declare function eCommerce:extract-instance-Customer(
+    $source as node()?
+) as map:map
+{
+    let $source-node := eCommerce:init-source($source, 'Customer')
+
+    let $instance := json:object()
+        =&gt;eCommerce:add-attachments($source-node, $source)
+        =&gt;map:with('$type', 'Customer')
+    return
+    if (empty($source-node/*))
+      then $instance=&gt;map:with('$ref', $source-node/text())
+    else
+    $instance
+    =&gt;   map:with('id', xs:int($source-node/customer_id))
+};
+
+
+
+ declare function eCommerce:extract-instance-Order(
+     $source as node()?
+ ) as map:map
+ {
+     let $source-node := eCommerce:init-source($source, 'Order')
+
+     let $instance := json:object()
+         =&gt;eCommerce:add-attachments($source-node, $source)
+         =&gt;map:with('$type', 'Order')
+     return
+     $instance
+     =&gt;   map:with('id',                     xs:int($source-node/id))
+     =&gt;   es:optional('customer',            eCommerce:extract-instance-Customer($source-node/customer_id))
+     =&gt;   es:optional('products',            es:extract-array($source-node/order_lines/order_line/product, eCommerce:extract-instance-Product#1))
+ };
+
+
+ declare function eCommerce:extract-instance-Product(
+     $source as node()?
+ ) as map:map
+ {
+     let $source-node := eCommerce:init-source($source, 'Product')
+
+     let $instance := json:object()
+         =&gt;eCommerce:add-attachments($source-node, $source)
+         =&gt;map:with('$type', 'Product')
+
+     return
+     if (empty($source-node/*))
+       then $instance=&gt;map:with('$ref', $source-node/text())
+     else
+     $instance
+     =&gt;   map:with('sku',                    xs:string($source-node/sku))
+ };
+
+(:~
+ : Turns an entity instance into an XML structure.
+ : This out-of-the box implementation traverses a map structure
+ : and turns it deterministically into an XML tree.
+ : Using this function as-is should be sufficient for most use
+ : cases, and will play well with other generated artifacts.
+ : @param $entity-instance A map:map instance returned from one of the extract-instance
+ :    functions.
+ : @return An XML element that encodes the instance.
+ :)
+declare function eCommerce:instance-to-canonical-xml(
+    $entity-instance as map:map
+) as element()
+{
+    (: Construct an element that is named the same as the Entity Type :)
+    element { map:get($entity-instance, '$type') }  {
+        if ( map:contains($entity-instance, '$ref') )
+        then map:get($entity-instance, '$ref')
+        else
+            for $key in map:keys($entity-instance)
+            let $instance-property := map:get($entity-instance, $key)
+            where ($key castable as xs:NCName)
+            return
+                typeswitch ($instance-property)
+                (: This branch handles embedded objects.  You can choose to prune
+                   an entity's representation of extend it with lookups here. :)
+                case json:object+
+                    return
+                        for $prop in $instance-property
+                        return element { $key } { eCommerce:instance-to-canonical-xml($prop) }
+                (: An array can also treated as multiple elements :)
+                case json:array
+                    return
+                        for $val in json:array-values($instance-property)
+                        return
+                            if ($val instance of json:object)
+                            then element { $key } {
+                                attribute datatype { 'array' },
+                                eCommerce:instance-to-canonical-xml($val) }
+                            else element { $key } {
+                                attribute datatype { 'array' },
+                                $val }
+                (: A sequence of values should be simply treated as multiple elements :)
+                case item()+
+                    return
+                        for $val in $instance-property
+                        return element { $key } { $val }
+                                        default return element { $key } { $instance-property }
+    }
+};
+
+
+(:
+ : Wraps a canonical instance (returned by instance-to-canonical-xml())
+ : within an envelope patterned document, along with the source
+ : document, which is stored in an attachments section.
+ : @param $entity-instance an instance, as returned by an extract-instance
+ : function
+ : @return A document which wraps both the canonical instance and source docs.
+ :)
+declare function eCommerce:instance-to-envelope(
+    $entity-instance as map:map
+) as document-node()
+{
+    document {
+        element es:envelope {
+            element es:instance {
+                element es:info {
+                    element es:title { map:get($entity-instance,'$type') },
+                    element es:version { '0.0.0' }
+                },
+                eCommerce:instance-to-canonical-xml($entity-instance)
+            },
+            element es:attachments {
+                map:get($entity-instance, '$attachments')
+            }
+        }
+    }
+};
+
+
+declare private function eCommerce:init-source(
+    $source as node()*,
+    $entity-type-name as xs:string
+) as node()*
+{
+    if ( ($source instance of document-node())
+        or (exists
+            ($source/element()[fn:node-name(.) eq xs:QName($entity-type-name)] )))
+    then $source/node()
+    else $source
+};
+
+
+declare private function eCommerce:add-attachments(
+    $instance as json:object,
+    $source-node as node()*,
+    $source as node()*
+) as json:object
+{
+    $instance
+    =&gt;map:with('$attachments',
+        typeswitch($source-node)
+        case object-node() return xdmp:quote($source)
+        case array-node() return xdmp:quote($source)
+        default return $source)
+};
+"
+}
+
+return xdmp:invoke-function(function() { 
+  xdmp:document-insert("/ext/extractions.xqy", $edited-module) }, 
+  map:map()=&gt;map:with("database", xdmp:database("Modules"))
+  )
+,
+"You have inserted an instance converter module into the modules database.
+ It can be used by importing it from transforms or other integration code like this:
+ import module namespace my = 'http://marklogic.com/tutorial-data/ECommerce-0.0.0' at '/ext/extractions-0.0.0.xqy';
+"</query><query active="false" focus="false" mode="xquery" name="harmonize">(: This query runs code in the instnace converter, harmonizing your source documents into canonical envelopes :)
+import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+import module namespace my = "http://marklogic.com/tutorial-data/ECommerce-0.0.0" at "/ext/extractions.xqy";
+ 
+for $envelope at $i in 
+(
+collection("customer") ! my:extract-instance-Customer(.) =&gt;my:instance-to-envelope(),
+collection("order") ! my:extract-instance-Order(.)=&gt;my:instance-to-envelope(),
+collection("product") ! my:extract-instance-Product(.)=&gt;my:instance-to-envelope()
+)
+return
+xdmp:document-insert("/envelope-0.0.0-" || $i || ".xml", $envelope, xdmp:default-permissions(), ("0.0.0","envelopes"));
+
+"You have run extraction code to create envelopes from the upstream source documents like this:",
+(/*:envelope[*:instance/Product])[1]
+</query><query active="true" focus="true" mode="xquery" name="Setup-TDE">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+import module namespace tde = "http://marklogic.com/xdmp/tde" at "/MarkLogic/tde.xqy";
+
+let $et := doc("/model-zero.xml")=&gt;es:model-from-xml()=&gt;es:extraction-template-generate()
+
+return
+
+(
+tde:template-insert("/e-Commerce.tdex", $et)
+,
+"You have just generated an extraction template from the model and put it into
+ the schemas database.  It will be used to create triples and rows from the envelope
+ documents.  Here is the template:",
+$et) 
+</query><query active="true" focus="false" mode="xquery" name="Intro">"
+This workspace starts to explore data modeling with Entity Services.
+
+You'll declare a model with entities Customers, Products and their
+relationships.
+
+You'll see the mechanics of working with Entity Services at
+the most basic level.
+"</query><query active="false" focus="false" mode="xquery" name="Your Model in Optic">(: This is an Optic query, crafted to report on the models in your database. 
+ :)
+import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+let $es := op:prefixer("http://marklogic.com/entity-services#")
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+
+(: Thes variables will be used to assemble the various joins I need :)
+let $model := op:col("model")
+let $type := op:col("type")
+let $property := op:col("property")
+let $property2 := op:col("property2")
+
+(: The entity services graph connects models to types to properties :)
+return
+(: The first from-triples block contains columns I expect in each row. :)
+op:from-triples( (
+   (: from the model, get its metadata :)
+   op:pattern( $model, $rdf("type"), $es("Model") ),
+   op:pattern( $model, $es("definitions"), $type),
+   op:pattern( $model, $es("version"), op:col("version")),
+   op:pattern( $model, $es("title"), op:col("modelTitle")),
+
+   (: from the type, get the primary key and all the property objects :)
+   op:pattern( $type, $es("title"), op:col("typeTitle")),
+   op:pattern( $type, $es("primaryKey"), op:col("pk")),
+   op:pattern( $type, $es("property"), $property),
+   op:pattern( $property, $rdf("type"), $es("Property")),
+   op:pattern( $property, $es("title"), op:col("propertyLabel"))
+   ))
+(: join to information about relationships.  outer join because not every property is a relationship :)
+=&gt;op:join-left-outer(
+    (: we need a union to get 'ref' from both arrays and singleton references. :)
+    op:union(
+      op:from-triples( (
+        op:pattern( $property2, $es("items"), op:col("items")),
+        op:pattern( op:col("items"), $es("ref"), op:col("referent")))),
+      op:from-triples( (
+        op:pattern( $property2, $es("ref"), op:col("referent")))))
+    (: join the referent from either items or directly in order to find the name of the propety :) 
+    =&gt;op:join-inner(
+      op:from-triples( (op:pattern( op:col("referent"), $es("title"), op:col("relationshipWith"))) ), 
+      op:on(op:col("referent"), op:col("referent") )), 
+    op:on($property, $property2))
+=&gt;op:where( op:eq(op:col("version"), "0.0.0"))
+=&gt;op:order-by("typeTitle")
+=&gt;op:select( ("modelTitle", "version", "typeTitle", "propertyLabel", "relationshipWith"))
+=&gt;op:result()</query><query active="false" focus="false" mode="xquery" name="Types and Instances">(: This is an Optic query, crafted show you documents categorized by class. :)
+import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+import module namespace opfn = "http://marklogic.com/optic/expression/fn" at "/MarkLogic/optic/optic-fn.xqy";
+
+let $es := op:prefixer("http://marklogic.com/entity-services#")
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+let $rdfs := op:prefixer("http://www.w3.org/2000/01/rdf-schema#")
+
+(: Thes variables will be used to assemble the various joins I need :)
+let $model := op:col("model")
+let $type := op:col("type")
+let $modelTitle := op:col("modelTitle")
+let $modelVersion := op:col("modelVersion")
+let $typeTitle := op:col("typeTitle")
+let $instanceDoc := op:col("instanceDoc")
+
+(: The entity services graph connects models to types to properties :)
+return
+(: The first from-triples block contains columns I expect in each row. :)
+op:from-triples( (
+   (: from the model, get its metadata :)
+   op:pattern( $model, $rdf("type"), $es("Model") ),
+   op:pattern( $model, $es("definitions"), $type),
+   op:pattern( $model, $es("version"), $modelVersion),
+   op:pattern( $model, $es("title"), $modelTitle ),
+   op:pattern( $type, $es("title"), $typeTitle),
+   
+   op:pattern( op:col("instance"), $rdf("type"), $type),
+   op:pattern( op:col("instance"), $rdfs("isDefinedBy"), op:col("instanceDocUri"))
+   ))
+=&gt;op:join-doc( $instanceDoc, op:col("instanceDocUri"))   
+=&gt;op:where( op:and(op:eq($modelTitle, "ECommerce"), op:eq($modelVersion, "0.0.0") ) )  
+=&gt;op:select( ($modelTitle, $modelVersion, $typeTitle, $instanceDoc) )
+=&gt;op:result()</query></workspace></export>

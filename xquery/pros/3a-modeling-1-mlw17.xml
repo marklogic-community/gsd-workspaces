@@ -1,0 +1,555 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export><workspace name="3a-modeling-1-mlw17"><query active="true" focus="false" mode="xquery" name="Model">(: this model extends the domain to include another domain type, a customer Segment. :) 
+import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+
+let $model :=
+&lt;es:model&gt;
+  &lt;es:info&gt;
+    &lt;es:title&gt;ECommerce&lt;/es:title&gt;
+    &lt;es:version&gt;0.0.2&lt;/es:version&gt;
+    &lt;es:description&gt;A model to describe the Customers, Products, and Orders in "Our Business"&lt;/es:description&gt;
+    &lt;es:base-uri&gt;http://marklogic.com/example/ontology/&lt;/es:base-uri&gt;
+  &lt;/es:info&gt;
+  &lt;es:definitions&gt;
+    &lt;Customer&gt;
+      &lt;es:properties&gt;
+        &lt;id&gt;&lt;es:datatype&gt;int&lt;/es:datatype&gt;&lt;es:description&gt;An integer to uniquely identify customers.&lt;/es:description&gt;&lt;/id&gt;
+        &lt;firstName&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;es:description&gt;The given name of the customer.&lt;/es:description&gt;&lt;/firstName&gt;
+        &lt;lastName&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;es:description&gt;The surname of the customer.&lt;/es:description&gt;&lt;/lastName&gt;
+        &lt;email&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;es:description&gt;The customer's email address, used for contacting&lt;/es:description&gt;&lt;/email&gt;
+        &lt;ssn&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;es:description&gt;The customer's social security number (PII!)&lt;/es:description&gt;&lt;/ssn&gt;
+        &lt;phone&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;es:description&gt;The customer's phone number.&lt;/es:description&gt;&lt;/phone&gt;
+        &lt;billTo&gt;&lt;es:ref&gt;#/definitions/Address&lt;/es:ref&gt;&lt;es:description&gt;Customers address for getting billing information.&lt;/es:description&gt;&lt;/billTo&gt;
+        &lt;shipTo&gt;&lt;es:ref&gt;#/definitions/Address&lt;/es:ref&gt;&lt;es:description&gt;Customer's physical address for receiving our products.&lt;/es:description&gt;&lt;/shipTo&gt;
+        &lt;!-- this is the line which defines a reference rather than the string from version 0.0.1 --&gt;
+        &lt;segment&gt;&lt;es:ref&gt;#/definitions/Segment&lt;/es:ref&gt;&lt;es:description&gt;A customer segment, for marketing differentiation.&lt;/es:description&gt;&lt;/segment&gt;
+        &lt;region&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;es:description&gt;Region of the country that the customer lives in, for marketing and support communication.&lt;/es:description&gt;&lt;/region&gt;
+      &lt;/es:properties&gt;
+      &lt;es:primary-key&gt;id&lt;/es:primary-key&gt;
+      &lt;/Customer&gt;
+    &lt;Segment&gt;
+      &lt;es:description&gt;A group of customers, used to categorize them into groups for marketing activity&lt;/es:description&gt;
+      &lt;es:properties&gt;
+        &lt;code&gt;
+          &lt;es:datatype&gt;string&lt;/es:datatype&gt;
+          &lt;es:description&gt;A three-character code referring to a segment of customers&lt;/es:description&gt;
+        &lt;/code&gt;
+        &lt;label&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/label&gt;
+      &lt;/es:properties&gt;
+      &lt;es:primary-key&gt;code&lt;/es:primary-key&gt;
+    &lt;/Segment&gt;
+    &lt;Address&gt;
+      &lt;es:properties&gt;
+         &lt;hash&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/hash&gt;
+         &lt;street&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/street&gt;
+         &lt;city&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/city&gt;
+         &lt;state&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/state&gt;
+         &lt;zip&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/zip&gt;
+         &lt;latitude&gt;&lt;es:datatype&gt;decimal&lt;/es:datatype&gt;&lt;/latitude&gt;
+         &lt;longitude&gt;&lt;es:datatype&gt;decimal&lt;/es:datatype&gt;&lt;/longitude&gt;
+      &lt;/es:properties&gt;
+      &lt;es:primary-key&gt;hash&lt;/es:primary-key&gt;
+    &lt;/Address&gt;
+    &lt;Order&gt;
+      &lt;es:properties&gt;
+        &lt;id&gt;&lt;es:datatype&gt;int&lt;/es:datatype&gt;&lt;/id&gt;
+        &lt;orderDate&gt;&lt;es:datatype&gt;date&lt;/es:datatype&gt;&lt;/orderDate&gt;
+        &lt;shipDate&gt;&lt;es:datatype&gt;dateTime&lt;/es:datatype&gt;&lt;/shipDate&gt;
+        &lt;customer&gt;&lt;es:ref&gt;#/definitions/Customer&lt;/es:ref&gt;&lt;/customer&gt;
+        &lt;paymentTerms&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;es:description&gt;Terms of payment.  Really an enum, may be 'COD' or...&lt;/es:description&gt;&lt;/paymentTerms&gt;   &lt;!-- really an enum --&gt;
+        &lt;orderLines&gt;&lt;es:datatype&gt;array&lt;/es:datatype&gt;&lt;es:items&gt;&lt;es:ref&gt;#/definitions/OrderLine&lt;/es:ref&gt;&lt;/es:items&gt;&lt;/orderLines&gt;
+      &lt;/es:properties&gt;
+      &lt;es:primary-key&gt;id&lt;/es:primary-key&gt;
+      &lt;es:range-index&gt;orderDate&lt;/es:range-index&gt;
+      &lt;es:range-index&gt;shipDate&lt;/es:range-index&gt;
+      &lt;es:range-index&gt;paymentTerms&lt;/es:range-index&gt;
+      &lt;es:required&gt;customer&lt;/es:required&gt;
+    &lt;/Order&gt;
+    &lt;OrderLine&gt;
+      &lt;es:properties&gt;
+        &lt;product&gt;&lt;es:ref&gt;#/definitions/Product&lt;/es:ref&gt;&lt;/product&gt;
+        &lt;quantity&gt;&lt;es:datatype&gt;int&lt;/es:datatype&gt;&lt;/quantity&gt;
+        &lt;unitPrice&gt;&lt;es:datatype&gt;decimal&lt;/es:datatype&gt;&lt;/unitPrice&gt;
+        &lt;discount&gt;&lt;es:datatype&gt;float&lt;/es:datatype&gt;&lt;/discount&gt;
+        &lt;total&gt;&lt;es:datatype&gt;decimal&lt;/es:datatype&gt;&lt;/total&gt;
+        &lt;notes&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/notes&gt;
+      &lt;/es:properties&gt;
+      &lt;es:word-lexicon&gt;notes&lt;/es:word-lexicon&gt;
+    &lt;/OrderLine&gt;
+    &lt;Product&gt;
+      &lt;es:properties&gt;
+        &lt;name&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/name&gt;
+        &lt;sku&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/sku&gt;
+        &lt;category&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;!-- enum --&gt;&lt;/category&gt;
+        &lt;relatedProduct&gt;&lt;es:datatype&gt;array&lt;/es:datatype&gt;&lt;es:items&gt;&lt;es:ref&gt;#/definitions/ProductRelation&lt;/es:ref&gt;&lt;/es:items&gt;&lt;/relatedProduct&gt;
+      &lt;/es:properties&gt;
+      &lt;es:primary-key&gt;sku&lt;/es:primary-key&gt;
+      &lt;es:range-index&gt;name&lt;/es:range-index&gt; 
+    &lt;/Product&gt;
+    &lt;ProductRelation&gt;
+      &lt;es:properties&gt;
+        &lt;product&gt;&lt;es:ref&gt;#/definitions/Product&lt;/es:ref&gt;&lt;/product&gt;
+        &lt;relationship&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/relationship&gt;
+      &lt;/es:properties&gt;
+    &lt;/ProductRelation&gt;
+  &lt;/es:definitions&gt;
+&lt;/es:model&gt;
+return  (xdmp:document-insert("/extended-model.xml", $model, xdmp:default-permissions(), "http://marklogic.com/entity-services/models"),
+"You have now inserted the XML model in this tab info the database.  Here we validate it and show its JSON representation and its triples:",
+es:model-validate($model),
+cts:triples((), (), (), (), (), cts:document-query("/extended-model.xml")))</query><query active="true" focus="false" mode="xquery" name="instance converter">(: This instance converter module accomodates the new Segment entity type :)
+import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+
+let $edited-module := text { "
+(: This buffer was created by running
+   xdmp:save('/share/instance.xqy', doc('/semantic-model.xml')=&gt;es:model-from-xml()=&gt;es:instance-converter-generate() )
+   and then editing the results :)
+
+xquery version '1.0-ml';
+
+
+module namespace eCommerce
+    = 'http://marklogic.com/example/ontology/ECommerce-0.0.2';
+
+import module namespace es = 'http://marklogic.com/entity-services'
+    at '/MarkLogic/entity-services/entity-services.xqy';
+
+declare option xdmp:mapping 'false';
+
+
+declare function eCommerce:extract-instance-Customer(
+    $source as node()?
+) as map:map
+{
+    let $source-node := eCommerce:init-source($source, 'Customer')
+
+    let $instance := json:object()
+        =&gt;eCommerce:add-attachments($source-node, $source)
+        =&gt;map:with('$type', 'Customer')
+    return
+    if (empty($source-node/*))
+    then $instance=&gt;map:with('$ref', $source-node/text())
+    else
+    $instance
+    =&gt;   map:with('id',                     xs:int($source-node/customer_id))
+    =&gt;es:optional('firstName',              xs:string($source-node/first_name))
+    =&gt;es:optional('lastName',               xs:string($source-node/last_name))
+    =&gt;es:optional('email',                  xs:string($source-node/email))
+    =&gt;es:optional('ssn',                    xs:string($source-node/ssn))
+    =&gt;es:optional('phone',                  xs:string($source-node/phone))
+    =&gt;es:optional('billTo',                 eCommerce:extract-instance-Address($source-node/billing_address))
+    =&gt;es:optional('shipTo',                 eCommerce:extract-instance-Address($source-node/shipping_address))
+    =&gt;es:optional('segment',                eCommerce:extract-instance-Segment($source-node/segment))
+    =&gt;es:optional('region',                 xs:string($source-node/region))
+};
+
+
+(:~
+ : Creates a map:map instance from some source document.
+ : @param $source-node  A document or node that contains
+ :   data for populating a Segment
+ : @return A map:map instance with extracted data and
+ :   metadata about the instance.
+ :)
+declare function eCommerce:extract-instance-Segment(
+    $source as node()?
+) as map:map
+{
+    let $source-node := eCommerce:init-source($source, 'Segment')
+
+    let $instance := json:object()
+        =&gt;map:with('$type', 'Segment')
+
+    return
+    if (empty($source-node/*))
+    then $instance=&gt;map:with('$ref', $source-node/text())
+    else
+    $instance
+    =&gt;   map:with('code',                   xs:string($source-node/code))
+    =&gt;es:optional('label',                  xs:string($source-node/label))
+};
+
+declare function eCommerce:extract-instance-Address(
+    $source as node()?
+) as map:map
+{
+    let $source-node := eCommerce:init-source($source, 'Address')
+
+    let $instance := json:object()
+        =&gt;map:with('$type', 'Address')
+    return
+
+    if (empty($source-node/*))
+         then $instance=&gt;map:with('$ref', $source-node/text())
+     else
+     $instance
+     =&gt;map:with   ('hash',                   xdmp:random())
+     =&gt;es:optional('street',                 xs:string($source-node/street))
+     =&gt;es:optional('city',                   xs:string($source-node/city))
+     =&gt;es:optional('state',                  xs:string($source-node/state))
+     =&gt;es:optional('zip',                    xs:string($source-node/zip))
+     =&gt;es:optional('latitude',               xs:decimal($source-node/latitude))
+     =&gt;es:optional('longitude',              xs:decimal($source-node/longitude))
+ };
+
+
+ declare function eCommerce:extract-instance-Order(
+     $source as node()?
+ ) as map:map
+ {
+     let $source-node := eCommerce:init-source($source, 'Order')
+
+     let $instance := json:object()
+         =&gt;eCommerce:add-attachments($source-node, $source)
+         =&gt;map:with('$type', 'Order')
+     return
+     if (empty($source-node/*))
+     then $instance=&gt;map:with('$ref', $source-node/text())
+     else
+     $instance
+     =&gt;   map:with('id',                     xs:int($source-node/id))
+     =&gt;es:optional('orderDate',             xs:date($source-node/order_date))
+     =&gt;es:optional('shipDate',              xdmp:parse-dateTime('[Y]-[M]-[D] [H]:[m]:[s]', $source-node/ship_date))
+     (: The following property is a local reference.  :)
+     =&gt;   map:with('customer',               eCommerce:extract-instance-Customer($source-node/customer_id))
+     =&gt;es:optional('paymentTerms',           xs:string($source-node/payment_terms))
+     (: The following property is a local reference.  :)
+     =&gt;es:optional('orderLines',             es:extract-array($source-node/order_lines/order_line, eCommerce:extract-instance-OrderLine#1))
+ };
+
+ declare function eCommerce:extract-instance-OrderLine(
+     $source as node()?
+ ) as map:map
+ {
+     let $source-node := eCommerce:init-source($source, 'OrderLine')
+
+     let $instance := json:object()
+         =&gt;eCommerce:add-attachments($source-node, $source)
+         =&gt;map:with('$type', 'OrderLine')
+     return
+     if (empty($source-node/*))
+     then $instance=&gt;map:with('$ref', $source-node/text())
+     else
+     $instance
+          (: The following property is a local reference.  :)
+     =&gt;es:optional('product',                eCommerce:extract-instance-Product($source-node/product))
+     =&gt;es:optional('quantity',               xs:int($source-node/quantity))
+     =&gt;es:optional('unitPrice',              xs:decimal($source-node/unitPrice))
+     =&gt;es:optional('discount',               xs:float($source-node/discount))
+     =&gt;es:optional('total',                  xs:decimal($source-node/total))
+     =&gt;es:optional('notes',                  xs:string($source-node/notes))
+ };
+
+ declare function eCommerce:extract-instance-Product(
+     $source as node()?
+ ) as map:map
+ {
+     let $source-node := eCommerce:init-source($source, 'Product')
+
+     let $instance := json:object()
+         =&gt;eCommerce:add-attachments($source-node, $source)
+         =&gt;map:with('$type', 'Product')
+
+     return
+     if (empty($source-node/*))
+     then $instance=&gt;map:with('$ref', $source-node/text())
+     else
+     $instance
+     =&gt;es:optional('name',                   xs:string($source-node/name))
+     =&gt;   map:with('sku',                    xs:string($source-node/sku))
+     =&gt;es:optional('category',               xs:string($source-node/category))
+     (: The following property is a local reference.  :)
+     =&gt;es:optional('relatedProduct',         es:extract-array($source-node/related_products/related_product, eCommerce:extract-instance-ProductRelation#1))
+ };
+
+ declare function eCommerce:extract-instance-ProductRelation(
+     $source as node()?
+ ) as map:map
+ {
+     let $source-node := eCommerce:init-source($source, 'ProductRelation')
+
+     let $instance := json:object()
+         =&gt;eCommerce:add-attachments($source-node, $source)
+         =&gt;map:with('$type', 'ProductRelation')
+
+     return
+
+     if (empty($source-node/*))
+     then $instance=&gt;map:with('$ref', $source-node/text())
+     else
+     
+     let $related-product := 
+       json:object()=&gt;map:with('$type', 'Product')=&gt;map:with('name', $source-node/product_name/text())
+
+     return
+     $instance
+     (: The following property is a local reference.  :)
+     =&gt;es:optional('product',                $related-product)
+     =&gt;es:optional('relationship',           xs:string($source-node/relationship))
+     };
+
+
+
+
+
+(:~
+ : Turns an entity instance into an XML structure.
+ : This out-of-the box implementation traverses a map structure
+ : and turns it deterministically into an XML tree.
+ : Using this function as-is should be sufficient for most use
+ : cases, and will play well with other generated artifacts.
+ : @param $entity-instance A map:map instance returned from one of the extract-instance
+ :    functions.
+ : @return An XML element that encodes the instance.
+ :)
+declare function eCommerce:instance-to-canonical-xml(
+    $entity-instance as map:map
+) as element()
+{
+    (: Construct an element that is named the same as the Entity Type :)
+    element { map:get($entity-instance, '$type') }  {
+        if ( map:contains($entity-instance, '$ref') )
+        then map:get($entity-instance, '$ref')
+        else
+            for $key in map:keys($entity-instance)
+            let $instance-property := map:get($entity-instance, $key)
+            where ($key castable as xs:NCName)
+            return
+                typeswitch ($instance-property)
+                (: This branch handles embedded objects.  You can choose to prune
+                   an entity's representation of extend it with lookups here. :)
+                case json:object+
+                    return
+                        for $prop in $instance-property
+                        return element { $key } { eCommerce:instance-to-canonical-xml($prop) }
+                (: An array can also treated as multiple elements :)
+                case json:array
+                    return
+                        for $val in json:array-values($instance-property)
+                        return
+                            if ($val instance of json:object)
+                            then element { $key } {
+                                attribute datatype { 'array' },
+                                eCommerce:instance-to-canonical-xml($val) }
+                            else element { $key } {
+                                attribute datatype { 'array' },
+                                $val }
+                (: A sequence of values should be simply treated as multiple elements :)
+                case item()+
+                    return
+                        for $val in $instance-property
+                        return element { $key } { $val }
+                                        default return element { $key } { $instance-property }
+    }
+};
+
+
+(:
+ : Wraps a canonical instance (returned by instance-to-canonical-xml())
+ : within an envelope patterned document, along with the source
+ : document, which is stored in an attachments section.
+ : @param $entity-instance an instance, as returned by an extract-instance
+ : function
+ : @return A document which wraps both the canonical instance and source docs.
+ :)
+declare function eCommerce:instance-to-envelope(
+    $entity-instance as map:map
+) as document-node()
+{
+    document {
+        element es:envelope {
+            element es:instance {
+                element es:info {
+                    element es:title { map:get($entity-instance,'$type') },
+                    element es:version { '0.0.2' }
+                },
+                eCommerce:instance-to-canonical-xml($entity-instance)
+            },
+            element es:attachments {
+                map:get($entity-instance, '$attachments')
+            }
+        }
+    }
+};
+
+
+declare private function eCommerce:init-source(
+    $source as node()*,
+    $entity-type-name as xs:string
+) as node()*
+{
+    if ( ($source instance of document-node())
+        or (exists
+            ($source/element()[fn:node-name(.) eq xs:QName($entity-type-name)] )))
+    then $source/node()
+    else $source
+};
+
+
+declare private function eCommerce:add-attachments(
+    $instance as json:object,
+    $source-node as node()*,
+    $source as node()*
+) as json:object
+{
+    $instance
+    =&gt;map:with('$attachments',
+        typeswitch($source-node)
+        case object-node() return xdmp:quote($source)
+        case array-node() return xdmp:quote($source)
+        default return $source)
+};
+"
+}
+
+return xdmp:invoke-function(function() { 
+  xdmp:document-insert("/ext/extractions-0.0.2.xqy", $edited-module) }, 
+  map:map()=&gt;map:with("database", xdmp:database("Modules"))
+  ),
+  
+"You have inserted an instance converter module into the modules database.
+ It can be used by importing it from transforms or other integration code like this:
+ import module namespace my = 'http://marklogic.com/tutorial-data/ECommerce-0.0.2' at '/ext/extractions-0.0.2.xqy';
+"</query><query active="true" focus="false" mode="xquery" name="harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+
+import module namespace my = "http://marklogic.com/example/ontology/ECommerce-0.0.2"
+  at "/ext/extractions-0.0.2.xqy";
+ 
+for $envelope at $i in 
+(
+collection("customer") ! my:extract-instance-Customer(.) =&gt;my:instance-to-envelope(),
+collection("order")    ! my:extract-instance-Order(.)    =&gt;my:instance-to-envelope(),
+collection("product")  ! my:extract-instance-Product(.)  =&gt;my:instance-to-envelope()
+)
+return
+xdmp:document-insert("/envelope-0.0.2" || $i || ".xml", $envelope, xdmp:default-permissions(), "envelopes");
+"You have just run extraction code to create envelopes from the upstream source documents like this:",
+(//*:instance[*:info/*:version="0.0.2"]/Product)[1]
+;
+
+import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+
+let $segments := 
+&lt;Segments&gt;
+&lt;es:instance&gt;
+  &lt;es:info&gt;
+    &lt;es:title&gt;Segment&lt;/es:title&gt;
+    &lt;es:version&gt;0.0.2&lt;/es:version&gt;
+  &lt;/es:info&gt;
+  { for $d in distinct-values(collection("envelopes")//segment/text()) 
+    return 
+     &lt;Segment&gt;
+       &lt;code&gt;{$d}&lt;/code&gt;
+       &lt;label&gt;The segment of customers with short code {$d}&lt;/label&gt;
+     &lt;/Segment&gt; }
+&lt;/es:instance&gt;
+&lt;/Segments&gt;
+return (
+xdmp:document-insert("/segments.xml", $segments, xdmp:default-permissions(), "reference"),
+"You've inserted this reference data for customer segments:",
+$segments)</query><query active="false" focus="false" mode="xquery" name="Reference Data">//Segments;
+
+(: no triples in this workspaces :)
+cts:triples( (), (), (), (), (), cts:document-query( //Segments/base-uri(.)))</query><query active="true" focus="true" mode="xquery" name="Setup TDE">(: One, save the default template :)
+import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+declare namespace tde = "http://marklogic.com/xdmp/tde";
+
+let $et := doc("/extended-model.xml")=&gt;es:model-from-xml()=&gt;es:extraction-template-generate()
+return xdmp:document-insert("/e-commerce.tdex", $et, xdmp:default-permissions(), "http://marklogic.com/xdmp/tde");
+
+(: two, insert triple patters into Customer template :)
+import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+declare namespace tde = "http://marklogic.com/xdmp/tde";
+
+let $customer-triples := doc("/e-commerce.tdex")//tde:template[tde:context="./Customer"]/tde:triples
+return 
+xdmp:node-insert-child($customer-triples,
+    (
+    &lt;triple xmlns="http://marklogic.com/xdmp/tde"&gt;
+      &lt;subject&gt;&lt;val&gt;$subject-iri&lt;/val&gt;&lt;/subject&gt;
+      &lt;predicate&gt;&lt;val&gt;sem:iri("http://marklogic.com/example/ontology/ECommerce-0.0.2/Customer/segment")&lt;/val&gt;&lt;/predicate&gt;
+      &lt;object&gt;&lt;val&gt;sem:iri("http://marklogic.com/example/ontology/ECommerce-0.0.2/Segment/" || ./segment/Segment)&lt;/val&gt;&lt;/object&gt;
+    &lt;/triple&gt;,
+    &lt;triple xmlns="http://marklogic.com/xdmp/tde"&gt;
+      &lt;subject&gt;&lt;val&gt;$subject-iri&lt;/val&gt;&lt;/subject&gt;
+      &lt;predicate&gt;&lt;val&gt;sem:iri("http://marklogic.com/example/ontology/ECommerce-0.0.2/Customer/firstName")&lt;/val&gt;&lt;/predicate&gt;
+      &lt;object&gt;&lt;val&gt;xs:string(./firstName)&lt;/val&gt;&lt;/object&gt;
+    &lt;/triple&gt;,
+    &lt;triple xmlns="http://marklogic.com/xdmp/tde"&gt;
+      &lt;subject&gt;&lt;val&gt;$subject-iri&lt;/val&gt;&lt;/subject&gt;
+      &lt;predicate&gt;&lt;val&gt;sem:iri("http://marklogic.com/example/ontology/ECommerce-0.0.2/Customer/lastName")&lt;/val&gt;&lt;/predicate&gt;
+      &lt;object&gt;&lt;val&gt;xs:string(./lastName)&lt;/val&gt;&lt;/object&gt;
+    &lt;/triple&gt;
+    )
+);
+    
+(: three, decorate Segment entities with triples :)
+import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+declare namespace tde = "http://marklogic.com/xdmp/tde";
+
+let $segment-triples := doc("/e-commerce.tdex")//tde:template[tde:context="./Segment"]/tde:triples
+return 
+xdmp:node-insert-child($segment-triples,
+    &lt;triple xmlns="http://marklogic.com/xdmp/tde"&gt;
+      &lt;subject&gt;&lt;val&gt;$subject-iri&lt;/val&gt;&lt;/subject&gt;
+      &lt;predicate&gt;&lt;val&gt;sem:iri("http://marklogic.com/example/ontology/ECommerce-0.0.2/Segment/label")&lt;/val&gt;&lt;/predicate&gt;
+      &lt;object&gt;&lt;val&gt;xs:string(./label)&lt;/val&gt;&lt;/object&gt;
+    &lt;/triple&gt;);
+
+(: four, modify paths to values in addresses to point to primary key values :)
+import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+declare namespace tde = "http://marklogic.com/xdmp/tde";
+
+for $customer-address in doc("/e-commerce.tdex")//tde:column[tde:name = ("shipTo", "billTo")]
+return
+(xdmp:node-replace($customer-address/tde:val/text(), text { $customer-address/tde:name/string() || "/Address/hash"}));
+
+(: five, Create row template for all Addresses :)
+import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+declare namespace tde = "http://marklogic.com/xdmp/tde";
+
+for $address-val in doc("/e-commerce.tdex")//tde:context[. = "./Address"]
+return
+(xdmp:node-replace($address-val/text(), text { ".//Address" }));
+
+    
+(: store the modified TDE in Schemas DB :)
+import module namespace tde = "http://marklogic.com/xdmp/tde" at "/MarkLogic/tde.xqy";
+let $modified-doc := doc("/e-commerce.tdex")
+return 
+("Inserted extraction template into schemas database",
+ $modified-doc,
+ tde:template-insert("/e-Commerce.tdex", $modified-doc, xdmp:default-permissions())
+   )
+</query><query active="false" focus="false" mode="sparql" name="Customer">PREFIX es: &lt;http://marklogic.com/entity-services#&gt; 
+PREFIX ecommerce: &lt;http://marklogic.com/example/ontology/ECommerce-0.0.2/&gt; 
+PREFIX customer: &lt;http://marklogic.com/example/ontology/ECommerce-0.0.2/Customer/&gt; 
+PREFIX segment: &lt;http://marklogic.com/example/ontology/ECommerce-0.0.2/Segment/&gt; 
+
+SELECT ?customerIri ?customerName ?segmentLabel ?descriptionOfSegment
+WHERE { 
+  ?customerIri a ?type;
+        customer:lastName ?customerName ;
+        customer:segment  ?segment .
+  ?segment segment:label  ?segmentLabel .
+  
+  ?segment a ?segmentType .
+  ?segmentType es:description ?descriptionOfSegment
+  FILTER (?type = ecommerce:Customer)
+}
+</query><query active="false" focus="false" mode="sql" name="Segment Join">SELECT * FROM 
+ECommerce.Customer c, ECommerce.Segment s
+WHERE c.segment = s.code
+</query><query active="false" focus="false" mode="sql" name="Addresses">select * from ECommerce.Address</query><query active="false" focus="false" mode="sql" name="Address Join">SELECT firstName, lastName, zip 
+FROM ECommerce.Customer c, ECommerce.Address a
+WHERE c.billTo = a.hash</query><query active="true" focus="false" mode="xquery" name="Intro">"
+ This workspace concentrates on how to refactor or change a model, and also
+ how to extend a model with triples.
+ 
+ We consider how to change an entity services model over time, by
+ turning a string property into its own entity type.
+ 
+ Also in this workspace we change the harmonizations to extract related products
+ from sparse data into instances, whereas in version 0.0.1 we dropped them on the floor
+ as degenerate cases.
+"</query></workspace></export>

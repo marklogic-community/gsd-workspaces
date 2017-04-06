@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export><workspace name="2b-entity-services-mlw17"><query active="true" focus="true" mode="sql" name="Four-view join">SELECT * from 
+ECommerce.Order l,
+ECommerce.Order_orderLines ol,
+ECommerce.Customer c,
+ECommerce.Product p
+WHERE l.customer = c.id
+and c.firstName like 'B%'
+AND ol.id = l.id
+ORDER BY c.id</query><query active="false" focus="false" mode="sparql" name="Model Query"># the model is surfaced to MarkLogic as a graph.
+# you can query for properties of a model with SPARQL.
+PREFIX es: &lt;http://marklogic.com/entity-services#&gt;
+
+SELECT ?s ?p ?o WHERE { 
+  ?s a es:Model ;
+ #     ?p ?o
+}
+</query><query active="false" focus="false" mode="sparql" name="Type Query"># All aspects of model descriptors are surfaced as
+# triples.
+PREFIX es: &lt;http://marklogic.com/entity-services#&gt;
+
+SELECT ?s ?p ?o
+WHERE { 
+  ?s a es:EntityType ;
+#      ?p ?o
+}
+</query><query active="true" focus="false" mode="xquery" name="Intro">"
+This workspace provides the basics of querying instance data created with 
+Entity Services.
+
+You'll see how MarkLogic search built-ins can display index values,
+how SQL and SPARQL can query instance and model data, and how
+basic Optic API queries can help you navigate your models and instances.
+"</query><query active="false" focus="false" mode="sql" name="Customers">SELECT * from 
+ECommerce.Customer c
+WHERE c.firstName like 'N%'
+ORDER BY c.id
+</query><query active="false" focus="false" mode="sql" name="Addresses">SELECT billTo, shipTo from ECommerce.Customer</query><query active="false" focus="false" mode="sparql" name="Instance Query"># generated extraction templates put instance data into classes
+PREFIX es: &lt;http://marklogic.com/entity-services#&gt; 
+PREFIX ecommerce: &lt;http://marklogic.com/example/ontology/ECommerce-0.0.1/&gt; 
+
+SELECT ?s ?type
+WHERE { 
+   ?s a ?type .
+   ?type a es:EntityType .
+#   ?p ?o .  
+}
+</query><query active="false" focus="false" mode="sparql" name="Doc Retrieval"># SPARQL queries can use built-in functions.
+# This one reads the instance document
+PREFIX es: &lt;http://marklogic.com/entity-services#&gt;
+PREFIX fn: &lt;http://www.w3.org/2005/xpath-functions#&gt;
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+PREFIX cts: &lt;http://marklogic.com/cts#&gt;
+
+SELECT ?doc
+WHERE { 
+  ?s rdfs:isDefinedBy ?o .
+  FILTER (cts:contains(?doc, "Wheeler"))
+  BIND (fn:doc(?o) as ?doc) 
+}</query><query active="false" focus="false" mode="sparql" name="Property Query"># use the es:title property to get user-readable labels to
+# your report or application
+PREFIX es: &lt;http://marklogic.com/entity-services#&gt;
+
+SELECT ?s ?propertyLabel ?typeLabel
+WHERE 
+{ 
+  ?s a es:Property ;
+       es:title ?propertyLabel
+#      ?p ?o 
+  .
+  ?type es:property ?s ;
+       es:title ?typeLabel
+}</query><query active="false" focus="false" mode="xquery" name="Optic Model">(: An Optic query can also query the triples in an Entity Services Model :)
+import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+let $es := op:prefixer("http://marklogic.com/entity-services#")
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+
+return
+op:from-triples( (
+   op:pattern( op:col("s"), $rdf("type"), $es("Model") ),
+   op:pattern( op:col("s"), op:col("p"), op:col("o") )
+   ) )
+=&gt;op:result()</query><query active="false" focus="false" mode="xquery" name="Optic Type">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+let $es := op:prefixer("http://marklogic.com/entity-services#")
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+
+return
+op:from-triples( (
+   op:pattern( op:col("s"), $rdf("type"), $es("EntityType") ),
+   op:pattern( op:col("s"), op:col("p"), op:col("o") )
+   ) )
+=&gt;op:result()</query><query active="false" focus="false" mode="xquery" name="Optic Property">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+let $es := op:prefixer("http://marklogic.com/entity-services#")
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+
+return
+op:from-triples( (
+   op:pattern( op:col("p"), $rdf("type"), $es("Property") ),
+   op:pattern( op:col("p"), $es("title"), op:col("propertyLabel")),
+   op:pattern( op:col("t"), $es("property"), op:col("p")),
+   op:pattern( op:col("t"), $es("title"), op:col("typeLabel"))
+   ) )
+=&gt;op:order-by(op:col("t"))   
+=&gt;op:select( ("typeLabel", "propertyLabel") )   
+=&gt;op:result()</query><query active="false" focus="false" mode="xquery" name="Optic Documents">(: Optic results can be processed without a binding/retrieval process :)
+import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy";
+
+let $fn := op:prefixer("http://www.w3.org/2005/xpath-functions#")
+let $rdfs := op:prefixer("http://www.w3.org/2000/01/rdf-schema#")
+let $result := 
+ op:from-triples( (
+   op:pattern( op:col("s"), $rdfs("isDefinedBy"), op:col("doc") )
+   ) )=&gt;op:select("doc")=&gt;op:result()
+
+return $result ! fn:doc(map:get(., "doc"))//firstName
+</query><query active="false" focus="false" mode="xquery" name="Lexicons">declare function local:idx-values($path-range-index) {
+cts:values(
+  cts:path-reference(
+    $path-range-index, 
+    (), 
+    map:entry("es", "http://marklogic.com/entity-services")))
+};
+
+(: All the values in the Order/orderDate property (xs:date)
+:)
+"All of the order dates:", local:idx-values("//es:instance/Order/orderDate")
+
+
+(: All the values in the Order/shipDate property (xs:dateTime)
+"All of the ship dates:", local:idx-values("//es:instance/Order/shipDate")
+:)
+
+(: All the values in the OrderLine/total property
+"All the total values from order lines:" , local:idx-values("//es:instance/Order/orderLines/OrderLine/total")
+:)</query><query active="false" focus="false" mode="xquery" name="Aggregates">declare function local:sum($path-range-index) {
+cts:sum-aggregate(
+  cts:path-reference(
+    $path-range-index, 
+    (), 
+    map:entry("es", "http://marklogic.com/entity-services")))
+};
+
+(
+"Sum of all the total values from orders:",local:sum("//es:instance/Order/orderLines/OrderLine/total")
+)</query><query active="false" focus="false" mode="xquery" name="Optic Document Join">(: Optic results can be processed without a binding/retrieval process :)
+import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy";
+
+let $es := op:prefixer("http://marklogic.com/entity-services#")
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+let $rdfs := op:prefixer("http://www.w3.org/2000/01/rdf-schema#")
+let $cts := op:prefixer("http://marklogic.com/cts#")
+
+return
+ (op:from-triples( (
+   op:pattern( op:col("s"), $rdfs("isDefinedBy"), op:col("docuri") )
+   ) )
+ =&gt;op:join-doc( op:col("doc"), op:col("docuri"))
+ =&gt;op:select("doc")=&gt;op:result()
+ )
+ ! map:get(. , "doc")//firstName
+</query></workspace></export>
