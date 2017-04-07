@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<export><workspace name="3a-modeling-1-mlw17"><query active="true" focus="false" mode="xquery" name="Model">(: this model extends the domain to include another domain type, a customer Segment. :) 
+<export><workspace name="3a-modeling-1-mlw17"><query active="false" focus="false" mode="xquery" name="Model">(: this model extends the domain to include another domain type, a customer Segment. :) 
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 let $model :=
@@ -97,7 +97,7 @@ let $model :=
 return  (xdmp:document-insert("/extended-model.xml", $model, xdmp:default-permissions(), "http://marklogic.com/entity-services/models"),
 "You have now inserted the XML model in this tab info the database.  Here we validate it and show its JSON representation and its triples:",
 es:model-validate($model),
-cts:triples((), (), (), (), (), cts:document-query("/extended-model.xml")))</query><query active="true" focus="false" mode="xquery" name="instance converter">(: This instance converter module accomodates the new Segment entity type :)
+cts:triples((), (), (), (), (), cts:document-query("/extended-model.xml")))</query><query active="false" focus="false" mode="xquery" name="instance converter">(: This instance converter module accomodates the new Segment entity type :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 let $edited-module := text { "
@@ -410,7 +410,7 @@ return xdmp:invoke-function(function() {
 "You have inserted an instance converter module into the modules database.
  It can be used by importing it from transforms or other integration code like this:
  import module namespace my = 'http://marklogic.com/tutorial-data/ECommerce-0.0.2' at '/ext/extractions-0.0.2.xqy';
-"</query><query active="true" focus="false" mode="xquery" name="harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+"</query><query active="false" focus="false" mode="xquery" name="harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 import module namespace my = "http://marklogic.com/example/ontology/ECommerce-0.0.2"
   at "/ext/extractions-0.0.2.xqy";
@@ -450,7 +450,7 @@ xdmp:document-insert("/segments.xml", $segments, xdmp:default-permissions(), "re
 $segments)</query><query active="false" focus="false" mode="xquery" name="Reference Data">//Segments;
 
 (: no triples in this workspaces :)
-cts:triples( (), (), (), (), (), cts:document-query( //Segments/base-uri(.)))</query><query active="true" focus="true" mode="xquery" name="Setup TDE">(: One, save the default template :)
+cts:triples( (), (), (), (), (), cts:document-query( //Segments/base-uri(.)))</query><query active="false" focus="false" mode="xquery" name="Setup TDE">(: One, save the default template :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 declare namespace tde = "http://marklogic.com/xdmp/tde";
 
@@ -542,7 +542,7 @@ ECommerce.Customer c, ECommerce.Segment s
 WHERE c.segment = s.code
 </query><query active="false" focus="false" mode="sql" name="Addresses">select * from ECommerce.Address</query><query active="false" focus="false" mode="sql" name="Address Join">SELECT firstName, lastName, zip 
 FROM ECommerce.Customer c, ECommerce.Address a
-WHERE c.billTo = a.hash</query><query active="true" focus="false" mode="xquery" name="Intro">"
+WHERE c.billTo = a.hash</query><query active="true" focus="true" mode="xquery" name="Intro">"
  This workspace concentrates on how to refactor or change a model, and also
  how to extend a model with triples.
  
