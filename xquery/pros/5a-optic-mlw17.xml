@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<export><workspace name="5a-optic-mlw17"><query active="true" focus="true" mode="xquery" name="Intro">"
+<export><workspace name="5a-optic-mlw17"><query active="true" focus="false" mode="xquery" name="Intro">"
 This workspace provides examples of the Optic API, which is new in MarkLogic 9.
 
 This API provides all of the query operators familiar to SQL or SPARQL developers,
@@ -77,7 +77,7 @@ op:from-triples( (
 =&gt;op:order-by("version")
 =&gt;op:select( ("modelTitle", "version", "description"))
 =&gt;op:where-distinct()
-=&gt;op:result()</query><query active="false" focus="false" mode="xquery" name="counting instanaces">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+=&gt;op:result()</query><query active="true" focus="true" mode="xquery" name="counting instances">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
 
 let $es := op:prefixer("http://marklogic.com/entity-services#")
 let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
@@ -97,7 +97,7 @@ op:from-triples( (
 =&gt;op:order-by("version")
 =&gt;op:select( ("typeTitle", "version", "ct"))
 =&gt;op:where-distinct()
-=&gt;op:result()</query><query active="false" focus="false" mode="xquery" name="Views">xquery version "1.0-ml";&#xd;</query><query active="false" focus="false" mode="xquery" name="Query 1">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+=&gt;op:result()</query><query active="true" focus="false" mode="xquery" name="Views">xquery version "1.0-ml";&#xd;</query><query active="false" focus="false" mode="xquery" name="Query 1">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
 
-op:from-view("ECommerce", "Product")
+op:from-view("ECommerce", "Order")
 =&gt;op:result()</query></workspace></export>
