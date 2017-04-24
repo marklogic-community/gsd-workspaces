@@ -1,0 +1,190 @@
+<export><workspace name="1a-xml-load-mlw17"><query name="load-customer-table" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+(: this script does blah blah blah :)
+
+let $doc :=
+&lt;rows&gt;
+  &lt;row&gt;
+    &lt;customer_id&gt;1&lt;/customer_id&gt;
+    &lt;first_name&gt;Nicholas&lt;/first_name&gt;
+    &lt;last_name&gt;Wheeler&lt;/last_name&gt;
+    &lt;email&gt;nwheeler0@cdbaby.com&lt;/email&gt;
+    &lt;ssn&gt;803-28-0354&lt;/ssn&gt;
+    &lt;phone&gt;1-(915)325-2812&lt;/phone&gt;
+    &lt;billing_address_id&gt;1&lt;/billing_address_id&gt;
+    &lt;shipping_address_id&gt;2&lt;/shipping_address_id&gt;
+    &lt;region&gt;justo&lt;/region&gt;
+    &lt;segment&gt;top&lt;/segment&gt;
+  &lt;/row&gt;
+  &lt;row&gt;
+    &lt;customer_id&gt;2&lt;/customer_id&gt;
+    &lt;first_name&gt;Richard&lt;/first_name&gt;
+    &lt;last_name&gt;Kennedy&lt;/last_name&gt;
+    &lt;email&gt;rkennedy1@apache.org&lt;/email&gt;
+    &lt;ssn&gt;253-66-8162&lt;/ssn&gt;
+    &lt;phone&gt;1-(815)551-8998&lt;/phone&gt;
+    &lt;billing_address_id&gt;3&lt;/billing_address_id&gt;
+    &lt;shipping_address_id&gt;4&lt;/shipping_address_id&gt;
+    &lt;region&gt;in&lt;/region&gt;
+    &lt;segment&gt;regular&lt;/segment&gt;
+  &lt;/row&gt;
+  &lt;row&gt;
+    &lt;customer_id&gt;3&lt;/customer_id&gt;
+    &lt;first_name&gt;Bonnie&lt;/first_name&gt;
+    &lt;last_name&gt;Clark&lt;/last_name&gt;
+    &lt;email&gt;bclark2@example.com&lt;/email&gt;
+    &lt;ssn&gt;947-95-7536&lt;/ssn&gt;
+    &lt;phone&gt;1-(515)755-7166&lt;/phone&gt;
+    &lt;billing_address_id&gt;5&lt;/billing_address_id&gt;
+    &lt;shipping_address_id&gt;6&lt;/shipping_address_id&gt;
+    &lt;region&gt;velit&lt;/region&gt;
+    &lt;segment&gt;coupon&lt;/segment&gt;
+  &lt;/row&gt;
+&lt;/rows&gt;
+
+let $docs := $doc/row
+let $count := fn:count($docs)
+let $insert :=  
+       for $d at $idx in $docs 
+       let $uri := fn:concat("/customer-",$idx,".xml")
+       return xdmp:document-insert($uri, &lt;root&gt;{$d/node()}&lt;/root&gt;, (), "customer-table")
+ 
+return (
+ $insert,
+ fn:concat("You have just inserted ", $count, " customer table records into the database.")
+  )
+</query><query name="load-address-table" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+let $doc :=
+&lt;rows&gt;
+    &lt;row&gt;
+      &lt;address-id&gt;1&lt;/address-id&gt;
+      &lt;street&gt;46958 Farwell Trail&lt;/street&gt;
+      &lt;city&gt;El Paso&lt;/city&gt;
+      &lt;state&gt;Texas&lt;/state&gt;
+      &lt;zip&gt;79950&lt;/zip&gt;
+      &lt;latitude&gt;31.6948&lt;/latitude&gt;
+      &lt;longitude&gt;-106.3&lt;/longitude&gt;
+    &lt;/row&gt;
+    &lt;row&gt;
+      &lt;address-id&gt;2&lt;/address-id&gt;
+      &lt;street&gt;9 Thierer Place&lt;/street&gt;
+      &lt;city&gt;Mobile&lt;/city&gt;
+      &lt;state&gt;Alabama&lt;/state&gt;
+      &lt;zip&gt;36628&lt;/zip&gt;
+      &lt;latitude&gt;30.6589&lt;/latitude&gt;
+      &lt;longitude&gt;-88.178&lt;/longitude&gt;
+    &lt;/row&gt;
+    &lt;row&gt;
+      &lt;address-id&gt;3&lt;/address-id&gt;
+      &lt;street&gt;01233 7th Parkway&lt;/street&gt;
+      &lt;city&gt;Rockford&lt;/city&gt;
+      &lt;state&gt;Illinois&lt;/state&gt;
+      &lt;zip&gt;61110&lt;/zip&gt;
+      &lt;latitude&gt;42.3254&lt;/latitude&gt;
+      &lt;longitude&gt;-89.1705&lt;/longitude&gt;
+    &lt;/row&gt;
+    &lt;row&gt;
+      &lt;address-id&gt;4&lt;/address-id&gt;
+      &lt;street&gt;19137 Superior Point&lt;/street&gt;
+      &lt;city&gt;Gulfport&lt;/city&gt;
+      &lt;state&gt;Mississippi&lt;/state&gt;
+      &lt;zip&gt;39505&lt;/zip&gt;
+      &lt;latitude&gt;30.4158&lt;/latitude&gt;
+      &lt;longitude&gt;-89.0684&lt;/longitude&gt;
+    &lt;/row&gt;
+    &lt;row&gt;
+      &lt;address-id&gt;5&lt;/address-id&gt;
+      &lt;street&gt;4 Red Cloud Plaza&lt;/street&gt;
+      &lt;city&gt;Des Moines&lt;/city&gt;
+      &lt;state&gt;Iowa&lt;/state&gt;
+      &lt;zip&gt;50305&lt;/zip&gt;
+      &lt;latitude&gt;41.6727&lt;/latitude&gt;
+      &lt;longitude&gt;-93.5722&lt;/longitude&gt;
+    &lt;/row&gt;
+    &lt;row&gt;
+      &lt;address-id&gt;6&lt;/address-id&gt;
+      &lt;street&gt;96328 Sutteridge Court&lt;/street&gt;
+      &lt;city&gt;Richmond&lt;/city&gt;
+      &lt;state&gt;Virginia&lt;/state&gt;
+      &lt;zip&gt;23272&lt;/zip&gt;
+      &lt;latitude&gt;37.5242&lt;/latitude&gt;
+      &lt;longitude&gt;-77.4932&lt;/longitude&gt;
+    &lt;/row&gt;
+&lt;/rows&gt;
+
+let $docs := $doc/row
+let $count := fn:count($docs)
+let $insert := 
+       for $d at $idx in $docs 
+       let $uri := fn:concat("/address-",$idx,".xml")
+       return xdmp:document-insert($uri, &lt;root&gt;{$d/node()}&lt;/root&gt;, (), "address-table")
+       
+return (
+ $insert,
+ fn:concat("You have just inserted ", $count, " address table records into the database.")
+  )
+</query><query name="denormalize-customers" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+ 
+(:
+ : Examine this and compare with /unit-02/corb/02-denormalize.xqy.
+ : The differences are found in the hardcoded URI used for testing here
+ : and inserting the document in the CORB module.
+:)
+
+let $uris := cts:uris('','document',cts:collection-query("customer-table"))
+let $insert :=
+ for $uri in $uris
+ let $customer  := fn:doc($uri) 
+ let $new-uri := fn:concat("/denormalized", $uri)
+
+ let $customer-bill-id := fn:string($customer/root/billing_address_id)
+ let $customer-ship-id :=  fn:string($customer/root/shipping_address_id)
+
+ let $bill-info := fn:collection("address-table")/root[address-id eq $customer-bill-id]/(* except address_id)
+ let $ship-info := fn:collection("address-table")/root[address-id eq $customer-ship-id]/(* except address_id)
+
+ let $final :=
+       &lt;customer&gt;           
+         {$customer/root/*,   
+          &lt;billing-address&gt;{$bill-info}&lt;/billing-address&gt;,
+          &lt;shipping-address&gt;{$ship-info}&lt;/shipping-address&gt;
+          }
+       &lt;/customer&gt;
+
+ return   xdmp:document-insert($new-uri,$final,(),"customer")
+
+return ($insert, 
+        fn:concat("You have just created 3 customer entities and inserted them into the database.")
+       )
+</query><query name="delete table collections" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+(: Though fine for development purposes, you don't always want to delete collections using xdmp:collection-delete() from query console
+
+   A good rules of thumb:
+      Single qconsole transaction for &lt; 10000 documents
+      Spawned tasks/task server   for &lt; 100000 documents
+      CORB                        for anything else
+:)
+
+xdmp:collection-delete("customer-table"),
+xdmp:collection-delete("address-table"),
+"You've just deleted the customer-table and address-table collections."</query><query name="Intro" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">"
+This workspace starts by demonstrating inserting data into MarkLogic.
+
+Generally we'll load data into MarkLogic using Client APIs such as Java or REST.  We can also load documents directly from Query Console.
+
+A common way to start working with data in MarkLogic is by loading extracts from .csv files that have been exported from relational tables.
+A .csv can be loaded into MarkLogic using Content Pump and each row in the .csv will become an individual
+XML or JSON document. The documents created after running the code in the load-customer-table, load-address-table tabs 
+will show you documents similar to those that would be created from loading a .csv of the same content using Content Pump
+for a .csv with the following format.
+
+customer_id,first_name,last_name,email,ssn,phone,billing_address_id,shipping_address_id,region,segment
+1,Nicholas,Wheeler,nwheeler0@cdbaby.com,803-28-0354,1-(915)325-2812,1,2,justo,top
+2,Richard,Kennedy,rkennedy1@apache.org,253-66-8162,1-(815)551-8998,3,4,in, regular
+
+We'll load the Customer data, then denormalize to create Customer entities. So you have an example of creating entities in MarkLogic from disparate tables.
+
+We'll proceed to the next workspace to load Orders and Products entities as-is.
+"</query></workspace></export>

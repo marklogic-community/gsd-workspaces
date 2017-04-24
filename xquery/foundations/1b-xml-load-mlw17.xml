@@ -1,4 +1,4 @@
-<export><workspace name="1-xml-load-mlw17"><query name="load-customer-data" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">let $doc :=
+<export><workspace name="1b-xml-load-mlw17"><query name="load-customer-data" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">let $doc :=
 &lt;dataset&gt;
   &lt;record&gt;
     &lt;customer_id&gt;1&lt;/customer_id&gt;
@@ -81,9 +81,12 @@
 &lt;/dataset&gt;
 
 let $docs := $doc/record
-return for $d at $idx in $docs 
-       let $uri := fn:concat("/customer-",$idx,".xml")
-       return xdmp:document-insert($uri, &lt;customer&gt;{$d/node()}&lt;/customer&gt;, (), "customer")
+let $count := fn:count($docs)
+return (for $d at $idx in $docs 
+        let $uri := fn:concat("/customer-",$idx,".xml")
+        return xdmp:document-insert($uri, &lt;customer&gt;{$d/node()}&lt;/customer&gt;, (), "customer"),
+        fn:concat("You just inserted ", $count, " customer records into the database.")
+        )
 </query><query name="load-order-data" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
 declare namespace html = "http://www.w3.org/1999/xhtml";
 let $doc :=
@@ -394,10 +397,15 @@ let $doc :=
   --&gt;
 &lt;/dataset&gt;
 
+
 let $docs := $doc/record
-return for $d at $idx in $docs 
-       let $uri := fn:concat("/order-",$idx,".xml")
-       return xdmp:document-insert($uri, &lt;order&gt;{$d/node()}&lt;/order&gt;, (), "order")</query><query name="load-product-data" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+let $count := fn:count($docs)
+return (for $d at $idx in $docs 
+        let $uri := fn:concat("/order-",$idx,".xml")
+          return xdmp:document-insert($uri, &lt;order&gt;{$d/node()}&lt;/order&gt;, (), "order"),
+       fn:concat("You just inserted ", $count, " order records into the database.")
+        )
+</query><query name="load-product-data" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
 declare namespace html = "http://www.w3.org/1999/xhtml";
 let $doc :=
 &lt;dataset&gt;
@@ -495,11 +503,14 @@ let $doc :=
   &lt;/record&gt;
 &lt;/dataset&gt;
 
+ 
 let $docs := $doc/record
-return for $d at $idx in $docs 
-       let $uri := fn:concat("/product-",$idx,".xml")
-       return xdmp:document-insert($uri, &lt;product&gt;{$d/node()}&lt;/product&gt;, (), "product")
-       
+let $count := fn:count($docs)
+return (for $d at $idx in $docs 
+        let $uri := fn:concat("/product-",$idx,".xml")
+         return xdmp:document-insert($uri, &lt;product&gt;{$d/node()}&lt;/product&gt;, (), "product"),
+        fn:concat("You just inserted ", $count, " product records into the database.")
+       )
        </query><query name="collection-count" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
 (:
 : A simple script to return the collections 
@@ -507,4 +518,10 @@ return for $d at $idx in $docs
 :)
 
 for $c in cts:collections()
-return fn:concat($c," : ",fn:count(fn:collection($c)))</query></workspace></export>
+return fn:concat($c," : ",fn:count(fn:collection($c)))</query><query name="Intro" focus="true" active="true" content-source="as:8163069407532591035:" mode="xquery">"
+This workspace starts by demonstrating inserting data into MarkLogic.
+
+Here the entities have already been defined for you.  We can load these entities as-is and then access in Query Console.
+
+After loading this data we can...
+"</query></workspace></export>
