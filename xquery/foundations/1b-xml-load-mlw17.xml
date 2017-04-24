@@ -1,4 +1,8 @@
-<export><workspace name="1b-xml-load-mlw17"><query name="load-customer-data" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">let $doc :=
+<export><workspace name="1b-xml-load-mlw17"><query name="load-customer-data" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+(: reloads customer entities as-is created in previous workspace.
+   places them in additional collecton "system-a"
+:) 
+let $doc :=
 &lt;dataset&gt;
   &lt;record&gt;
     &lt;customer_id&gt;1&lt;/customer_id&gt;
@@ -83,8 +87,8 @@
 let $docs := $doc/record
 let $count := fn:count($docs)
 return (for $d at $idx in $docs 
-        let $uri := fn:concat("/customer-",$idx,".xml")
-        return xdmp:document-insert($uri, &lt;customer&gt;{$d/node()}&lt;/customer&gt;, (), "customer"),
+        let $uri := fn:concat("/denormalized/customer-",$idx,".xml")
+        return xdmp:document-insert($uri, &lt;customer&gt;{$d/node()}&lt;/customer&gt;, (), ("customer", "system-a")),
         fn:concat("You just inserted ", $count, " customer records into the database.")
         )
 </query><query name="load-order-data" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
@@ -518,10 +522,84 @@ return (for $d at $idx in $docs
 :)
 
 for $c in cts:collections()
-return fn:concat($c," : ",fn:count(fn:collection($c)))</query><query name="Intro" focus="true" active="true" content-source="as:8163069407532591035:" mode="xquery">"
+return fn:concat($c," : ",fn:count(fn:collection($c)))</query><query name="Intro" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">"
 This workspace starts by demonstrating inserting data into MarkLogic.
 
 Here the entities have already been defined for you.  We can load these entities as-is and then access in Query Console.
 
 After loading this data we can...
-"</query></workspace></export>
+"</query><query name="load-additional-customer-data" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+
+(: similar to Paul Jackson record in the Red Pill presentation. 
+   loads customer entities into "customer" and "system-b" collections.
+:)
+
+let $doc :=
+&lt;dataset&gt;
+  &lt;record&gt;
+    &lt;id&gt;82&lt;/id&gt;
+    &lt;fname&gt;Fanechka&lt;/fname&gt;
+    &lt;lname&gt;Applebee&lt;/lname&gt;
+    &lt;phone&gt;1-(915)318-6020&lt;/phone&gt;
+    &lt;ssn&gt;482-78-7787&lt;/ssn&gt;
+    &lt;street&gt;3833 Merchant Parkway&lt;/street&gt;
+    &lt;city&gt;El Paso&lt;/city&gt;
+    &lt;state&gt;Texas&lt;/state&gt;
+    &lt;postal&gt;79934&lt;/postal&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;42&lt;/id&gt;
+    &lt;fname&gt;Gunther&lt;/fname&gt;
+    &lt;lname&gt;Revely&lt;/lname&gt;
+    &lt;phone&gt;1-(251)551-0806&lt;/phone&gt;
+    &lt;ssn&gt;729-28-2635&lt;/ssn&gt;
+    &lt;street&gt;76291 Memorial Parkway&lt;/street&gt;
+    &lt;city&gt;Mobile&lt;/city&gt;
+    &lt;state&gt;Alabama&lt;/state&gt;
+    &lt;postal&gt;36622&lt;/postal&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;1&lt;/id&gt;
+    &lt;fname&gt;Rickey&lt;/fname&gt;
+    &lt;lname&gt;Roostan&lt;/lname&gt;
+    &lt;phone&gt;1-(808)408-2422&lt;/phone&gt;
+    &lt;ssn&gt;120-59-9484&lt;/ssn&gt;
+    &lt;street&gt;2 Northwestern Road&lt;/street&gt;
+    &lt;city&gt;Honolulu&lt;/city&gt;
+    &lt;state&gt;Hawaii&lt;/state&gt;
+    &lt;postal&gt;96825&lt;/postal&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;9&lt;/id&gt;
+    &lt;fname&gt;Kristina&lt;/fname&gt;
+    &lt;lname&gt;Frankel&lt;/lname&gt;
+    &lt;phone&gt;1-(469)618-6671&lt;/phone&gt;
+    &lt;ssn&gt;355-62-0033&lt;/ssn&gt;
+    &lt;street&gt;889 Novick Center&lt;/street&gt;
+    &lt;city&gt;Dallas&lt;/city&gt;
+    &lt;state&gt;Texas&lt;/state&gt;
+    &lt;postal&gt;75226&lt;/postal&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;33&lt;/id&gt;
+    &lt;fname&gt;Kora&lt;/fname&gt;
+    &lt;lname&gt;McIntosh&lt;/lname&gt;
+    &lt;phone&gt;1-(806)259-1852&lt;/phone&gt;
+    &lt;ssn&gt;258-12-1494&lt;/ssn&gt;
+    &lt;street&gt;27 John Wall Street&lt;/street&gt;
+    &lt;city&gt;Lubbock&lt;/city&gt;
+    &lt;state&gt;Texas&lt;/state&gt;
+    &lt;postal&gt;79405&lt;/postal&gt;
+  &lt;/record&gt;
+&lt;/dataset&gt;
+
+let $docs := $doc/record
+let $count := fn:count($docs)
+return (for $d at $idx in $docs 
+        let $uri := fn:concat("/customer-",$idx,".xml")
+        return xdmp:document-insert($uri, &lt;customer&gt;{$d/node()}&lt;/customer&gt;, (), ("customer", "system-b")),
+        fn:concat("You just inserted ", $count, " customer records into the database.")
+        )
+
+</query></workspace></export>
