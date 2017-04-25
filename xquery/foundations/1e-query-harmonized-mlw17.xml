@@ -3,9 +3,9 @@
 cts:search(
   fn:collection("customer"), 
   cts:element-word-query(xs:QName("shipping-zip"),"36628") 
-    )</query><query name="shipping-zip-xpath-query" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+    )</query><query name="shipping-zip-xpath-query" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
 
-/customer[header/shipping-zip eq "36628"]</query><query name="REST-get-query-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">(:Structured Search
+/customer[canonical/shipping-zip eq "36628"]</query><query name="REST-get-query-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">(:Structured Search
 Query Related Orders, Products by Key
 Add Triples to Envelope
 Query Related Orders by Triple
@@ -52,7 +52,7 @@ xdmp:http-post(fn:concat("http://localhost:8000/v1/search"),
                     &lt;/headers&gt;
                    &lt;/options&gt;,
                    document{ $structured-query }
-                )(: [2] :)</query><query name="REST-get-document" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+                )(: [2] :)</query><query name="REST-get-document" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
 
 xdmp:http-get(fn:concat("http://localhost:8000/v1/documents?uri=/denormalized/customer-1.xml"), 
                    &lt;options xmlns="xdmp:http"&gt;
