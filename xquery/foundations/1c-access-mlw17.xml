@@ -37,7 +37,7 @@ let $points :=
 return 
   cts:search(fn:collection(),
      cts:element-pair-geospatial-query(xs:QName("billing_address"),
-        xs:QName("latitude"), xs:QName("longitude"),  cts:polygon($points)))</query><query name="and-query-2" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+        xs:QName("latitude"), xs:QName("longitude"),  cts:polygon($points)))</query><query name="and-query-2" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
 
 cts:search(fn:collection("customer"), 
    cts:and-query((
@@ -51,4 +51,7 @@ cts:search(fn:collection("customer"),
   </query><query name="element-query-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
 
 cts:search(fn:collection("order"), 
-                 cts:element-query(xs:QName("status"), "in progress"))</query></workspace></export>
+                 cts:element-query(xs:QName("status"), "in progress"))</query><query name="Intro" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">"
+This workspace demonstrates searching and querying documents in MarkLogic.
+
+"</query></workspace></export>

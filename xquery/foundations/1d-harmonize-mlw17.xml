@@ -1,0 +1,83 @@
+<export><workspace name="1d-harmonize-mlw17"><query name="envelope-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+let $docs := fn:collection("customer")
+let $enveloped-docs :=
+   for $doc in $docs return
+   let $collections:= xdmp:document-get-collections($doc)
+   return
+     &lt;customer&gt;{
+      &lt;source&gt;{$doc/customer/*}&lt;/source&gt;
+   }&lt;/customer&gt;
+return $enveloped-docs
+</query><query name="envelope-2" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+let $uris := cts:uris('','document', cts:collection-query("customer"))
+
+let $enveloped-docs :=
+   for $uri in $uris 
+   let $source := fn:doc($uri)
+   return
+     &lt;customer&gt;{
+      &lt;source&gt;{$source/customer/*}&lt;/source&gt;
+   }&lt;/customer&gt;
+   
+return $enveloped-docs
+
+
+</query><query name="envelope-3" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+let $uris := cts:uris('','document', cts:collection-query("customer"))
+
+let $enveloped-docs :=
+   for $uri in $uris 
+   let $collections := xdmp:document-get-collections($uri)
+   let $source := fn:doc($uri)
+   let $doc := 
+                &lt;customer&gt;{
+                  &lt;source&gt;{$source/customer/*}&lt;/source&gt;
+                }&lt;/customer&gt;
+   return xdmp:document-insert($uri, $doc, (), ($collections, "enveloped"))
+return $enveloped-docs</query><query name="uris-a" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+
+let $uris := cts:uris('','document', cts:and-query((cts:collection-query("customer"), 
+                                                   cts:collection-query("system-a"),
+                                                   cts:collection-query("enveloped"))))
+                                                   
+return $uris</query><query name="harmonize-a" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+let $uris := cts:uris('','document', cts:and-query((cts:collection-query("customer"), 
+                                                   cts:collection-query("system-a"),
+                                                   cts:collection-query("enveloped"))))
+                                                   
+for $uri in $uris
+let $doc := fn:doc($uri)
+let $zip := $doc/customer/source/shipping_address/zip/text()
+let $header := &lt;header&gt;&lt;zip&gt;{$zip}&lt;/zip&gt;&lt;/header&gt;
+return xdmp:node-insert-before($doc/customer/source, $header)</query><query name="harmonize-b" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+let $uris := cts:uris('','document', cts:and-query((cts:collection-query("customer"), 
+                                                   cts:collection-query("system-b"),
+                                                   cts:collection-query("enveloped"))))
+                                                   
+for $uri in $uris
+let $doc := fn:doc($uri)
+let $zip := $doc/customer/source/postal/text()
+let $header := &lt;header&gt;&lt;zip&gt;{$zip}&lt;/zip&gt;&lt;/header&gt;
+return xdmp:node-insert-before($doc/customer/source, $header)
+</query><query name="header-a" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+let $uris := cts:uris('','document', cts:and-query((cts:collection-query("customer"), 
+                                                   cts:collection-query("system-a"),
+                                                   cts:collection-query("enveloped"))))
+                                                   
+for $uri in $uris
+let $doc := fn:doc($uri)
+let $zip := $doc/customer/source/shipping_address/zip/text()
+let $header := &lt;header&gt;&lt;zip&gt;{$zip}&lt;/zip&gt;&lt;/header&gt;
+return ($header) (: , $doc) :)</query><query name="Query 1" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">"
+This workspace demonstrates applying the envelope pattern and harmonization to douments in MarkLogic.
+
+Mention CORB, Data Movement SDK, here
+
+"</query></workspace></export>
