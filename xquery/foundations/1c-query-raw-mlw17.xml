@@ -1,4 +1,4 @@
-<export><workspace name="1c-access-mlw17"><query name="word-query-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="1c-query-raw-mlw17"><query name="word-query-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
 
 cts:search(/product, "Sonair")</query><query name="word-query-2" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
 
