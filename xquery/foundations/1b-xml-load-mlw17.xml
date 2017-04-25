@@ -557,11 +557,11 @@ let $doc :=
     &lt;street&gt;76291 Memorial Parkway&lt;/street&gt;
     &lt;city&gt;Mobile&lt;/city&gt;
     &lt;state&gt;Alabama&lt;/state&gt;
-    &lt;postal&gt;36622&lt;/postal&gt;
+    &lt;postal&gt;36628&lt;/postal&gt;
   &lt;/record&gt;
   &lt;record&gt;
     &lt;id&gt;1&lt;/id&gt;
-    &lt;fname&gt;Rickey&lt;/fname&gt;
+    &lt;fname&gt;Richard&lt;/fname&gt;
     &lt;lname&gt;Roostan&lt;/lname&gt;
     &lt;phone&gt;1-(808)408-2422&lt;/phone&gt;
     &lt;ssn&gt;120-59-9484&lt;/ssn&gt;

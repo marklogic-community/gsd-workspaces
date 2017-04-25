@@ -1,0 +1,54 @@
+<export><workspace name="1c-access-mlw17"><query name="word-query-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+cts:search(/product, "Sonair")</query><query name="word-query-2" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+cts:search(/customer, cts:word-query("Richard"))</query><query name="element-query-2" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+cts:search(fn:collection("customer"), 
+                 cts:element-query(xs:QName("city"), "mobile"))</query><query name="and-query-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+cts:search(fn:collection("customer"), 
+   cts:and-query(
+            (cts:element-query(xs:QName("city"), "mobile"),
+             cts:element-query(xs:QName("postal"), "36628"))
+           )
+   )</query><query name="MOVE-geo query 1" focus="false" active="false" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+(:Show me customers with a shipping address within a 20 mile radius of El Paso, TX
+  Document contains lat/long of 29.4413, -98.4793 
+  31.6948, -106.3
+:)
+
+cts:search(fn:collection("customer"),
+  cts:element-pair-geospatial-query(xs:QName("billing_address"),
+    xs:QName("latitude"), xs:QName("longitude"),  (cts:circle(20, cts:point(31.696275, -106.302553)))))
+    
+    </query><query name="MOVE-qeo query 2" focus="false" active="false" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+(: Show me all documents with a shipping address within a polygon defined by the 3 points
+   defining a triangle in El Paso, TX. 
+   A minimum of 3 points required to make a polygon.
+:)
+let $points :=
+ (cts:point(31.699492, -106.304141),
+  cts:point(31.691839, -106.302275),
+  cts:point(31.696111, -106.294442))
+
+  
+return 
+  cts:search(fn:collection(),
+     cts:element-pair-geospatial-query(xs:QName("billing_address"),
+        xs:QName("latitude"), xs:QName("longitude"),  cts:polygon($points)))</query><query name="and-query-2" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+cts:search(fn:collection("customer"), 
+   cts:and-query((
+              cts:element-query(xs:QName("city"), "mobile"),
+                cts:or-query((
+                  cts:element-query(xs:QName("postal"), "36628"),
+                  cts:element-query(xs:QName("zip"), "36628")
+                  ))
+             )))
+           
+  </query><query name="element-query-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+cts:search(fn:collection("order"), 
+                 cts:element-query(xs:QName("status"), "in progress"))</query></workspace></export>
