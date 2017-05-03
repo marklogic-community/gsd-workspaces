@@ -1,7 +1,7 @@
-<export><workspace name="1g-tde-mlw17"><query name="create and validate template" focus="false" listorder="1" taborder="1" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="1g-tde-mlw17"><query name="create and validate template" focus="false" listorder="1" taborder="3" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
-  Create a simple Template that defines a SQL view over documents.
-  Validate the Template.
+ : Create a simple Template that defines a SQL view over documents.
+ : Validate the Template.
 :)
 
 let $my-first-TDE:=
@@ -51,11 +51,11 @@ return
  tde:validate( 
    $my-first-TDE 
    ) 
-</query><query name="test template" focus="false" listorder="2" taborder="2" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="test template" focus="false" listorder="2" taborder="1" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (:
-  Create a simple Template that defines a SQL view over documents.
-  Test the Template by seeing which rows are generated when you apply it to a document.
+ : Create a simple Template that defines a SQL view over documents.
+ : Test the Template by seeing which rows are generated when you apply it to a document.
 :)
 
 let $my-first-TDE:=
@@ -105,11 +105,12 @@ return
    fn:doc("/customer-2.xml"), 
    $my-first-TDE 
    ) 
-</query><query name="insert the template" focus="false" listorder="3" taborder="3" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="insert the template" focus="false" listorder="3" taborder="2" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (:
-  Insert the Template.
-  The function tde:template-insert() will validate the template; insert it into the Schemas database; and assign the special collection "http://marklogic.com/xdmp/tde"
+ : Insert the Template.
+ : The function tde:template-insert() will validate the template; insert it into the Schemas database; 
+ : and assign the special collection "http://marklogic.com/xdmp/tde"
 :)
 
 import module "http://marklogic.com/xdmp/tde" at "/MarkLogic/tde.xqy";
@@ -183,7 +184,10 @@ select * from customers
 :)
  
 xdmp:sql('select * from customers')
-</query><query name="simple SQL JavaScript" focus="false" listorder="7" taborder="7" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="javascript">xdmp.sql('select * from customers')
+</query><query name="simple SQL JavaScript" focus="false" listorder="7" taborder="7" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="javascript">
+// simple SQL query from JavaScript
+
+xdmp.sql('select * from customers')
 </query><query name="Combination Query" focus="false" listorder="8" taborder="8" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (:
@@ -202,6 +206,9 @@ xdmp:sql(
   cts:word-query('Novick')
   )
 </query><query name="Optic API - XQuery" focus="false" listorder="9" taborder="9" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(:
+ # simple SQL query from the Optic API XQuery
+:)
  
 import module namespace op="http://marklogic.com/optic"
      at "/MarkLogic/optic.xqy";
@@ -211,10 +218,22 @@ op:from-view("customer", "customers")
    =&gt; op:order-by("shipping_zip")
    =&gt; op:result()</query><query name="Optic API JavaScript" focus="false" listorder="10" taborder="10" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="javascript">'use strict';
 
+// simple SQL query from the Optic API JavaScript
+
 const op = require('/MarkLogic/optic');
 
 op.fromView('customer', 'customers')
    .select(['customer_id', 'last_name', 'shipping_zip'])
    .orderBy('shipping_zip')
    .result();
-</query><query name="Intro" focus="true" listorder="11" taborder="11" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";&#13;</query></workspace></export>
+</query><query name="Intro" focus="true" listorder="11" taborder="11" active="true" database="6441050416343490118" server="10757672201913389096" database-name="Schemas" server-name="App-Services" mode="xquery">"
+This workspace demonstrates creating a SQL view
+on top of our Customer entities using
+Template Driven Extraction (TDE) and then querying
+through a variety of APIs - JavaScript, Optic, SQL, and XQuery.
+"
+</query><query name="Cleanup Schemas" focus="false" listorder="12" taborder="12" active="true" database="6441050416343490118" server="10757672201913389096" database-name="Schemas" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(:
+ : Remove template (and view) from Schemas database.
+:)
+xdmp:collection-delete( "TDE-EA" )</query></workspace></export>
