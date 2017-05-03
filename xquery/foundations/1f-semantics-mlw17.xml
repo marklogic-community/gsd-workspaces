@@ -1,6 +1,7 @@
-<export><workspace name="1f-semantics-mlw17"><query name="create-triples-1" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="1f-semantics-mlw17"><query name="create-triples-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
 import module namespace sem = "http://marklogic.com/semantics"
    at "/MarkLogic/semantics.xqy";
+   
 (: Creating triples using sem:triples()
  : These triples create the relationship:
  : CustomerID placed OrderID .
@@ -236,4 +237,7 @@ WHERE {
   ?customer :label $lname .
 	?customer :placed ?order .
 	?order :contains ?product .
-  $product :label "Domainer". }</query></workspace></export>
+  $product :label "Domainer". }</query><query name="Query 1" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">"
+This workspace illustrates Semantics by demonstrating how we can
+create and query triples.
+"</query></workspace></export>
