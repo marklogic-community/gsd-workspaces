@@ -1,7 +1,10 @@
 <export><workspace name="1b-xml-load-mlw17"><query name="load-customer-data" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
-(: reloads customer entities as-is created in previous workspace.
-   places them in additional collecton "system-a"
+(: This script reloads customer entities as-is.
+ : These entities were created by denormalzing separate
+ : records in the previous workspace.
+ : The entities are saved in the collecton "system-a"
 :) 
+
 let $doc :=
 &lt;dataset&gt;
   &lt;record&gt;
@@ -92,7 +95,9 @@ return (for $d at $idx in $docs
         fn:concat("You just inserted ", $count, " customer records into the database.")
         )
 </query><query name="load-order-data" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
-declare namespace html = "http://www.w3.org/1999/xhtml";
+(: This script loads order entities as-is.
+ : These orders relate to customer entities from system-a by customer_id
+:) 
 let $doc :=
 &lt;dataset&gt;
   &lt;record&gt;
@@ -410,7 +415,10 @@ return (for $d at $idx in $docs
        fn:concat("You just inserted ", $count, " order records into the database.")
         )
 </query><query name="load-product-data" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
-declare namespace html = "http://www.w3.org/1999/xhtml";
+(: This script loads product entities as-is.
+ : These orders relate to order entities where 
+ : order.order_lines.order_line.product = product.id
+:) 
 let $doc :=
 &lt;dataset&gt;
   &lt;record&gt;
@@ -517,22 +525,26 @@ return (for $d at $idx in $docs
        )
        </query><query name="collection-count" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
 (:
-: A simple script to return the collections 
+ : A simple script to return the collections 
  : loaded into the system with their counts.
+ : The collection lexicon must be enabled.
 :)
 
 for $c in cts:collections()
 return fn:concat($c," : ",fn:count(fn:collection($c)))</query><query name="Intro" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">"
-This workspace starts by demonstrating inserting data into MarkLogic.
+This workspace demonstrates inserting data into MarkLogic.
 
-Here the entities have already been defined for you.  We can load these entities as-is and then access in Query Console.
+Here the entities have already been defined for you.  We c
+an load these entities as is and then access in Query Console.
 
-After loading this data we can...
+In this section we load additional data for orders and products,
+as well as customers from a separate systems having a 
+different schema.
 "</query><query name="load-additional-customer-data" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
-declare namespace html = "http://www.w3.org/1999/xhtml";
-
-(: similar to Paul Jackson record in the Red Pill presentation. 
-   loads customer entities into "customer" and "system-b" collections.
+(: This script loads additional customer entities as is
+ : into "customer" and "system-b" collections.
+ : The latent schema is similar to the "Paul Jackson" 
+ : record in the Red Pill presentation. 
 :)
 
 let $doc :=

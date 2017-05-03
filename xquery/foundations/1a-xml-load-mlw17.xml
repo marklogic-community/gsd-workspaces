@@ -1,6 +1,10 @@
 <export><workspace name="1a-xml-load-mlw17"><query name="load-customer-table" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
-
-(: this script does blah blah blah :)
+(: This script loads rows from a customer table. The table has the shape:
+ : customer_id,first_name,last_name,email,ssn,phone,billing_address_id,shipping_address_id,region,segment
+ : and was exported to the filesystem as a csv.  Loading with content pump, the records loaded
+ : will look similar to the following.  Click "Run". Click "Explore". 
+ : And click on one of the document URIs to view one of the documents.
+:)
 
 let $doc :=
 &lt;rows&gt;
@@ -47,13 +51,14 @@ let $count := fn:count($docs)
 let $insert :=  
        for $d at $idx in $docs 
        let $uri := fn:concat("/customer-",$idx,".xml")
-       return xdmp:document-insert($uri, &lt;root&gt;{$d/node()}&lt;/root&gt;, (), "customer-table")
+       return xdmp:document-insert($uri, &lt;root&gt;{$d/node()}&lt;/root&gt;, (), ("customer-table","system-a"))
  
 return (
  $insert,
  fn:concat("You have just inserted ", $count, " customer table records into the database.")
   )
-</query><query name="load-address-table" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+</query><query name="load-address-table" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+(: This script loads rows from an address table. :)
 
 let $doc :=
 &lt;rows&gt;
@@ -118,18 +123,16 @@ let $count := fn:count($docs)
 let $insert := 
        for $d at $idx in $docs 
        let $uri := fn:concat("/address-",$idx,".xml")
-       return xdmp:document-insert($uri, &lt;root&gt;{$d/node()}&lt;/root&gt;, (), "address-table")
+       return xdmp:document-insert($uri, &lt;root&gt;{$d/node()}&lt;/root&gt;, (), ("address-table","system-a"))
        
 return (
  $insert,
  fn:concat("You have just inserted ", $count, " address table records into the database.")
   )
 </query><query name="denormalize-customers" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
- 
 (:
- : Examine this and compare with /unit-02/corb/02-denormalize.xqy.
- : The differences are found in the hardcoded URI used for testing here
- : and inserting the document in the CORB module.
+ : This script is a simple example of creating entities in MarkLogic by \\
+ : denormalizing records loaded from separate tables.
 :)
 
 let $uris := cts:uris('','document',cts:collection-query("customer-table"))
@@ -152,24 +155,28 @@ let $insert :=
           }
        &lt;/customer&gt;
 
- return   xdmp:document-insert($new-uri,$final,(),"customer")
+ return   xdmp:document-insert($new-uri,$final,(),("customer","system-a"))
 
 return ($insert, 
         fn:concat("You have just created 3 customer entities and inserted them into the database.")
        )
 </query><query name="delete table collections" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
-
-(: Though fine for development purposes, you don't always want to delete collections using xdmp:collection-delete() from query console
-
-   A good rules of thumb:
-      Single qconsole transaction for &lt; 10000 documents
-      Spawned tasks/task server   for &lt; 100000 documents
-      CORB                        for anything else
+(: 
+ :  This script deletes the collections containing the records we created
+ :  our denormalized entities from.
+ :  
+ :  Though fine for development purposes, you don't always want to 
+ :  delete collections using xdmp:collection-delete() from query console
+ :
+ :  A good rules of thumb:
+ :    Single qconsole transaction for &lt; 10000 documents
+ :    Spawned tasks/task server   for &lt; 100000 documents
+ :    CORB                        for anything else
 :)
 
 xdmp:collection-delete("customer-table"),
 xdmp:collection-delete("address-table"),
-"You've just deleted the customer-table and address-table collections."</query><query name="Intro" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">"
+"You've just deleted the customer-table and address-table collections."</query><query name="Intro" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">"
 This workspace starts by demonstrating inserting data into MarkLogic.
 
 Generally we'll load data into MarkLogic using Client APIs such as Java or REST.  We can also load documents directly from Query Console.
