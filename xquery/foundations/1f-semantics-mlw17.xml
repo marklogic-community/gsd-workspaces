@@ -1,28 +1,10 @@
-<export><workspace name="1f-semantics-mlw17"><query name="orders-by-key" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
-(:
-Query Related Orders, Products by Key
-Add Triples to Envelope
-Query Related Orders by Triple
-Addional Metadata to relationships
-:)
-let $customer-doc := fn:doc("/denormalized/customer-3.xml")
-let $customer-id := $customer-doc/customer/source/customer_id
-let $orders := fn:collection("order")/order[customer_id eq $customer-id]
-return ($customer-doc, $orders )</query><query name="products-by-key" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
-(:won't work after enveloped:)
-
-let $customer-doc := fn:doc("/denormalized/customer-3.xml")
-let $customer-id := $customer-doc/customer/source/customer_id
-
-let $orders := fn:collection("order")/order[customer_id eq $customer-id]
-let $prod-ids := fn:distinct-values($orders/order_lines/order_line/product/text())
-
-let $products := fn:collection("product")/product[id eq $prod-ids]
-return $products/(&lt;prod&gt;{name, sku}&lt;/prod&gt;)
-</query><query name="create-triples-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
-
+<export><workspace name="1f-semantics-mlw17"><query name="create-triples-1" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
 import module namespace sem = "http://marklogic.com/semantics"
    at "/MarkLogic/semantics.xqy";
+(: Creating triples using sem:triples()
+ : These triples create the relationship:
+ : CustomerID placed OrderID .
+:)
 
 let $sem-prefix := "http://www.marklogic.com/orders#"
 let $uris := cts:uris('','document',cts:collection-query("order"))
@@ -41,9 +23,15 @@ let $triples := (
 
 
 return $triples</query><query name="create-triple-header" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
-
 import module namespace sem = "http://marklogic.com/semantics"
    at "/MarkLogic/semantics.xqy";
+(: Creating triples using sem:triples()
+ : These triples create the relationship:
+ :      CustomerID placed OrderID .
+ :      OrderID contains ProductID .
+ : and places them in a &lt;triples&gt; section which we'll
+ : later add to our envelopes.
+:)
 
 let $sem-prefix := "http://www.marklogic.com/orders#"
 let $uris := cts:uris('','document',cts:collection-query("order"))                                                   
@@ -67,10 +55,13 @@ let $triple-header := &lt;triples&gt;
                        {$triples}
                       &lt;/triples&gt;
 return $triple-header</query><query name="create-triples-2" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
-
 import module namespace sem = "http://marklogic.com/semantics"
    at "/MarkLogic/semantics.xqy";
-
+(: Creating triples using sem:triples()
+ : These triples create the relationship:
+ :      CustomerID placed OrderID .
+ :      OrderID contains ProductID .
+:)
 let $sem-prefix := "http://www.marklogic.com/orders#"
 let $uris := cts:uris('','document',cts:collection-query("order"))                                                   
 for $uri in $uris
@@ -91,9 +82,11 @@ let $triples := (
 
 
 return $triples</query><query name="add-triples" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
-
 import module namespace sem = "http://marklogic.com/semantics"
    at "/MarkLogic/semantics.xqy";
+(: This script creates the triples and places them in a
+ : &lt;triples&gt; section within our Order entity envelopes.
+:)
 
 let $sem-prefix := "http://www.marklogic.com/orders#"
 let $uris := cts:uris('','document',cts:collection-query("order"))                                                   
@@ -135,15 +128,21 @@ let $prod-ids := fn:distinct-values($orders/order_lines/order_line/product/text(
 
 let $products := fn:collection("product")/product[id eq $prod-ids]
 return  $products/(&lt;prod&gt;{name, sku}&lt;/prod&gt;) 
-</query><query name="SPARQL-SELECT" focus="false" active="true" content-source="as:6240101570028256752:" mode="sparql">## query
+</query><query name="SPARQL-SELECT" focus="false" active="true" content-source="as:6240101570028256752:" mode="sparql"># query
+# Show me the Customers who placed an Order 
+# containing Product5
+
 PREFIX : &lt;http://www.marklogic.com/orders#&gt;  
 
- 
 SELECT ?customer
 WHERE {
 	?customer :placed ?order .
 	?order :contains :Product5 }
-</query><query name="SPARQL-CONSTRUCT" focus="false" active="true" content-source="as:6240101570028256752:" mode="sparql">## SPARQL QUERY
+</query><query name="SPARQL-CONSTRUCT" focus="false" active="true" content-source="as:6240101570028256752:" mode="sparql"># Creating a new fact/relationshipos
+# Create a relationship that defines when a Customer places an Order
+# that contains a Product, we can state the Customer "bought"
+# the Product
+
 PREFIX : &lt;http://www.marklogic.com/orders#&gt;  
 
 CONSTRUCT { ?customer :bought ?product }
@@ -151,8 +150,9 @@ WHERE {
 	?customer :placed ?order .
 	?order :contains ?product }
 
-</query><query name="SPARQL-INSERT" focus="false" active="true" content-source="as:6240101570028256752:" mode="sparql-update">## SPARQL UPDATE
-##Comments and labels for customer and products - create separate triples
+</query><query name="SPARQL-INSERT" focus="false" active="true" content-source="as:6240101570028256752:" mode="sparql-update"># SPARQL UPDATE
+# Insert our new triples into the database
+
 PREFIX : &lt;http://www.marklogic.com/orders#&gt;  
 
 INSERT 
@@ -161,12 +161,16 @@ INSERT
 	  ?customer :placed ?order .
 	  ?order :contains ?product 
 }
-</query><query name="SPARQL-bought" focus="false" active="true" content-source="as:6240101570028256752:" mode="sparql">## query
+</query><query name="SPARQL-bought" focus="false" active="true" content-source="as:6240101570028256752:" mode="sparql"># query
+# Show me customers who have bought Product5
 
 PREFIX : &lt;http://www.marklogic.com/orders#&gt;  
 
 SELECT ?customer
 WHERE { ?customer :bought :Product5 } </query><query name="Add Comments" focus="false" active="true" content-source="as:6240101570028256752:" mode="sparql-update">## SPARQL UPDATE
+# add comments to the database to define the meaning of what 
+# our predicates/relatioships mean
+
 PREFIX : &lt;http://www.marklogic.com/orders#&gt;  
 
 INSERT DATA {
@@ -177,7 +181,8 @@ INSERT DATA {
   }
 }
  
-</query><query name="Query Comment" focus="false" active="true" content-source="as:6240101570028256752:" mode="sparql">PREFIX : &lt;http://www.marklogic.com/orders#&gt;  
+</query><query name="Query Comment" focus="false" active="true" content-source="as:6240101570028256752:" mode="sparql">#query our comment for the 'placed' predicate
+PREFIX : &lt;http://www.marklogic.com/orders#&gt;  
 
 SELECT $comment
 WHERE{
@@ -186,7 +191,9 @@ WHERE{
  </query><query name="Add Labels" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
 import module namespace sem = "http://marklogic.com/semantics"
    at "/MarkLogic/semantics.xqy";
-
+(: Add additional labels for our Products and Customers so we can 
+ : query using the labels
+:)
 
 let $sem-prefix := "http://www.marklogic.com/orders#"
 let $order-uris := cts:uris('','document',cts:collection-query("order"))                                                   
@@ -214,13 +221,14 @@ let $cust-triples :=
 
 return sem:rdf-insert(( $cust-triples, $prod-triples ),(),(), "order-details")
   </query><query name="fn:doc()" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
-declare namespace html = "http://www.w3.org/1999/xhtml";
-fn:doc("/triplestore/19a7bc190f61d0fb.xml")</query><query name="SPARQL-labels" focus="false" active="true" content-source="as:6240101570028256752:" mode="sparql">PREFIX : &lt;http://www.marklogic.com/orders#&gt;  
+(: query the triplestore document.xml created in the previous tab, "Add Labels" :)
+fn:doc("/triplestore/19a7bc190f61d0fb.xml")</query><query name="SPARQL-labels" focus="false" active="true" content-source="as:6240101570028256752:" mode="sparql">#Show me the product name for Product5
+PREFIX : &lt;http://www.marklogic.com/orders#&gt;  
 
 SELECT   ?productname
 WHERE {
 	:Product5 :label ?productname .
-  }</query><query name="SPARQL-labels-2" focus="false" active="true" content-source="as:6240101570028256752:" mode="sparql">## query
+  }</query><query name="SPARQL-labels-2" focus="false" active="true" content-source="as:6240101570028256752:" mode="sparql">#Show me the name of the customers which purchased the product "Domainer"
 PREFIX : &lt;http://www.marklogic.com/orders#&gt;  
 
 SELECT   ?lname
