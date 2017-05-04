@@ -1,0 +1,242 @@
+<export><workspace name="2b-REST-search-mlw17"><query name="get-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+xdmp:http-get( "http://localhost:8000/v1/search?q=Sonair", 
+                   &lt;options xmlns="xdmp:http"&gt;
+                    &lt;authentication&gt;
+                       &lt;username&gt;admin&lt;/username&gt;
+                       &lt;password&gt;admin&lt;/password&gt;
+                    &lt;/authentication&gt;
+                   &lt;/options&gt;)
+</query><query name="post" focus="false" active="false" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+
+let $doc := xdmp:document-get("C:\Users\paven\Desktop\ARCHIVE\Erie\search-7.json")
+ return xdmp:http-post("http://localhost:8000/v1/search",
+
+                   &lt;options xmlns="xdmp:http"&gt;
+                    &lt;authentication&gt;
+                       &lt;username&gt;oslo&lt;/username&gt;
+                       &lt;password&gt;oslo&lt;/password&gt;
+                    &lt;/authentication&gt;
+                    &lt;headers&gt;
+                       &lt;content-type&gt;application/json&lt;/content-type&gt;
+                    &lt;/headers&gt;
+                   &lt;/options&gt;,
+                     $doc 
+                    ) 
+</query><query name="put" focus="false" active="false" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+
+let $doc := xdmp:document-get("C:\Users\paven\Desktop\Load\MarkLogicFiles\Load_Files\44838.xhtml")
+return  xdmp:http-put('http://localhost:80403/v1/documents?uri=/xml/2/3/test-doc.xhtml',
+
+                   &lt;options xmlns="xdmp:http"&gt;
+                    &lt;authentication&gt;
+                       &lt;username&gt;uhg-writer&lt;/username&gt;
+                       &lt;password&gt;oslo&lt;/password&gt;
+                    &lt;/authentication&gt;
+                    &lt;headers&gt;
+                       &lt;content-type&gt;application/xml&lt;/content-type&gt;
+                    &lt;/headers&gt;
+                   &lt;/options&gt;,
+                     text{xdmp:quote($doc)}
+                    ) 
+</query><query name="get-2" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+xdmp:http-get( "http://localhost:8000/v1/search?q=Zaam-Dox&amp;amp;collection=product", 
+                   &lt;options xmlns="xdmp:http"&gt;
+                    &lt;authentication&gt;
+                       &lt;username&gt;admin&lt;/username&gt;
+                       &lt;password&gt;admin&lt;/password&gt;
+                    &lt;/authentication&gt;
+                   &lt;/options&gt;)
+</query><query name="get-3" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+xdmp:http-get( "http://localhost:8000/v1/search?q=Zaam-Dox&amp;amp;collection=product&amp;amp;format=json", 
+                   &lt;options xmlns="xdmp:http"&gt;
+                    &lt;authentication&gt;
+                       &lt;username&gt;admin&lt;/username&gt;
+                       &lt;password&gt;admin&lt;/password&gt;
+                    &lt;/authentication&gt;
+                   &lt;/options&gt;)
+</query><query name="fn:doc()" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+fn:doc("/product-3.xml")</query><query name="post-element-value" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+(:
+   Structured Search with REST
+:)
+let $structured-query :=
+'{
+    "query" : {
+      "queries": [{
+          "value-query" : {
+              "element": {
+                "name": "shipping-zip",
+                "ns": ""
+              },
+                "text": [
+                  "36628"
+                ]
+           }
+      }]
+    }
+ }'
+ 
+return 
+xdmp:http-post(fn:concat("http://localhost:8000/v1/search"), 
+                   &lt;options xmlns="xdmp:http"&gt;
+                    &lt;authentication&gt;
+                       &lt;username&gt;admin&lt;/username&gt;
+                       &lt;password&gt;admin&lt;/password&gt;
+                    &lt;/authentication&gt;
+                      &lt;headers&gt;
+                       &lt;content-type&gt;application/json&lt;/content-type&gt;
+                    &lt;/headers&gt;
+                   &lt;/options&gt;,
+                   document{ $structured-query }
+                ) [2]</query><query name="post-and-query" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+(:
+cts:search(fn:collection("product"), 
+   cts:and-query(
+            (cts:element-query(xs:QName("relationship"), "complement"),
+             cts:element-query(xs:QName("name"), "Sonair"))
+           )
+   )
+:)
+let $structured-query :=
+'{ "query" : {
+      "queries": [{
+         "and-query": {
+            "queries": [{
+                 "value-query" : {
+                     "element": {
+                     "name": "relationship",
+                     "ns": ""
+                 },
+                  "text": [
+                           "complement"
+                  ]
+                 },
+                 "value-query" : {
+                     "element": {
+                     "name": "name",
+                     "ns": ""
+                 },
+                  "text": [
+                           "sonair"
+                  ]
+                }
+            }]
+          }
+      }]
+    }
+ }'
+ 
+return 
+xdmp:http-post(fn:concat("http://localhost:8000/v1/search"), 
+                   &lt;options xmlns="xdmp:http"&gt;
+                    &lt;authentication&gt;
+                       &lt;username&gt;admin&lt;/username&gt;
+                       &lt;password&gt;admin&lt;/password&gt;
+                    &lt;/authentication&gt;
+                      &lt;headers&gt;
+                       &lt;content-type&gt;application/json&lt;/content-type&gt;
+                    &lt;/headers&gt;
+                   &lt;/options&gt;,
+                   document{ $structured-query }
+                ) [2]
+                
+                </query><query name="post-geo-JSON" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+(:
+cts:search(fn:collection("customer"),
+  cts:element-pair-geospatial-query(xs:QName("billing_address"),
+    xs:QName("latitude"), xs:QName("longitude"),  cts:circle(20, cts:point(31.760423, -106.485124))))
+:)
+
+let $structured-query :=
+'{"query": {
+    "queries": [{
+      "geo-elem-pair-query": {
+        "parent": { "ns": "", "name": "billing_address" },
+        "lat": { "ns": "", "name": "latitude" },
+        "lon": { "ns": "", "name": "longitude" },
+        "circle": [
+          {
+            "radius": 20,
+            "point": [{ "latitude": 31.760423, "longitude": -106.485124 } ]
+       
+          } 
+        ]
+      }
+    }] 
+}}'
+ 
+return 
+xdmp:http-post(fn:concat("http://localhost:8000/v1/search"), 
+                   &lt;options xmlns="xdmp:http"&gt;
+                    &lt;authentication&gt;
+                       &lt;username&gt;admin&lt;/username&gt;
+                       &lt;password&gt;admin&lt;/password&gt;
+                    &lt;/authentication&gt;
+                      &lt;headers&gt;
+                       &lt;content-type&gt;application/json&lt;/content-type&gt;
+                    &lt;/headers&gt;
+                   &lt;/options&gt;,
+                   document{ $structured-query }
+                ) [2]</query><query name="post-geo-XML" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+(:
+cts:search(fn:collection("customer"),
+  cts:element-pair-geospatial-query(xs:QName("billing_address"),
+    xs:QName("latitude"), xs:QName("longitude"),  cts:circle(20, cts:point(31.760423, -106.485124))))
+:)
+
+let $structured-query :=
+&lt;query xmlns="http://marklogic.com/appservices/search"&gt;
+  &lt;geo-elem-pair-query&gt;
+    &lt;parent ns="" name="billing_address"/&gt; 
+    &lt;lat ns="" name="latitude"/&gt; 
+    &lt;lon ns="" name="longitude"/&gt;
+    &lt;circle&gt;
+      &lt;radius&gt;20&lt;/radius&gt;
+      &lt;point&gt; &lt;latitude&gt;31.760423&lt;/latitude&gt; &lt;longitude&gt;-106.485124&lt;/longitude&gt; &lt;/point&gt;
+    &lt;/circle&gt;
+  &lt;/geo-elem-pair-query&gt;
+&lt;/query&gt;
+ 
+return 
+xdmp:http-post(fn:concat("http://localhost:8000/v1/search"), 
+                   &lt;options xmlns="xdmp:http"&gt;
+                    &lt;authentication&gt;
+                       &lt;username&gt;admin&lt;/username&gt;
+                       &lt;password&gt;admin&lt;/password&gt;
+                    &lt;/authentication&gt;
+                      &lt;headers&gt;
+                       &lt;content-type&gt;application/xml&lt;/content-type&gt;
+                    &lt;/headers&gt;
+                   &lt;/options&gt;,
+                   document{ $structured-query }
+                ) [2]</query><query name="post-parse" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+(:
+cts:search(fn:collection("customer"),
+  cts:element-pair-geospatial-query(xs:QName("billing_address"),
+    xs:QName("latitude"), xs:QName("longitude"),  cts:circle(20, cts:point(31.760423, -106.485124))))
+:)
+
+let $structured-query := cts:parse("merchant NEAR/5 parkway AND texas")
+return 
+xdmp:http-post(fn:concat("http://localhost:8000/v1/search"), 
+                   &lt;options xmlns="xdmp:http"&gt;
+                    &lt;authentication&gt;
+                       &lt;username&gt;admin&lt;/username&gt;
+                       &lt;password&gt;admin&lt;/password&gt;
+                    &lt;/authentication&gt;
+                      &lt;headers&gt;
+                       &lt;content-type&gt;application/xml&lt;/content-type&gt;
+                    &lt;/headers&gt;
+                   &lt;/options&gt;,
+                   document{ $structured-query }
+                ) [2]
+</query><query name="cts:parse" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+
+cts:parse("merchant NEAR/5 parkway AND texas")</query></workspace></export>

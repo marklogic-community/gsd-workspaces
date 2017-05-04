@@ -1,0 +1,74 @@
+<export><workspace name="2a-cts-search-mlw17"><query name="word-query-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+cts:search(/product, "Sonair")</query><query name="word-query-2" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+cts:search(/product, cts:word-query("Sonair"))</query><query name="element-query-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+cts:search(fn:collection("product"), 
+   cts:element-query(xs:QName("relationship"), "complement"))</query><query name="and-query-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+cts:search(fn:collection("product"), 
+   cts:and-query(
+            (cts:element-query(xs:QName("relationship"), "complement"),
+             cts:element-query(xs:QName("name"), "Sonair"))
+           )
+   )</query><query name="geo-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+(:Show me customers with a billing address within a 
+  20 mile radius of downtown El Paso, TX  (31.760423, -106.485124)
+  Document contains lat/long of 31.6948, -106.3 - Nicholas Wheeler
+:)
+
+cts:search(fn:collection("customer"),
+  cts:element-pair-geospatial-query(xs:QName("billing_address"),
+    xs:QName("latitude"), xs:QName("longitude"),  cts:circle(20, cts:point(31.760423, -106.485124))))
+    
+
+ </query><query name="geo-2" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+(: Show me all documents with a shipping address within a polygon defined by the 3 points
+   defining a triangle bound within  Richmond VA 
+   Document contains 37.5242,-77.4932 . - Bonnie Clark
+   A minimum of 3 points required to make a polygon.
+:)
+let $points :=
+ (cts:point(37.515028, -77.506390),
+  cts:point(37.562430, -77.479031),
+  cts:point(37.544314, -77.399979))
+  
+return 
+  cts:search(fn:collection(),
+     cts:element-pair-geospatial-query(xs:QName("shipping_address"),
+        xs:QName("latitude"), xs:QName("longitude"),  cts:polygon($points)))</query><query name="geo-3" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+
+let $nick := cts:point(31.6948, -106.3)
+let $bonnie :=  
+ (cts:point(37.515028, -77.506390),
+  cts:point(37.562430, -77.479031),
+  cts:point(37.544314, -77.399979))
+  
+return
+geo:shortest-distance(
+  $nick,
+  cts:polygon($bonnie))
+  
+  </query><query name="and-not-1" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+cts:search(fn:collection("product"), 
+   cts:and-not-query(
+             cts:element-query(xs:QName("relationship"), "complement"),
+             cts:element-query(xs:QName("name"), "Sonair")
+           )
+   )</query><query name="basic sum" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+(:create decimal element range index on total:)
+
+for $order-id in fn:collection("order")/order/source/id
+  let $total-amount := cts:sum-aggregate(
+                                cts:element-reference(xs:QName("total")), 
+                                (), 
+                                cts:element-value-query(xs:QName("id"),  xs:string($order-id))
+                                )
+  return 
+    element order {
+      attribute id {$order-id },
+      attribute total-amount { $total-amount }
+    }
+</query></workspace></export>
