@@ -37,7 +37,7 @@ task wrapper(type: Wrapper) {
 ext {
 // note and beware, if any of these workspaces are not found, this task throws a DOM error.
     workspaceUser = "admin"
-    workspaceNames = "1-xml-load-mlw17,1b-entities-zero-mlw17,2a-entity-services-mlw17,2b-entity-services-mlw17,3a-modeling-1-mlw17,3b-metadata-mlw17,3c-modeling-semantics-mlw17,4a-combinations-mlw17,5a-optic-mlw17"
+    workspaceNames = "1a-xml-load-mlw17,1b-entities-zero-mlw17,2a-entity-services-mlw17,2b-entity-services-mlw17,3a-modeling-1-mlw17,3b-metadata-mlw17,3c-modeling-semantics-mlw17,4a-combinations-mlw17,5a-optic-mlw17"
     mlAppConfig {
         createTriggersDatabase = false
     }

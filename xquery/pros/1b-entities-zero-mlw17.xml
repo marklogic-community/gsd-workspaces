@@ -41,17 +41,34 @@ let $model :=
     &lt;/Product&gt;
   &lt;/es:definitions&gt;
 &lt;/es:model&gt;
-return (xdmp:document-insert("/model-zero.xml", $model, xdmp:default-permissions(), "http://marklogic.com/entity-services/models"),
-"You have now inserted the XML model in this tab info the database.  Here I validate it and show its JSON representation and its triples:",
-es:model-validate($model),
-cts:triples( (), (), (), (), (),cts:document-query("/model-zero.xml")))</query><query active="false" focus="false" mode="xquery" name="Generate-Test-Instances">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+return (
+  xdmp:document-insert("/model-zero.xml", $model, xdmp:default-permissions(), "http://marklogic.com/entity-services/models"),
+  "You have now inserted the XML model in this tab info the database.  Here I validate it and show its JSON representation and its triples:",
+  es:model-validate($model),
+  cts:triples( (), (), (), (), (),cts:document-query("/model-zero.xml"))
+)
+
+(: 
+  Run once to insert the XML version of the model document.  Use the collection quoted in order to index your model as triples.
+  This module outputs the validated serialization of the model, which is in JSON.
+  If you run this module two times, you'll also get to see the triples which were indexed when the document was first inserted.
+  This model forms the basis of code generation functions.
+  The triples form the substrate on which we'll run several SPARQL and Optic API queries.
+  :)</query><query active="false" focus="false" mode="xquery" name="Generate-Test-Instances">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 for $test-instance at $i in doc("/model-zero.xml")=&gt;es:model-from-xml()=&gt;es:model-get-test-instances()
 let $uri := "/instance/"|| fn:local-name($test-instance) || "/" || $i
 return 
 xdmp:document-insert($uri, $test-instance, xdmp:default-permissions(), ("test-instances")),
 "You have generates some tests intances from your model using es:model-get-test-instances.
- Here is one of them:", doc('/instance/Customer/1')</query><query active="false" focus="false" mode="xquery" name="Setup-Instance-Converter">let $edited-module := text { "
+ Here is one of them:", doc('/instance/Customer/1')
+ 
+(:
+ Given a valid model, we can provide a text exemplar so that you can examine the structure of an instance
+ document in the database.
+ This module inserts one document for each type in the model.
+ Upon a second run, you QConsole outputs the contents of the test document.
+ :)</query><query active="false" focus="false" mode="xquery" name="Setup-Instance-Converter">let $edited-module := text { "
 (: This buffer was created by running
    xdmp:save('/share/instance.xqy', doc('/model.xml')=&gt;es:model-from-xml()=&gt;es:instance-converter-generate() )
    and then editing the results :)
@@ -233,17 +250,21 @@ declare private function eCommerce:add-attachments(
 }
 
 return xdmp:invoke-function(function() { 
-  xdmp:document-insert("/ext/extractions.xqy", $edited-module) }, 
+  xdmp:document-insert("/ext/extractions-0.0.0.xqy", $edited-module) }, 
   map:map()=&gt;map:with("database", xdmp:database("Modules"))
   )
 ,
 "You have inserted an instance converter module into the modules database.
  It can be used by importing it from transforms or other integration code like this:
  import module namespace my = 'http://marklogic.com/tutorial-data/ECommerce-0.0.0' at '/ext/extractions-0.0.0.xqy';
-"</query><query active="false" focus="false" mode="xquery" name="harmonize">(: This query runs code in the instnace converter, harmonizing your source documents into canonical envelopes :)
+"
+
+(:
+ This buffer contains a conversion module.  It was generated, and then modified to conform to the source documents.
+ :)</query><query active="false" focus="false" mode="xquery" name="harmonize">(: This query runs code in the instnace converter, harmonizing your source documents into canonical envelopes :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
-import module namespace my = "http://marklogic.com/tutorial-data/ECommerce-0.0.0" at "/ext/extractions.xqy";
- 
+import module namespace my = "http://marklogic.com/tutorial-data/ECommerce-0.0.0" at "/ext/extractions-0.0.0.xqy";
+
 for $envelope at $i in 
 (
 collection("customer") ! my:extract-instance-Customer(.) =&gt;my:instance-to-envelope(),
@@ -254,8 +275,12 @@ return
 xdmp:document-insert("/envelope-0.0.0-" || $i || ".xml", $envelope, xdmp:default-permissions(), ("0.0.0","envelopes"));
 
 "You have run extraction code to create envelopes from the upstream source documents like this:",
-(/*:envelope[*:instance/Product])[1]
-</query><query active="true" focus="true" mode="xquery" name="Setup-TDE">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+(/*:envelope[*:instance[*:info/*:version="0.0.0"]])[1]
+
+(:
+ This buffer invokes code inserted in the previous step.
+ Its creates envelopes from each of the three kinds of input data,
+ Then stores them :)</query><query active="false" focus="false" mode="xquery" name="Setup-TDE">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 import module namespace tde = "http://marklogic.com/xdmp/tde" at "/MarkLogic/tde.xqy";
 
 let $et := doc("/model-zero.xml")=&gt;es:model-from-xml()=&gt;es:extraction-template-generate()
@@ -269,7 +294,7 @@ tde:template-insert("/e-Commerce.tdex", $et)
  the schemas database.  It will be used to create triples and rows from the envelope
  documents.  Here is the template:",
 $et) 
-</query><query active="true" focus="false" mode="xquery" name="Intro">"
+</query><query active="true" focus="true" mode="xquery" name="Intro">"
 This workspace starts to explore data modeling with Entity Services.
 
 You'll declare a model with entities Customers, Products and their
@@ -322,7 +347,7 @@ op:from-triples( (
       op:on(op:col("referent"), op:col("referent") )), 
     op:on($property, $property2))
 =&gt;op:where( op:eq(op:col("version"), "0.0.0"))
-=&gt;op:order-by("typeTitle")
+=&gt;op:order-by(( "typeTitle", "propertyLabel" ))
 =&gt;op:select( ("modelTitle", "version", "typeTitle", "propertyLabel", "relationshipWith"))
 =&gt;op:result()</query><query active="false" focus="false" mode="xquery" name="Types and Instances">(: This is an Optic query, crafted show you documents categorized by class. :)
 import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
@@ -357,4 +382,6 @@ op:from-triples( (
 =&gt;op:join-doc( $instanceDoc, op:col("instanceDocUri"))   
 =&gt;op:where( op:and(op:eq($modelTitle, "ECommerce"), op:eq($modelVersion, "0.0.0") ) )  
 =&gt;op:select( ($modelTitle, $modelVersion, $typeTitle, $instanceDoc) )
-=&gt;op:result()</query></workspace></export>
+=&gt;op:result()</query><query active="false" focus="false" mode="sql" name="SQL!">SELECT * FROM Ecommerce.Product;
+SELECT * FROM Ecommerce.Customer;
+SELECT * FROM Ecommerce.Order;</query></workspace></export>

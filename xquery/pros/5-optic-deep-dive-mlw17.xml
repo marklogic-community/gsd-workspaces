@@ -1,8 +1,0 @@
-<export><workspace name="5-optic-deep-dive-mlw17"><query name="Optic API Deep Dive" focus="true" listorder="1" taborder="1" active="true" database="9519346717167514106" server="10288014009910814601" database-name="dh-content" server-name="dh" mode="xquery">(:
-This workspace explores the Optic API.
-
-:)</query><query name="A complex query" focus="false" listorder="2" taborder="2" active="true" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
-
-op:from-view("ECommerce", "Customer")
-=&gt;op:where(cts:word-query("Baby"))
-=&gt;op:result()</query><query name="Query 1" focus="false" listorder="3" taborder="3" active="true" database="3509593754672177159" server="14213096509134413707" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";&#13;declare namespace html = "http://www.w3.org/1999/xhtml";&#13;&lt;p&gt;hello world&lt;/p&gt;</query></workspace></export>
