@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<export><workspace name="3a-modeling-1-mlw17"><query active="true" focus="false" mode="xquery" name="Model">(: this model extends the domain to include another domain type, a customer Segment. :) 
+<export><workspace name="3a-modeling-1-mlw17"><query active="false" focus="false" mode="xquery" name="Model">(: this model extends the domain to include another domain type, a customer Segment. :) 
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 let $model :=
@@ -75,6 +75,7 @@ let $model :=
         &lt;notes&gt;&lt;es:datatype&gt;string&lt;/es:datatype&gt;&lt;/notes&gt;
       &lt;/es:properties&gt;
       &lt;es:word-lexicon&gt;notes&lt;/es:word-lexicon&gt;
+      &lt;es:range-index&gt;total&lt;/es:range-index&gt;
     &lt;/OrderLine&gt;
     &lt;Product&gt;
       &lt;es:properties&gt;
@@ -97,7 +98,7 @@ let $model :=
 return  (xdmp:document-insert("/extended-model.xml", $model, xdmp:default-permissions(), "http://marklogic.com/entity-services/models"),
 "You have now inserted the XML model in this tab info the database.  Here we validate it and show its JSON representation and its triples:",
 es:model-validate($model),
-cts:triples((), (), (), (), (), cts:document-query("/extended-model.xml")))</query><query active="true" focus="false" mode="xquery" name="instance converter">(: This instance converter module accomodates the new Segment entity type :)
+cts:triples((), (), (), (), (), cts:document-query("/extended-model.xml")))</query><query active="false" focus="false" mode="xquery" name="instance converter">(: This instance converter module accomodates the new Segment entity type :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 let $edited-module := text { "
@@ -279,7 +280,10 @@ declare function eCommerce:extract-instance-Address(
      else
      
      let $related-product := 
-       json:object()=&gt;map:with('$type', 'Product')=&gt;map:with('name', $source-node/product_name/text())
+       json:object()=&gt;map:with('$type', 'Product')
+         =&gt;map:with('name', $source-node/product_name/text())
+         =&gt;map:with('sku', xdmp:random())
+
 
      return
      $instance
@@ -410,7 +414,7 @@ return xdmp:invoke-function(function() {
 "You have inserted an instance converter module into the modules database.
  It can be used by importing it from transforms or other integration code like this:
  import module namespace my = 'http://marklogic.com/tutorial-data/ECommerce-0.0.2' at '/ext/extractions-0.0.2.xqy';
-"</query><query active="true" focus="false" mode="xquery" name="harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+"</query><query active="false" focus="false" mode="xquery" name="harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 import module namespace my = "http://marklogic.com/example/ontology/ECommerce-0.0.2"
   at "/ext/extractions-0.0.2.xqy";
@@ -422,9 +426,9 @@ collection("order")    ! my:extract-instance-Order(.)    =&gt;my:instance-to-env
 collection("product")  ! my:extract-instance-Product(.)  =&gt;my:instance-to-envelope()
 )
 return
-xdmp:document-insert("/envelope-0.0.2" || $i || ".xml", $envelope, xdmp:default-permissions(), "envelopes");
+xdmp:document-insert("/envelope-0.0.2" || $i || ".xml", $envelope, xdmp:default-permissions(), ("0.0.2","envelopes"));
 "You have just run extraction code to create envelopes from the upstream source documents like this:",
-(//*:instance[*:info/*:version="0.0.2"]/Product)[1]
+(//*:instance[*:info/*:version="0.0.2"])[1]
 ;
 
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
@@ -450,7 +454,7 @@ xdmp:document-insert("/segments.xml", $segments, xdmp:default-permissions(), "re
 $segments)</query><query active="false" focus="false" mode="xquery" name="Reference Data">//Segments;
 
 (: no triples in this workspaces :)
-cts:triples( (), (), (), (), (), cts:document-query( //Segments/base-uri(.)))</query><query active="true" focus="true" mode="xquery" name="Setup TDE">(: One, save the default template :)
+cts:triples( (), (), (), (), (), cts:document-query( //Segments/base-uri(.)))</query><query active="false" focus="false" mode="xquery" name="Setup TDE">(: One, save the default template :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 declare namespace tde = "http://marklogic.com/xdmp/tde";
 
@@ -512,13 +516,34 @@ for $address-val in doc("/e-commerce.tdex")//tde:context[. = "./Address"]
 return
 (xdmp:node-replace($address-val/text(), text { ".//Address" }));
 
+(: six, correct context for order lines :)
+import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+declare namespace tde = "http://marklogic.com/xdmp/tde";
+
+for $orderLine in doc("/e-commerce.tdex")//tde:context[. = "./orderLines"]
+return
+(xdmp:node-replace($orderLine/text(), text { "./orderLines/OrderLine" }),
+ xdmp:node-replace($orderLine/..//tde:val[text() = "../id"], &lt;tde:val&gt;../../id&lt;/tde:val&gt;)
+);
+
+(: seven, correct context for related products :)
+import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+declare namespace tde = "http://marklogic.com/xdmp/tde";
+
+for $orderLine in doc("/e-commerce.tdex")//tde:context[. = "./relatedProduct"]
+return
+(xdmp:node-replace($orderLine/text(), text { "./relatedProduct/ProductRelation" }),
+ xdmp:node-replace($orderLine/..//tde:val[text() = "../sku"], &lt;tde:val&gt;../../sku&lt;/tde:val&gt;),
+ xdmp:node-replace($orderLine/..//tde:val[text() = "product/Product"], &lt;tde:val&gt;product/Product/name&lt;/tde:val&gt;)
+);
+
     
 (: store the modified TDE in Schemas DB :)
 import module namespace tde = "http://marklogic.com/xdmp/tde" at "/MarkLogic/tde.xqy";
 let $modified-doc := doc("/e-commerce.tdex")
 return 
 ("Inserted extraction template into schemas database",
- $modified-doc,
+ $modified-doc//tde:template,
  tde:template-insert("/e-Commerce.tdex", $modified-doc, xdmp:default-permissions())
    )
 </query><query active="false" focus="false" mode="sparql" name="Customer">PREFIX es: &lt;http://marklogic.com/entity-services#&gt; 
@@ -542,9 +567,8 @@ ECommerce.Customer c, ECommerce.Segment s
 WHERE c.segment = s.code
 </query><query active="false" focus="false" mode="sql" name="Addresses">select * from ECommerce.Address</query><query active="false" focus="false" mode="sql" name="Address Join">SELECT firstName, lastName, zip 
 FROM ECommerce.Customer c, ECommerce.Address a
-WHERE c.billTo = a.hash</query><query active="true" focus="false" mode="xquery" name="Intro">"
- This workspace concentrates on how to refactor or change a model, and also
- how to extend a model with triples.
+WHERE c.billTo = a.hash</query><query active="true" focus="true" mode="xquery" name="Intro">"
+ This workspace concentrates on how to refactor or change a model.
  
  We consider how to change an entity services model over time, by
  turning a string property into its own entity type.
@@ -552,4 +576,38 @@ WHERE c.billTo = a.hash</query><query active="true" focus="false" mode="xquery" 
  Also in this workspace we change the harmonizations to extract related products
  from sparse data into instances, whereas in version 0.0.1 we dropped them on the floor
  as degenerate cases.
-"</query></workspace></export>
+"</query><query active="false" focus="false" mode="xquery" name="Setup Indexes">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy";
+
+let $props := doc("/extended-model.xml")=&gt;es:model-validate()=&gt;es:database-properties-generate()
+let $quoted := xdmp:quote($props)
+  =&gt;replace("%%DATABASE%%", "Documents")
+  =&gt;replace("%%SCHEMAS_DATABASE%%", "Schemas")
+  =&gt;replace("OrderLine", "Order/orderLines/OrderLine")
+
+return
+(
+xdmp:http-put("http://localhost:8002/manage/v2/databases/Documents/properties",
+   &lt;options xmlns="xdmp:http"&gt;
+       &lt;authentication method="digest"&gt;
+         &lt;username&gt;admin&lt;/username&gt;
+         &lt;password&gt;admin&lt;/password&gt;
+       &lt;/authentication&gt;
+       &lt;headers&gt;
+         &lt;content-type&gt;application/json&lt;/content-type&gt;
+       &lt;/headers&gt;
+     &lt;/options&gt;
+     , text { $quoted })[3],
+"You have just generated a database configuration for indexing the instance data, and sent
+that configuration to the REST Management API.  Here is the payload that Entity Services created:",
+xdmp:unquote($quoted)
+)
+
+(:
+  These database properties are most well-suited to Search applications.
+  For each property configured as indexed or with a word lexicon, the generated
+  properties will have a corresponding range index or word lexicon definition.
+ :)</query><query active="false" focus="false" mode="sql" name="Products">SELECT *
+FROM ECommerce.Product l, ECommerce.Product_relatedProduct r
+WHERE
+l.sku = r.sku
+</query></workspace></export>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<export><workspace name="1a-xml-load-mlw17"><query active="true" focus="false" mode="xquery" name="load-customer-data">let $doc :=
+<export><workspace name="1a-xml-load-mlw17"><query active="false" focus="false" mode="xquery" name="load-customer-data">let $doc :=
 &lt;dataset&gt;
   &lt;record&gt;
     &lt;customer_id&gt;1&lt;/customer_id&gt;
@@ -88,7 +88,7 @@ return
        return xdmp:document-insert($uri, &lt;customer&gt;{$d/node()}&lt;/customer&gt;, (), ("as-is","customer")),
 "You have inserted three customer records into the database.  
 They come from a hypothetical 'upstream system'.
-To view one, use the 'Explore' button and find '/customer-1.xml'.")</query><query active="true" focus="false" mode="xquery" name="load-order-data">xquery version "1.0-ml";
+To view one, use the 'Explore' button and find '/customer-1.xml'.")</query><query active="false" focus="false" mode="xquery" name="load-order-data">xquery version "1.0-ml";
 declare namespace html = "http://www.w3.org/1999/xhtml";
 let $doc :=
 &lt;dataset&gt;
@@ -405,7 +405,7 @@ return
        return xdmp:document-insert($uri, &lt;order&gt;{$d/node()}&lt;/order&gt;, (), ("as-is","order")),
 "You have inserted three order records into the database.  
 They come from a hypothetical 'upstream system'.
-To view one, use the 'Explore' button and find '/order-1.xml'")</query><query active="true" focus="false" mode="xquery" name="load-product-data">xquery version "1.0-ml";
+To view one, use the 'Explore' button and find '/order-1.xml'")</query><query active="false" focus="false" mode="xquery" name="load-product-data">xquery version "1.0-ml";
 declare namespace html = "http://www.w3.org/1999/xhtml";
 let $doc :=
 &lt;dataset&gt;
@@ -414,6 +414,7 @@ let $doc :=
     &lt;name&gt;Regrant&lt;/name&gt;
     &lt;sku&gt;664229048-8&lt;/sku&gt;
     &lt;category&gt;interdum&lt;/category&gt;
+    &lt;description&gt;This product will surprise you with its elegance and refinement.  It contains three separate approaches to products, including but not limited to ants, termites, and spiders&lt;/description&gt; 
     &lt;related_products&gt;
       &lt;related_product&gt;
         &lt;product_name&gt;massa&lt;/product_name&gt;
@@ -510,7 +511,7 @@ return (for $d at $idx in $docs
 "You have inserted five product records into the database.  
 They come from a hypothetical 'upstream system'.
 To view one, use the 'Explore' button and find '/product-1.xml'.")
-       </query><query active="true" focus="true" mode="xquery" name="collection-count">xquery version "1.0-ml";
+       </query><query active="false" focus="false" mode="xquery" name="collection-count">xquery version "1.0-ml";
 (:
 : A simple script to return the collections 
  : loaded into the system with their counts.
@@ -527,7 +528,7 @@ return fn:concat($c," : ",fn:count(fn:collection($c)))</query><query active="fal
  : but cannot run on a very large database becuase it is a single 
  : transaction.
 for $d in collection() return xdmp:document-delete(base-uri($d))
-:)</query><query active="true" focus="false" mode="xquery" name="Intro">"
+:)</query><query active="true" focus="true" mode="xquery" name="Intro">"
  This workspace simply contains the very first data to be loaded into the workshop.
  After running all the tabs (except 'clear database') you will have several customers
  orders, and products, in a form that will metamorphasize over the course of the workshop.
