@@ -1,4 +1,4 @@
-<export><workspace name="2-sql-mapping-mlw17"><query name="terminology" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="sql-mapping-mlw17"><query name="terminology" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
 import module namespace functx = "http://www.functx.com" at "/MarkLogic/functx/functx-1.0-nodoc-2007-01.xqy";
 declare namespace html = "http://www.w3.org/1999/xhtml";
 
@@ -59,6 +59,8 @@ MarkLogic XQuery Expression: NOT NECESSARY.
 :)
 
 /customer
+
+(:xpath way to start working with trees, function wrapper in js so you can do same dang things "trees is trees" - grechaw :)
 
 
 </query><query name="selectAttributes" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
@@ -269,7 +271,7 @@ WHERE b='q'
 for $a in /user[b = 'q']/a
 return node-replace($a, &lt;a&gt;{$a + 2}&lt;/a&gt;)
 
-:)</query><query name="DELETE" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+:)</query><query name="DELETE" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
 declare namespace html = "http://www.w3.org/1999/xhtml";
 
 (:
@@ -281,4 +283,4 @@ let $orders := /order[status="in progress"]
 let $uris := for $o in $orders return xdmp:node-uri($o)
 return  xdmp:document-delete($uris)
 
-(: xdmp:collection-delete("collection-name") :)</query></workspace></export>
+(: xdmp:collection-delete("collection-name") :)</query><query name="GROUP BY" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";&#13;declare namespace html = "http://www.w3.org/1999/xhtml";&#13;&lt;p&gt;hello world&lt;/p&gt;</query></workspace></export>
