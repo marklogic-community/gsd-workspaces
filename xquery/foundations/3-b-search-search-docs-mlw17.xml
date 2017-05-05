@@ -1,7 +1,0 @@
-<export><workspace name="3-b-search-search-docs-mlw17"><query name="Query 1" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
-
-import module namespace search = 
-  "http://marklogic.com/appservices/search"
-  at "/MarkLogic/appservices/search/search.xqy";
-
-search:search("hello world")</query></workspace></export>
