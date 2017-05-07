@@ -1,0 +1,112 @@
+<export><workspace name="4c-matchmaking-mlw17"><query name="1. Insert Documents" focus="false" listorder="1" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(:
+ Insert 2 additional documents into the database.  These documents come
+ from different systems, so are inserted into separate collections.
+ We store the queries within the document to enable matchmaker queries.
+:)
+
+let $customer-1-sql-server := 
+ 
+&lt;customer&gt;
+    &lt;customer_id&gt;1&lt;/customer_id&gt;
+    &lt;first_name&gt;Nicholas&lt;/first_name&gt;
+    &lt;last_name&gt;Wheeler&lt;/last_name&gt;
+    &lt;email&gt;nwheeler0@cdbaby.com&lt;/email&gt;
+    &lt;ssn&gt;803-28-0354&lt;/ssn&gt;
+    &lt;phone&gt;1-(915)325-2812&lt;/phone&gt;
+    &lt;billing_address&gt;
+      &lt;street&gt;46958 Farwell Trail&lt;/street&gt;
+      &lt;city&gt;El Paso&lt;/city&gt;
+      &lt;state&gt;Texas&lt;/state&gt;
+      &lt;zip&gt;79950&lt;/zip&gt;
+      &lt;latitude&gt;31.6948&lt;/latitude&gt;
+      &lt;longitude&gt;-106.3&lt;/longitude&gt;
+    &lt;/billing_address&gt;
+    &lt;shipping_address&gt;
+      &lt;street&gt;9 Thierer Place&lt;/street&gt;
+      &lt;city&gt;Mobile&lt;/city&gt;
+      &lt;state&gt;Alabama&lt;/state&gt;
+      &lt;zip&gt;36628&lt;/zip&gt;
+      &lt;latitude&gt;30.6589&lt;/latitude&gt;
+      &lt;longitude&gt;-88.178&lt;/longitude&gt;
+    &lt;/shipping_address&gt;
+    &lt;region&gt;justo&lt;/region&gt;
+    &lt;segment&gt;top&lt;/segment&gt;
+    &lt;query&gt;{ 
+           cts:and-query((
+             cts:element-value-query(xs:QName("fname"),"nicholas"),
+             cts:element-value-query(xs:QName("lname"),"wheeler"),
+             cts:element-value-query(xs:QName("street"),"46958 Farwell Trail"),
+             cts:element-value-query(xs:QName("email"),"nwheeler0@cdbaby.com")
+            ))
+            }
+     &lt;/query&gt;
+ &lt;/customer&gt;
+ 
+let $customer-2-oracle :=
+ &lt;customer&gt;
+    &lt;id&gt;99999&lt;/id&gt;
+    &lt;fname&gt;Nicholas&lt;/fname&gt;
+    &lt;lname&gt;Wheeler&lt;/lname&gt;
+    &lt;email&gt;nwheeler0@cdbaby.com&lt;/email&gt;
+    &lt;phone_number&gt;1-(915)325-2812&lt;/phone_number&gt;
+    &lt;address&gt;
+      &lt;street&gt;46958 Farwell Trail&lt;/street&gt;
+      &lt;city&gt;El Paso&lt;/city&gt;
+      &lt;state&gt;Texas&lt;/state&gt;
+      &lt;zip&gt;79950&lt;/zip&gt;
+      &lt;latitude&gt;31.6948&lt;/latitude&gt;
+      &lt;longitude&gt;-106.3&lt;/longitude&gt;
+    &lt;/address&gt;
+    &lt;notes&gt;Some other gobbledygook&lt;/notes&gt;
+     &lt;query&gt;{ 
+           cts:and-query((
+             cts:element-value-query(xs:QName("first_name"),"nicholas"),
+             cts:element-value-query(xs:QName("last_name"),"wheeler"),
+             cts:element-value-query(xs:QName("street"),"46958 Farwell Trail"),
+             cts:element-value-query(xs:QName("email"),"nwheeler0@cdbaby.com")
+            ))
+            }
+     &lt;/query&gt;
+ &lt;/customer&gt;
+ 
+ return (xdmp:document-insert("/customer-4.xml", $customer-1-sql-server,(), ("customer-match","sql-server")),
+         xdmp:document-insert("/customer-5.xml", $customer-2-oracle,(), ("customer-match","oracle")),
+         "You've added 2 additional customer documents to the database in the 'customer-match' collection."
+         )
+ </query><query name="2. Reverse Customer 1" focus="false" listorder="2" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(:
+ : Find the matching customer from the perspective of the sql-server customer.
+:)
+let $sql-server-doc := doc("/customer-4.xml")/customer
+for $match in cts:search(/customer,
+  cts:and-query((
+    cts:query($sql-server-doc/query/element()),
+    cts:reverse-query($sql-server-doc)
+  ))
+)
+return (fn:base-uri($match), $match)</query><query name="3. Reverse Customer 2" focus="false" listorder="3" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(:
+ : Find the matching customer from the perspective of the oracle customer.
+:)
+
+let $oracle-doc := fn:doc("/customer-5.xml")/customer
+for $match in cts:search(/customer,
+  cts:and-query((
+    cts:query($oracle-doc/query/element()),
+    cts:reverse-query($oracle-doc)
+  ))
+)
+return (fn:base-uri($match), $match)</query><query name="4. Cleanup" focus="false" listorder="4" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(:
+ : Delete the customer-match collection.
+:)
+
+xdmp:collection-delete("customer-match")</query><query name="Intro" focus="true" listorder="5" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
+In this workspace we demonstrate a way to use the reverse index in matchmaker queries.
+This particular example comes to us from a use case that is helpful for data integration.
+
+When we have 2 customer documents that are similar, but no master customer identifier, we
+may know that if certain attributes have similar certain values, then we have 90% confidence
+this person is the same person.  We can use matchmaker queries to identify similar persons.
+"</query></workspace></export>
