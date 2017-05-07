@@ -1,4 +1,9 @@
-<export><workspace name="4-c-matchmaking"><query name="1. Insert Documents" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="4-c-matchmaking"><query name="1. Insert Documents" focus="false" listorder="1" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(:
+ Insert 2 additional documents into the database.  These documents come
+ from different systems, so are inserted into separate collections.
+ We store the queries within the document to enable matchmaker queries.
+:)
 
 let $customer-1-sql-server := 
  
@@ -65,10 +70,14 @@ let $customer-2-oracle :=
      &lt;/query&gt;
  &lt;/customer&gt;
  
- return (xdmp:document-insert("/customer-4.xml", $customer-1-sql-server,(), "customer-match"),
-         xdmp:document-insert("/customer-5.xml", $customer-2-oracle,(), "customer-match"))
- </query><query name="2. Reverse Customer 1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
-
+ return (xdmp:document-insert("/customer-4.xml", $customer-1-sql-server,(), ("customer-match","sql-server")),
+         xdmp:document-insert("/customer-5.xml", $customer-2-oracle,(), ("customer-match","oracle")),
+         "You've added 2 additional customer documents to the database in the 'customer-match' collection."
+         )
+ </query><query name="2. Reverse Customer 1" focus="false" listorder="2" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(:
+ : Find the matching customer from the perspective of the sql-server customer.
+:)
 let $sql-server-doc := doc("/customer-4.xml")/customer
 for $match in cts:search(/customer,
   cts:and-query((
@@ -76,7 +85,10 @@ for $match in cts:search(/customer,
     cts:reverse-query($sql-server-doc)
   ))
 )
-return (fn:base-uri($match), $match)</query><query name="3. Reverse Customer 2" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+return (fn:base-uri($match), $match)</query><query name="3. Reverse Customer 2" focus="false" listorder="3" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(:
+ : Find the matching customer from the perspective of the oracle customer.
+:)
 
 let $oracle-doc := fn:doc("/customer-5.xml")/customer
 for $match in cts:search(/customer,
@@ -85,6 +97,16 @@ for $match in cts:search(/customer,
     cts:reverse-query($oracle-doc)
   ))
 )
-return (fn:base-uri($match), $match)</query><query name="4. Cleanup" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+return (fn:base-uri($match), $match)</query><query name="4. Cleanup" focus="true" listorder="4" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(:
+ : Delete the customer-match collection.
+:)
 
-xdmp:collection-delete("customer-match")</query></workspace></export>
+xdmp:collection-delete("customer-match")</query><query name="Intro" focus="false" listorder="5" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
+In this workspace we demonstrate a way to use the reverse index in matchmaker queries.
+This particular example comes to us from a use case that is helpful for data integration.
+
+When we have 2 customer documents that are similar, but no master customer identifier, we
+may know that if certain attributes have similar certain values, then we have 90% confidence
+this person is the same person.  We can use matchmaker queries to identify similar persons.
+"</query></workspace></export>

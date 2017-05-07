@@ -1,4 +1,4 @@
-<export><workspace name="4-a-reverse-query-mlw17"><query name="2. Reverse query contains" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="4-a-reverse-query-mlw17"><query name="2. Reverse query contains" focus="false" listorder="1" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 let $query :=
 &lt;query&gt;
@@ -21,7 +21,7 @@ let $doc := &lt;dog&gt;
 return  cts:contains($query, cts:reverse-query($doc))
 
  
-</query><query name="3. Insert queries and docs" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+</query><query name="3. Insert queries and docs" focus="false" listorder="2" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 let $query :=
     &lt;query&gt;
@@ -66,12 +66,14 @@ let $dogs :=
 return (xdmp:document-insert("/query-1.xml", $query, (), "queries"),
         for $dog at $idx in $dogs/*
         let $uri := fn:concat("/dog-",$idx,".xml")
-        return xdmp:document-insert($uri, $dog, (), "dogs"))</query><query name="4. Reverse query" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+        return xdmp:document-insert($uri, $dog, (), "dogs"))</query><query name="4. Reverse query" focus="false" listorder="3" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 let $dogs := fn:collection("dogs")
-  return cts:search(/query, cts:reverse-query($dogs))</query><query name="1. Serializing Queries" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+  return cts:search(/query, cts:reverse-query($dogs))</query><query name="1. Serializing Queries" focus="false" listorder="4" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 declare namespace html = "http://www.w3.org/1999/xhtml";
 
 let $query := &lt;xml-element&gt;{cts:word-query("hello")}&lt;/xml-element&gt;
 
-return $query</query></workspace></export>
+return $query</query><query name="Intro" focus="true" listorder="5" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
+ In this workspace we demonstrate how to use the reverse index.
+"</query></workspace></export>
