@@ -1,18 +1,31 @@
-<export><workspace name="2a-cts-search-mlw17"><query name="word-query-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
-
-cts:search(/product, "Sonair")</query><query name="word-query-2" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
-
-cts:search(/product, cts:word-query("Sonair"))</query><query name="element-query-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="2a-cts-search-mlw17"><query name="word-query-1" focus="false" listorder="1" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(: Show me any products containing the text 'Sonair' 
+ : anywhere in the document/entity 
+:)
+cts:search(/product, "Sonair")</query><query name="word-query-2" focus="false" listorder="2" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(: Show me any products containing the text 'Sonair' 
+ : anywhere in the document/entity 
+:)
+cts:search(/product, cts:word-query("Sonair"))</query><query name="element-query-1" focus="false" listorder="3" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(: Show me any entities in the product collection 
+ : containing the text 'complement' occurring as a value 
+ : for the 'relationship' element.
+:)
 
 cts:search(fn:collection("product"), 
-   cts:element-query(xs:QName("relationship"), "complement"))</query><query name="and-query-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+   cts:element-query(xs:QName("relationship"), "complement"))</query><query name="and-query-1" focus="false" listorder="4" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(: Show me any entities in the product collection 
+ : containing the text 'complement' occurring as a value 
+ : for the 'relationship' element AND also has the text 
+ : 'Sonair' as a value for the name element.
+:)
 
 cts:search(fn:collection("product"), 
    cts:and-query(
             (cts:element-query(xs:QName("relationship"), "complement"),
              cts:element-query(xs:QName("name"), "Sonair"))
            )
-   )</query><query name="geo-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+   )</query><query name="geo-1" focus="false" listorder="5" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (:Show me customers with a billing address within a 
   20 mile radius of downtown El Paso, TX  (31.760423, -106.485124)
@@ -24,7 +37,7 @@ cts:search(fn:collection("customer"),
     xs:QName("latitude"), xs:QName("longitude"),  cts:circle(20, cts:point(31.760423, -106.485124))))
     
 
- </query><query name="geo-2" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+ </query><query name="geo-2" focus="false" listorder="6" taborder="8" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: Show me all documents with a shipping address within a polygon defined by the 3 points
    defining a triangle bound within  Richmond VA 
    Document contains 37.5242,-77.4932 . - Bonnie Clark
@@ -38,7 +51,7 @@ let $points :=
 return 
   cts:search(fn:collection(),
      cts:element-pair-geospatial-query(xs:QName("shipping_address"),
-        xs:QName("latitude"), xs:QName("longitude"),  cts:polygon($points)))</query><query name="geo-3" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+        xs:QName("latitude"), xs:QName("longitude"),  cts:polygon($points)))</query><query name="geo-3" focus="false" listorder="7" taborder="9" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 let $nick := cts:point(31.6948, -106.3)
 let $bonnie :=  
@@ -51,14 +64,23 @@ geo:shortest-distance(
   $nick,
   cts:polygon($bonnie))
   
-  </query><query name="and-not-1" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+  </query><query name="and-not-1" focus="false" listorder="8" taborder="6" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(: Show me any entities in the product collection 
+ : containing the text 'complement' occurring as a value 
+ : for the 'relationship' element BUT DOES NOT have the text 
+ : 'Sonair' as a value for the name element.
+:)
+
 cts:search(fn:collection("product"), 
    cts:and-not-query(
              cts:element-query(xs:QName("relationship"), "complement"),
              cts:element-query(xs:QName("name"), "Sonair")
            )
-   )</query><query name="basic sum" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
-(:create decimal element range index on total:)
+   )</query><query name="basic sum" focus="false" listorder="9" taborder="11" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+
+(: For each Order show me the total for the 'total' element 
+ : for all order lines within the order.
+:)
 
 for $order-id in fn:collection("order")/order/source/id
   let $total-amount := cts:sum-aggregate(
@@ -71,4 +93,49 @@ for $order-id in fn:collection("order")/order/source/id
       attribute id {$order-id },
       attribute total-amount { $total-amount }
     }
+</query><query name="Intro" focus="true" listorder="10" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
+In this workspace we explore various types of search 
+and query.
+
+We will also use the Management API to add a range index
+on a numeric attribute of our Order entities so we can
+calculate some quick sums.
+"</query><query name="add-range-index" focus="false" listorder="11" taborder="10" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(: In MarkLogic 9 the collection lexicon and triple index are enabled by default.
+ : Here we use the management API to add a range index on 'total' for our orders.
+ : We also enable fast reverse searches to use the reverse index for
+ : alerting examples coming up in unit 4.
+:)
+let $config :=
+'{
+  "fast-reverse-searches": true,
+  "range-element-index": [
+    {
+      "localname": "total",
+      "namespace-uri": "",
+      "collation": null,
+      "range-value-positions": false,
+      "scalar-type": "decimal",
+      "invalid-values": "reject"
+    }
+  ]
+}'
+ 
+return 
+(
+xdmp:http-put(fn:concat("http://localhost:8002/manage/v2/databases/Documents/properties"), 
+                   &lt;options xmlns="xdmp:http"&gt;
+                    &lt;authentication&gt;
+                       &lt;username&gt;admin&lt;/username&gt;
+                       &lt;password&gt;admin&lt;/password&gt;
+                    &lt;/authentication&gt;
+                      &lt;headers&gt;
+                       &lt;content-type&gt;application/json&lt;/content-type&gt;
+                    &lt;/headers&gt;
+                   &lt;/options&gt;,
+                   document{ $config }
+                ),
+ "You've just used the management API to add an element range index on 'total' and to enable the reverse index.",
+ "Goto the Admin UI and select Groups -&gt; Databases -&gt; Documents -&gt; Element Range Indexes to see the index you've just created."
+)
 </query></workspace></export>
