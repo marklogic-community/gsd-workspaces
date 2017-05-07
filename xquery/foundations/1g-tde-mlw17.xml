@@ -1,4 +1,4 @@
-<export><workspace name="1g-tde-mlw17"><query name="create and validate template" focus="false" listorder="1" taborder="3" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="1g-tde-mlw17"><query name="create and validate template" focus="false" listorder="1" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : Create a simple Template that defines a SQL view over documents.
  : Validate the Template.
@@ -48,10 +48,11 @@ let $my-first-TDE:=
 &lt;/template&gt;
 
 return 
- tde:validate( 
+ (tde:validate( 
    $my-first-TDE 
-   ) 
-</query><query name="test template" focus="false" listorder="2" taborder="1" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+   ),
+   "You've created and validated your first TDE template."
+)</query><query name="test template" focus="false" listorder="2" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (:
  : Create a simple Template that defines a SQL view over documents.
@@ -105,7 +106,7 @@ return
    fn:doc("/customer-2.xml"), 
    $my-first-TDE 
    ) 
-</query><query name="insert the template" focus="false" listorder="3" taborder="2" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="insert the template" focus="false" listorder="3" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (:
  : Insert the Template.
@@ -158,13 +159,18 @@ let $my-first-TDE:=
   &lt;/rows&gt;
 &lt;/template&gt;
 
-return tde:template-insert(
- "/test/my-first-TDE.xml" ,
- $my-first-TDE ,
- xdmp:default-permissions() ,
- "TDE-EA"
- )
-</query><query name="show the view" focus="false" listorder="4" taborder="4" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+return 
+
+( tde:template-insert(
+   "/test/my-first-TDE.xml" ,
+   $my-first-TDE ,
+   xdmp:default-permissions() ,
+   "TDE-EA"
+  ),
+   "You just saved your TDE template template the Schemas database.",
+   "Change your database to Schemas, and click 'Explore' to view the template URI."
+)
+</query><query name="show the view" focus="false" listorder="4" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (:
   Show the view you just created.
@@ -172,23 +178,23 @@ return tde:template-insert(
 
  tde:get-view ( "customer", "customers" )
  
-</query><query name="simple SQL query" focus="false" listorder="5" taborder="5" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="sql">/*
+</query><query name="simple SQL query" focus="false" listorder="5" taborder="6" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="sql">/*
  # simple SQL query using the SQL mode in Query Console
 */
  
 select * from customers
 
-</query><query name="simple SQL XQuery" focus="false" listorder="6" taborder="6" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="xquery">
+</query><query name="simple SQL XQuery" focus="false" listorder="6" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  # simple SQL query from XQuery
 :)
  
 xdmp:sql('select * from customers')
-</query><query name="simple SQL JavaScript" focus="false" listorder="7" taborder="7" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="javascript">
+</query><query name="simple SQL JavaScript" focus="false" listorder="7" taborder="8" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="javascript">
 // simple SQL query from JavaScript
 
 xdmp.sql('select * from customers')
-</query><query name="Combination Query" focus="false" listorder="8" taborder="8" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="Combination Query" focus="false" listorder="8" taborder="9" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (:
  # combination SQL query from XQuery
@@ -205,7 +211,7 @@ xdmp:sql(
   (),
   cts:word-query('Novick')
   )
-</query><query name="Optic API - XQuery" focus="false" listorder="9" taborder="9" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="Optic API - XQuery" focus="false" listorder="9" taborder="10" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  # simple SQL query from the Optic API XQuery
 :)
@@ -216,7 +222,7 @@ import module namespace op="http://marklogic.com/optic"
 op:from-view("customer", "customers")
    =&gt; op:select(("customer_id", "last_name", "shipping_zip"))
    =&gt; op:order-by("shipping_zip")
-   =&gt; op:result()</query><query name="Optic API JavaScript" focus="false" listorder="10" taborder="10" active="true" database="3662323880148367790" server="10757672201913389096" database-name="Documents" server-name="App-Services" mode="javascript">'use strict';
+   =&gt; op:result()</query><query name="Optic API JavaScript" focus="false" listorder="10" taborder="11" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="javascript">'use strict';
 
 // simple SQL query from the Optic API JavaScript
 
@@ -226,14 +232,15 @@ op.fromView('customer', 'customers')
    .select(['customer_id', 'last_name', 'shipping_zip'])
    .orderBy('shipping_zip')
    .result();
-</query><query name="Intro" focus="true" listorder="11" taborder="11" active="true" database="6441050416343490118" server="10757672201913389096" database-name="Schemas" server-name="App-Services" mode="xquery">"
+</query><query name="Intro" focus="true" listorder="11" taborder="1" active="true" database="14059993161380782136" server="12590722383439523806" database-name="Schemas" server-name="App-Services" mode="xquery">"
 This workspace demonstrates creating a SQL view
 on top of our Customer entities using
 Template Driven Extraction (TDE) and then querying
 through a variety of APIs - JavaScript, Optic, SQL, and XQuery.
 "
-</query><query name="Cleanup Schemas" focus="false" listorder="12" taborder="12" active="true" database="6441050416343490118" server="10757672201913389096" database-name="Schemas" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="Cleanup Schemas" focus="false" listorder="12" taborder="12" active="true" database="14059993161380782136" server="12590722383439523806" database-name="Schemas" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : Remove template (and view) from Schemas database.
 :)
-xdmp:collection-delete( "TDE-EA" )</query></workspace></export>
+xdmp:collection-delete( "TDE-EA" ),
+"After deleting the template. Try to Query the View. You will find it no longer exists."</query></workspace></export>

@@ -1,4 +1,4 @@
-<export><workspace name="1b-xml-load-mlw17"><query name="load-customer-data" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="1b-xml-load-mlw17"><query name="load-customer-data" focus="false" listorder="1" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: This script reloads customer entities as-is.
  : These entities were created by denormalzing separate
  : records in the previous workspace.
@@ -94,7 +94,7 @@ return (for $d at $idx in $docs
         return xdmp:document-insert($uri, &lt;customer&gt;{$d/node()}&lt;/customer&gt;, (), ("customer", "system-a")),
         fn:concat("You just inserted ", $count, " customer records into the database.")
         )
-</query><query name="load-order-data" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+</query><query name="load-order-data" focus="false" listorder="2" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: This script loads order entities as-is.
  : These orders relate to customer entities from system-a by customer_id
 :) 
@@ -414,7 +414,7 @@ return (for $d at $idx in $docs
           return xdmp:document-insert($uri, &lt;order&gt;{$d/node()}&lt;/order&gt;, (), "order"),
        fn:concat("You just inserted ", $count, " order records into the database.")
         )
-</query><query name="load-product-data" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+</query><query name="load-product-data" focus="false" listorder="3" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: This script loads product entities as-is.
  : These orders relate to order entities where 
  : order.order_lines.order_line.product = product.id
@@ -523,7 +523,7 @@ return (for $d at $idx in $docs
          return xdmp:document-insert($uri, &lt;product&gt;{$d/node()}&lt;/product&gt;, (), "product"),
         fn:concat("You just inserted ", $count, " product records into the database.")
        )
-       </query><query name="collection-count" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+       </query><query name="collection-count" focus="false" listorder="4" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : A simple script to return the collections 
  : loaded into the system with their counts.
@@ -531,16 +531,16 @@ return (for $d at $idx in $docs
 :)
 
 for $c in cts:collections()
-return fn:concat($c," : ",fn:count(fn:collection($c)))</query><query name="Intro" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">"
+return fn:concat($c," : ",fn:count(fn:collection($c)))</query><query name="Intro" focus="false" listorder="5" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
 This workspace demonstrates inserting data into MarkLogic.
 
-Here the entities have already been defined for you.  We c
-an load these entities as is and then access in Query Console.
+Here the entities have already been defined for you.  We can 
+load these entities as is and then access in Query Console.
 
 In this section we load additional data for orders and products,
 as well as customers from a separate systems having a 
 different schema.
-"</query><query name="load-additional-customer-data" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+"</query><query name="load-additional-customer-data" focus="true" listorder="6" taborder="6" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: This script loads additional customer entities as is
  : into "customer" and "system-b" collections.
  : The latent schema is similar to the "Paul Jackson" 

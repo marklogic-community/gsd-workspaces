@@ -1,4 +1,4 @@
-<export><workspace name="1d-harmonize-mlw17"><query name="envelope-1" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="1d-harmonize-mlw17"><query name="envelope-1" focus="false" listorder="1" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: This script applies the envelope pattern to customer entitities.
  : We first test our envelope in Query Console.
  : The root element is named for the type of entity we are enveloping.
@@ -13,7 +13,7 @@ let $enveloped-docs :=
       &lt;source&gt;{$doc/customer/*}&lt;/source&gt;
    }&lt;/customer&gt;
 return $enveloped-docs
-</query><query name="envelope-2" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+</query><query name="envelope-2" focus="false" listorder="2" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (: This script applies the envelope pattern to customer entitities.
  : Here we use cts:uris() to return the URIs we want to envelope.
@@ -32,7 +32,7 @@ let $enveloped-docs :=
 return $enveloped-docs
 
 
-</query><query name="envelope-3" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+</query><query name="envelope-3" focus="false" listorder="3" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: This script applies the envelope pattern to customer entitities
  : and inserts the results in the database.
  : Enveloped documents are added to the 'enveloped' collection.
@@ -52,7 +52,7 @@ let $enveloped-docs :=
    return xdmp:document-insert($uri, $doc, (), ($collections, "enveloped"))
 return ($enveloped-docs,
         fn:concat("You have just enveloped the ",$collection," collection entities.")
-       )</query><query name="uris-a" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+       )</query><query name="uris-a" focus="false" listorder="4" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: This returns the URIs for the documents returned by a more complex query.
 :)
 
@@ -60,7 +60,7 @@ let $uris := cts:uris('','document', cts:and-query((cts:collection-query("custom
                                                    cts:collection-query("system-a"),
                                                    cts:collection-query("enveloped"))))
                                                    
-return $uris</query><query name="harmonize-a" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+return $uris</query><query name="harmonize-a" focus="false" listorder="5" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (: This script creates the canonical section for
  : our enveloped documents from system-a and 
@@ -76,7 +76,7 @@ let $zip := $doc/customer/source/shipping_address/zip/text()
 let $header := &lt;canonical&gt;&lt;shipping-zip&gt;{$zip}&lt;/shipping-zip&gt;&lt;/canonical&gt;
 return xdmp:node-insert-before($doc/customer/source, $header);
 
-"You just added &lt;canonical&gt; sections to your enveloped documents from system-a";</query><query name="harmonize-b" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+"You just added &lt;canonical&gt; sections to your enveloped documents from system-a";</query><query name="harmonize-b" focus="false" listorder="6" taborder="8" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: This script creates the canonical section for
  : our enveloped documents from system-b and 
  : inserts them before the &lt;source&gt; sections 
@@ -94,7 +94,7 @@ let $header := &lt;canonical&gt;&lt;shipping-zip&gt;{$zip}&lt;/shipping-zip&gt;&
 return xdmp:node-insert-before($doc/customer/source, $header);
 
 "You just added &lt;canonical&gt; sections to your enveloped documents from system-b";
-</query><query name="header-a" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+</query><query name="header-a" focus="false" listorder="7" taborder="6" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (: This script mocks up the header section we'll add
  : to our enveloped documents to start storing a 
@@ -109,7 +109,7 @@ for $uri in $uris
 let $doc := fn:doc($uri)
 let $zip := $doc/customer/source/shipping_address/zip/text()
 let $header := &lt;canonical&gt;&lt;shipping-zip&gt;{$zip}&lt;/shipping-zip&gt;&lt;/canonical&gt;
-return ($header) (: , $doc) :)</query><query name="Intro" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">"
+return ($header) (: , $doc) :)</query><query name="Intro" focus="false" listorder="8" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
 This workspace demonstrates applying the envelope pattern and harmonization 
 to douments in MarkLogic. Here we explore the building blocks and the
 underlying concepts.
@@ -123,7 +123,7 @@ automated to be scheduled as needed.
 The Data Hub Framework and Data Movement SDK can also be leveraged 
 for harmonization and enveloping.  
 
-"</query><query name="harmonize-a-2" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+"</query><query name="harmonize-a-2" focus="false" listorder="9" taborder="9" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (: This script adds an additional metadata section 
  : to our enveloped documents from system-a and 
@@ -145,7 +145,7 @@ let $metadata := &lt;metadata&gt;
 return  xdmp:node-insert-before($doc/customer/canonical, $metadata);
 
 "You just added &lt;metadata&gt; sections to your enveloped documents from system-a";
-</query><query name="harmonize-b-2" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+</query><query name="harmonize-b-2" focus="true" listorder="10" taborder="10" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: This script adds an additional metadata section 
  : to our enveloped documents from system-b and 
  : inserts them before the &lt;canonical&gt; section

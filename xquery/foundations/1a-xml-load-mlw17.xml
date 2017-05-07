@@ -1,4 +1,4 @@
-<export><workspace name="1a-xml-load-mlw17"><query name="load-customer-table" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="1a-xml-load-mlw17"><query name="load-customer-table" focus="false" listorder="1" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: This script loads rows from a customer table. The table has the shape:
  : customer_id,first_name,last_name,email,ssn,phone,billing_address_id,shipping_address_id,region,segment
  : and was exported to the filesystem as a csv.  Loading with content pump, the records loaded
@@ -55,9 +55,11 @@ let $insert :=
  
 return (
  $insert,
- fn:concat("You have just inserted ", $count, " customer table records into the database.")
+ fn:concat("You have just inserted ", $count, " customer table records into the database."),
+            "Click ""Explore"" above to see the documents inserted listed.",
+            "Click on one of the URIs to view the contents of the document"
   )
-</query><query name="load-address-table" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+</query><query name="load-address-table" focus="false" listorder="2" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: This script loads rows from an address table. :)
 
 let $doc :=
@@ -129,7 +131,7 @@ return (
  $insert,
  fn:concat("You have just inserted ", $count, " address table records into the database.")
   )
-</query><query name="denormalize-customers" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+</query><query name="denormalize-customers" focus="false" listorder="3" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : This script is a simple example of creating entities in MarkLogic by \\
  : denormalizing records loaded from separate tables.
@@ -160,7 +162,7 @@ let $insert :=
 return ($insert, 
         fn:concat("You have just created 3 customer entities and inserted them into the database.")
        )
-</query><query name="delete table collections" focus="false" active="true" content-source="as:6240101570028256752:" mode="xquery">xquery version "1.0-ml";
+</query><query name="delete table collections" focus="true" listorder="4" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: 
  :  This script deletes the collections containing the records we created
  :  our denormalized entities from.
@@ -176,7 +178,7 @@ return ($insert,
 
 xdmp:collection-delete("customer-table"),
 xdmp:collection-delete("address-table"),
-"You've just deleted the customer-table and address-table collections."</query><query name="Intro" focus="true" active="true" content-source="as:6240101570028256752:" mode="xquery">"
+"You've just deleted the customer-table and address-table collections."</query><query name="Intro" focus="false" listorder="5" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
 This workspace starts by demonstrating inserting data into MarkLogic.
 
 Generally we'll load data into MarkLogic using Client APIs such as Java or REST.  We can also load documents directly from Query Console.
