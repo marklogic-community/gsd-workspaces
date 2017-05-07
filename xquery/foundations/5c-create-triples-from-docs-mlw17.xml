@@ -1,0 +1,261 @@
+<export><workspace name="5c-create-triples-from-docs-mlw17"><query name="delete collections" focus="false" listorder="1" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+
+(: Delete Triples created from ttl in unit # :)
+
+xdmp:collection-delete("http://marklogic.com/example/graphs/customers"),
+xdmp:collection-delete("http://marklogic.com/example/graphs/orders"),
+xdmp:collection-delete("http://marklogic.com/example/graphs/products"),
+xdmp:collection-delete("http://marklogic.com/semantics#default-graph")</query><query name="create-customer-triples" focus="false" listorder="2" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+import module namespace sem = "http://marklogic.com/semantics"
+   at "/MarkLogic/semantics.xqy";
+(: 
+ : A script to create triples for Customers from elements on 
+ : documents using the sem:* API. 
+ : Typically start by modeling the data similar to how it came in from the source.
+ : We may want to consider remodeling to better capture hierarchy/taxonomy, 
+ : example- a plant has a part and a part name? 
+ :   maybe better to model as:  a plant has a part and a part has a part name
+:)
+
+let $uris := cts:uris('','document',cts:collection-query("customer"))
+for $URI at $idx in $uris return  
+
+
+let $doc := fn:doc($URI)
+
+(: # vs / :)
+
+let $ids-prefix := "http://marklogic.com/example/customers/"
+let $ont-prefix :=    "http://marklogic.com/example/ontology/"
+let $rdf-prefix := "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+let $xs-prefix := "http:///www.w3.org/2001/"  (: contrast with xs:long() :)
+
+let $id := $doc/customer/source/customer_id/fn:string(.)
+let $first-name := $doc/source/customer/first_name/fn:string(.)
+let $last-name := $doc/source/customer/last_name/fn:string(.)
+let $email := $doc/source/customer/email/fn:string(.)
+let $ssn := $doc/source/customer/ssn/fn:string(.)
+let $phone := $doc/source/customer/phone/fn:string(.)
+
+let $billing-id := fn:concat($idx,0)
+let $shipping-id := fn:concat($idx,1)
+
+let $billing-street := $doc/customer/source/billing_address/street/fn:string(.)
+let $billing-city := $doc/customer/source/billing_address/city/fn:string(.)
+let $billing-state := $doc/customer/source/billing_address/state/fn:string(.)
+let $billing-zip := $doc/customer/source/billing_address/zip/fn:string(.)
+let $billing-latitude := $doc/customer/source/billing_address/latitude/fn:string(.)
+let $billing-longitude := $doc/customer/source/billing_address/longitude/fn:string(.)
+
+let $shipping-street := $doc/customer/source/shipping_address/street/fn:string(.)
+let $shipping-city := $doc/customer/source/shipping_address/city/fn:string(.)
+let $shipping-state := $doc/customer/source/shipping_address/state/fn:string(.)
+let $shipping-zip := $doc/customer/source/shipping_address/zip/fn:string(.)
+let $shipping-latitude := $doc/customer/source/shipping_address/latitude/fn:string(.)
+let $shipping-longitude := $doc/customer/source/shipping_address/longitude/fn:string(.)
+
+let $region := $doc/customer/source/region/fn:string(.)
+let $segment := $doc/customer/source/segment/fn:string(.)
+
+let $triples := 
+(
+  sem:triple(sem:iri($ids-prefix || $id),
+             sem:iri($rdf-prefix || "type"),
+             sem:iri($ont-prefix || "Customer" )),
+           
+  sem:triple(sem:iri($ids-prefix || $id),
+             sem:iri($ont-prefix || "customerId"),
+               (: as charles about http:///www.w3.org/2001/long" vs this 
+                  looks like they're XMLSchema in orig except for long and decimal. Reason? :)
+             xs:long($id)),
+             
+  sem:triple(sem:iri($ids-prefix || $id),
+             sem:iri($ont-prefix || "firstName"),
+             $first-name),
+             
+  sem:triple(sem:iri($ids-prefix || $id),
+             sem:iri($ont-prefix || "lastName"),
+             $last-name),
+              
+  sem:triple(sem:iri($ids-prefix || $id),
+             sem:iri($ont-prefix || "email"),
+             $email),
+             
+  sem:triple(sem:iri($ids-prefix || $id),
+             sem:iri($ont-prefix || "ssn"),
+             $ssn),
+
+  sem:triple(sem:iri($ids-prefix || $id),
+             sem:iri($ont-prefix || "phone"),
+             $phone),
+             
+  sem:triple(sem:iri($ids-prefix || $id),
+             sem:iri($ont-prefix || "region"),
+             $region),
+  
+  (:Billing Triples:)
+  sem:triple(sem:iri($ids-prefix || $id),
+             sem:iri($ont-prefix || "billingAddress"),
+             sem:iri($ont-prefix || $billing-id)),
+  
+  sem:triple(sem:iri($ids-prefix || $billing-id),
+             sem:iri($rdf-prefix || "type"),
+             sem:iri($ont-prefix || "BillingAddress" )),
+         
+  sem:triple(sem:iri($ids-prefix || $billing-id),
+             sem:iri($ont-prefix || "street"),
+             $billing-street),
+             
+  sem:triple(sem:iri($ids-prefix || $billing-id),
+             sem:iri($ont-prefix || "city"),
+             $billing-city),
+             
+  sem:triple(sem:iri($ids-prefix || $billing-id),
+             sem:iri($ont-prefix || "state"),
+             $billing-state),
+             
+  sem:triple(sem:iri($ids-prefix || $billing-id),
+             sem:iri($ont-prefix || "zip"),
+             $billing-zip),
+             
+  sem:triple(sem:iri($ids-prefix || $billing-id),
+             sem:iri($ont-prefix || "latitude"),
+             xs:decimal($billing-latitude)),
+             
+  sem:triple(sem:iri($ids-prefix || $billing-id),
+             sem:iri($ont-prefix || "longitude"),
+             xs:decimal($billing-longitude)),
+  
+  (:Shipping Triples:)
+  sem:triple(sem:iri($ids-prefix || $id),
+             sem:iri($ont-prefix || "shippingAddress"),
+             sem:iri($ont-prefix || $shipping-id)),
+   
+  sem:triple(sem:iri($ids-prefix || $shipping-id),
+             sem:iri($rdf-prefix || "type"),
+             sem:iri($ont-prefix || "ShippingAddress" )),
+   
+  sem:triple(sem:iri($ids-prefix || $shipping-id),
+             sem:iri($ont-prefix || "street"),
+             $shipping-street),
+             
+  sem:triple(sem:iri($ids-prefix || $shipping-id),
+             sem:iri($ont-prefix || "city"),
+             $shipping-city),
+             
+  sem:triple(sem:iri($ids-prefix || $shipping-id),
+             sem:iri($ont-prefix || "state"),
+             $shipping-state),
+             
+  sem:triple(sem:iri($ids-prefix || $shipping-id),
+             sem:iri($ont-prefix || "zip"),
+             $shipping-zip),
+             
+  sem:triple(sem:iri($ids-prefix || $shipping-id),
+             sem:iri($ont-prefix || "latitude"),
+             xs:decimal($shipping-latitude)),
+             
+  sem:triple(sem:iri($ids-prefix || $shipping-id),
+             sem:iri($ont-prefix || "longitude"),
+             xs:decimal($shipping-longitude))              
+             
+)
+
+return 
+("You've just loaded customer triples into the database in the http://marklogic.com/example/graphs/customers collection",
+        sem:graph-insert(sem:iri("http://marklogic.com/example/graphs/customers"), $triples),
+        $triples)
+       
+        
+        </query><query name="create-order-triples" focus="false" listorder="3" taborder="" active="false" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";&#13;declare namespace html = "http://www.w3.org/1999/xhtml";&#13;&lt;p&gt;hello world&lt;/p&gt;</query><query name="create-product-triples" focus="false" listorder="4" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+import module "http://marklogic.com/xdmp/tde" at "/MarkLogic/tde.xqy";
+
+(: This script creates triples by Template Driven Extraction (TDE)
+ : The moment we load the template, the triples are added to the 
+ : triple index and available to query via SPARQL.
+ :)
+
+let $triples-template :=
+&lt;template xmlns="http://marklogic.com/xdmp/tde"&gt;
+  &lt;context&gt;/product&lt;/context&gt;
+    &lt;vars&gt;
+      &lt;var&gt;
+        &lt;name&gt;EX&lt;/name&gt;
+        &lt;val&gt;"http://marklogic.com/example/products/"&lt;/val&gt;
+      &lt;/var&gt;
+      &lt;var&gt;
+        &lt;name&gt;RDF&lt;/name&gt;
+        &lt;val&gt;"http://www.w3.org/1999/02/22-rdf-syntax-ns#"&lt;/val&gt;
+      &lt;/var&gt;
+       &lt;var&gt;
+        &lt;name&gt;ONT&lt;/name&gt;
+        &lt;val&gt;"http://marklogic.com/example/ontology/"&lt;/val&gt;
+      &lt;/var&gt;
+    &lt;/vars&gt;
+    &lt;triples&gt;
+      &lt;triple&gt;
+        &lt;subject&gt;
+          &lt;val&gt;sem:iri( $EX || id)&lt;/val&gt;
+        &lt;/subject&gt;
+        &lt;predicate&gt;
+          &lt;val&gt;sem:iri( $RDF || "type")&lt;/val&gt;
+        &lt;/predicate&gt;
+        &lt;object&gt;
+          &lt;val&gt;sem:iri( $ONT || "Product")&lt;/val&gt;
+        &lt;/object&gt;
+      &lt;/triple&gt;
+      &lt;triple&gt;
+        &lt;subject&gt;
+          &lt;val&gt;sem:iri( $EX || id)&lt;/val&gt;
+        &lt;/subject&gt;
+        &lt;predicate&gt;
+          &lt;val&gt;sem:iri( $ONT || "name")&lt;/val&gt;
+        &lt;/predicate&gt;
+        &lt;object&gt;
+          &lt;val&gt;xs:string(name)&lt;/val&gt;
+        &lt;/object&gt;
+      &lt;/triple&gt;
+      &lt;triple&gt;
+        &lt;subject&gt;
+          &lt;val&gt;sem:iri( $EX || id)&lt;/val&gt;
+        &lt;/subject&gt;
+        &lt;predicate&gt;
+          &lt;val&gt;sem:iri( $ONT || "sku")&lt;/val&gt;
+        &lt;/predicate&gt;
+        &lt;object&gt;
+          &lt;val&gt;xs:string(sku)&lt;/val&gt;
+        &lt;/object&gt;
+      &lt;/triple&gt;
+    &lt;/triples&gt;
+&lt;/template&gt;
+
+return ( tde:template-insert(
+   "/test/my-semantics-TDE.xml" ,
+   $triples-template  ,
+   xdmp:default-permissions() ,
+   "TDE-Semantics"
+  ),
+   "You just saved your TDE template template to the Schemas database.",
+   "Change your database to Schemas, and click 'Explore' to view the template URI."
+)</query><query name="SPARQL" focus="false" listorder="7" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
+PREFIX ids: &lt;http://marklogic.com/example/products/&gt; 
+PREFIX taxo: &lt;http://marklogic.com/example/taxonomies/&gt; 
+PREFIX xs: &lt;http:///www.w3.org/2001/&gt; 
+
+#This is the same query as in 5b
+
+SELECT 
+ ?name ?sku
+WHERE
+{
+  ?s a :Product ;
+     :name ?name ;
+     :sku ?sku .
+}
+LIMIT 10</query><query name="tde:node-extract" focus="false" listorder="8" taborder="6" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+tde:node-data-extract(fn:doc("/product-2.xml"))</query><query name="cleanup schemas" focus="true" listorder="7" taborder="7" active="true" database="14059993161380782136" server="12590722383439523806" database-name="Schemas" server-name="App-Services" mode="xquery">"
+This workspace demonstrates creating triples from APIs. 
+First we create triples using the sem:* API. 
+Then we create triples using Template Driven Extraction (TDE)
+"</query><query name="Intro" focus="false" listorder="8" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";&#13;declare namespace html = "http://www.w3.org/1999/xhtml";&#13;&lt;p&gt;hello world&lt;/p&gt;</query></workspace></export>

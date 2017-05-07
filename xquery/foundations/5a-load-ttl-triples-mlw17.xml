@@ -1,4 +1,4 @@
-<export><workspace name="5a-load-ttl-triples-mlw17"><query name="load-customer-data" focus="false" listorder="1" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="5a-load-ttl-triples-mlw17"><query name="load-customer-data" focus="true" listorder="1" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 import module namespace sem = "http://marklogic.com/semantics" at "/MarkLogic/semantics.xqy";
 (: 
  : A script to load triples for Customers serialized as turtle (.ttl)
@@ -297,7 +297,7 @@ return
 )      
 
 (: note here, relatedTo points to bnodes that we don't know much about.  A refinement to these triples would be to model
-   ProductRelations, which would have a reference to a product and the enum as a type :)</query><query name="cleanup" focus="true" listorder="4" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+   ProductRelations, which would have a reference to a product and the enum as a type :)</query><query name="cleanup" focus="false" listorder="4" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (: Remove the triples we created from the database.:)
  

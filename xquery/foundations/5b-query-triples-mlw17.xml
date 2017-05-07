@@ -7,9 +7,10 @@ SELECT
  ?s ?p ?o
 WHERE
 {
+   ?s a :Product.
   ?s ?p ?o
 }
-LIMIT 10</query><query name="embedded SPARQL" focus="false" listorder="2" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">sem:sparql('PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
+LIMIT 100</query><query name="embedded SPARQL" focus="false" listorder="2" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">sem:sparql('PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
 PREFIX ids: &lt;http://marklogic.com/example/products/&gt; 
 PREFIX taxo: &lt;http://marklogic.com/example/taxonomies/&gt; 
 PREFIX xs: &lt;http:///www.w3.org/2001/&gt; 
@@ -86,13 +87,13 @@ where exists(
              sem:iri("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), 
              $o("Product")))
 order by sem:triple-subject($triple)
-return $triple</query><query name="Intro" focus="true" listorder="9" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">(:
+return $triple</query><query name="Intro" focus="false" listorder="9" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">(:
 
 This workspace has the most basic queries conceivable
 replicated using SPARQL, SPARQL-in a programming language, Optic (XQuery version), 
 and using cts:triples() directly.
 
-:)</query><query name="cleanup" focus="false" listorder="10" taborder="10" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+:)</query><query name="cleanup" focus="true" listorder="10" taborder="10" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (: Remove the triples we created from the database.:)
  
