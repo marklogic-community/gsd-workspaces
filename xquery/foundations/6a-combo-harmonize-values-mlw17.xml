@@ -1,0 +1,146 @@
+<export><workspace name="6a-combo-harmonize-values-mlw17"><query name="1. Insert Documents" focus="false" listorder="1" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(: Insert 3 documents, All with variations of a name we know to belong to the same individual.  
+:)
+
+xdmp:document-insert(
+  "/patients/record1.xml", 
+  &lt;document id="1"&gt;
+    &lt;content&gt;
+      &lt;name&gt;Theodore&lt;/name&gt;
+      &lt;date&gt;01-27-2015&lt;/date&gt;
+      &lt;comments&gt;Perfectly Healthy. Standard checkup and bloodwork tests AOK.&lt;/comments&gt;
+    &lt;/content&gt;
+  &lt;/document&gt; ,
+  xdmp:default-permissions() ,
+  "patients"
+  ) ;
+  
+xdmp:document-insert(
+  "/patients/record2.xml", 
+  &lt;document id="2"&gt;
+    &lt;content&gt;
+      &lt;name&gt;Ted&lt;/name&gt;
+      &lt;date&gt;02-12-2016&lt;/date&gt;
+      &lt;comments&gt;Patient complained of throat pains.  Throat not inflammed. Test for strep negative.&lt;/comments&gt;
+    &lt;/content&gt;
+  &lt;/document&gt; ,
+  xdmp:default-permissions() ,
+  "patients"
+  ) ;
+  
+  xdmp:document-insert(
+  "/patients/record3.xml", 
+  &lt;document id="3"&gt;
+    &lt;content&gt;
+      &lt;name&gt;Teddy&lt;/name&gt;
+      &lt;date&gt;01-09-2017&lt;/date&gt;
+      &lt;comments&gt;Patient has swelling in left foot. Sprained ankle trippinng on tennis ball.  Patient suffers from obesity.&lt;/comments&gt;
+    &lt;/content&gt;
+  &lt;/document&gt; ,
+  xdmp:default-permissions() ,
+  "patients"
+  ) ;
+  
+  "You just loaded 3 patient records into the patients collection in the database."
+  </query><query name="2. Query 1 - Ted OR" focus="false" listorder="2" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(: 
+  Query 1 - We know the Schema of the documents, but we can search for "Ted".
+  (But note: this will also find people with middle/last name Ted, and text that contains "Ted", 
+             and what about Theodore?
+  :)
+
+cts:search(
+  fn:collection(), 
+  cts:word-query("Ted")
+  )</query><query name="3. Query 2 - Ted OR" focus="false" listorder="3" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(: 
+  Query 2 - We need our search to be more precise, i.e. We want documents with "Ted", "Teddy", or "Theodore" as name.
+            But here we've hardcoded values into the query. There must be a better way...
+:)
+
+cts:search(
+  fn:collection(), 
+  cts:or-query( (
+   cts:element-word-query(xs:QName("name"),"Ted") ,
+   cts:element-word-query(xs:QName("name"),"Teddy") ,
+   cts:element-word-query(xs:QName("name"),"Theodore") 
+   ))
+  )</query><query name="4. Insert Triples" focus="false" listorder="4" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="sparql-update">## update
+
+## Insert triples that says "Ted" and "Teddy" and "Theodore" 
+## are the values of ex:given-name1, ex:given-name2, ex:given-name2 
+## which are all of type given-name
+
+## Note: we just built a semantic model!
+
+PREFIX ex: &lt;http://example.com/sem1&gt; 
+
+INSERT DATA {
+  GRAPH &lt;sem1-graph&gt; {
+    ex:given-name1 a ex:given-name .
+    ex:given-name1 ex:label "Ted" .
+    ex:given-name2 a ex:given-name .
+    ex:given-name2 ex:label "Teddy" .
+    ex:given-name2 a ex:given-name .
+    ex:given-name2 ex:label "Theodore" .
+  }
+}</query><query name="5. Find all variations of a given name" focus="false" listorder="5" taborder="6" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="sparql">## query the model
+## show us all the different ways to express given-name  (EXPRESS or ASSERT? ASK CHARLES :)
+
+PREFIX ex: &lt;http://example.com/sem1&gt; 
+
+SELECT DISTINCT( ?label AS ?dlabel ) WHERE {
+  ?s a ex:given-name .
+  ?s ex:label ?label
+}</query><query name="6. Use the model in a search" focus="false" listorder="6" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(:
+  (XQuery version) Use the semantic model we just built to search for documents with given names for "Ted"
+  Model: query writer doesnt need to know anything about the model, since it's encapsulated in the triples, and centrally managed
+:)
+
+import module namespace sem = "http://marklogic.com/semantics" 
+  at "/MarkLogic/semantics.xqy";
+  
+declare namespace sparql-res = "http://www.w3.org/2005/sparql-results#" ;
+  
+let $sparql-query := '
+PREFIX ex: &lt;http://example.com/sem1&gt; 
+
+SELECT DISTINCT( ?label AS ?dlabel ) WHERE {
+  ?s a ex:given-name .
+  ?s ex:label ?label
+}
+'
+
+let $map := sem:sparql($sparql-query)
+let $keys := map:keys($map)
+let $given-names := map:get($map,$keys[1])
+
+(: 
+another way to achieve the results of 21-23 follows but
+you'll want to understand maps and use them as that's the best practice
+
+let $result :=
+  sem:sparql( $sparql )
+
+let $given-names :=
+  sem:query-results-serialize( $result )//sparql-res:literal/text()
+:)
+
+return
+  cts:search(
+    fn:collection(), 
+    cts:element-word-query(xs:QName("name"),$given-names)
+    )
+  
+  </query><query name="7. Cleanup Triples" focus="false" listorder="7" taborder="8" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="sparql-update">## update
+        
+        DROP GRAPH &lt;sem1-graph&gt;</query><query name="8. Cleanup Documents" focus="false" listorder="8" taborder="9" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+
+xdmp:collection-delete( "patients" )</query><query name="Intro" focus="true" listorder="9" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
+In this workspace we step through a simple of case of using 
+Documents and Semantics together.
+
+Here we use Semantics to help harmonize element values to 
+enable the simplification of queries.
+"</query></workspace></export>
