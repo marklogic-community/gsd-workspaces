@@ -1,0 +1,1206 @@
+<export><workspace name="6c-combo-fraud-ex-mlw17"><query name="2. Enrich Merchant Data" focus="false" listorder="1" taborder="2" active="true" database="7111507668735099406" server="1149688552922301636" database-name="FinancialServices" server-name="FinancialServices-XDBC-8030" mode="xquery">xquery version "1.0-ml";
+
+for $merchant in fn:collection("merchant")/merchant
+  let $partial-name-iri := fn:replace(fn:lower-case($merchant/ownerName), "\s", "-")
+  let $triples :=
+    element triples {
+      let $prefix := "http://fin-def.com/"
+      return
+        (
+          sem:triple(sem:iri($prefix || "merchant#" || $merchant/id), sem:iri($prefix || "predicate#merchantName"), xs:string($merchant/name)),
+          sem:triple(sem:iri($prefix || "merchant#" || $merchant/id), sem:iri($prefix || "predicate#merchantOwner"), sem:iri($prefix || "person#" || $partial-name-iri)),
+          sem:triple(sem:iri($prefix || "person#" || $partial-name-iri), sem:iri($prefix || "predicate#personName"), xs:string($merchant/ownerName))
+        )    
+    }
+  return
+    xdmp:document-insert(
+      fn:base-uri($merchant),
+      &lt;merchant id="{$merchant/id}"&gt;{
+        (
+          element content {
+            $merchant/(* except id),
+            element businessType { "restaurant" }
+          },
+          element meta { $triples }
+        )
+      }&lt;/merchant&gt;,
+      (),
+      "merchant"
+    )
+</query><query name="Load Other Data" focus="false" listorder="2" taborder="4" active="true" database="7111507668735099406" server="1149688552922301636" database-name="FinancialServices" server-name="FinancialServices-XDBC-8030" mode="xquery">xquery version "1.0-ml";
+
+xdmp:document-insert(
+  "/data/event/100001.json",
+  object-node {
+    "event": object-node {
+      "id": "100001",
+      "type": "account creation",
+      "businessName": "The Green Paper Laundry",
+      "ownerName": array-node { "Mickey Dodgiano", "Joey Badguy" }
+    }
+  },
+  (),
+  "event"
+),
+xdmp:document-insert(
+  "/data/police-report/pr-910212.txt",
+  text {
+   "Report Date: August 1st 2016 at 21:16
+    Description: On the evening of January 8th 2016, officer Wasinski observed Joey Badguy, until that time unknown to the police, selling marijuana
+                 to two teenage youths on the corner of 4th and Adams.  Officer Wasinski was able to apprehend Badguy and bring him in for questioning
+                 whereupon Street-Walker confessed to being in possession of 1lb of marijuana with intent to sell."
+  },
+  (),
+  "police-report"
+)</query><query name="Basic Search" focus="false" listorder="3" taborder="5" active="true" database="7111507668735099406" server="1149688552922301636" database-name="FinancialServices" server-name="FinancialServices-XDBC-8030" mode="xquery">xquery version "1.0-ml";
+
+let $queries := (
+    (: Full-text search:)
+    cts:word-query("Dallas"),
+    (: Full-text search within a specific element of the document :)
+    cts:element-word-query(xs:QName("address"), "Dallas"),
+    (: Full-text search within a specific element of the document and a query for a specific value within a specific element of the document :)
+    cts:and-query((cts:element-word-query(xs:QName("address"), "Dallas"), cts:element-value-query(xs:QName("creditRating"), "Good")))
+  )
+for $query at $cntr in $queries
+  return
+    (
+      "=== Results for query " || $cntr || ": " || $query || " ===",
+      cts:search(fn:collection("merchant"), $query)
+    )
+</query><query name="Basic Join" focus="false" listorder="4" taborder="6" active="true" database="7111507668735099406" server="1149688552922301636" database-name="FinancialServices" server-name="FinancialServices-XDBC-8030" mode="xquery">xquery version "1.0-ml";
+
+for $merchant in fn:collection("merchant")/merchant
+  return
+    element merchant {
+      attribute name {$merchant/content/name},
+      for $transaction in fn:collection("transaction")/transaction[content/merchant eq $merchant/@id]
+        return
+          element transaction { $transaction/content/(transactionDateTime|type|amount) }
+    }</query><query name="Basic Sum" focus="false" listorder="5" taborder="7" active="true" database="7111507668735099406" server="1149688552922301636" database-name="FinancialServices" server-name="FinancialServices-XDBC-8030" mode="xquery">xquery version "1.0-ml";
+
+for $merchant-ID in fn:collection("merchant")/merchant/@id
+  let $total-amount := cts:sum-aggregate(cts:element-reference(xs:QName("amount")), (), cts:element-value-query(xs:QName("merchant"), xs:string($merchant-ID)))
+  return
+    element merchant {
+      attribute id { $merchant-ID },
+      attribute total-amount { $total-amount }
+    }
+</query><query name="Suspicious Restaurants 1" focus="false" listorder="6" taborder="8" active="true" database="7111507668735099406" server="1149688552922301636" database-name="FinancialServices" server-name="FinancialServices-XDBC-8030" mode="sparql">    prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+    prefix m: &lt;http://fin-def.com/merchant#&gt;
+    prefix p: &lt;http://fin-def.com/predicate#&gt;
+    prefix t: &lt;http://fin-def.com/transaction#&gt;
+
+    select ?merchant ?merchantName (count(?merchant) as ?count) (sum(?amount) as ?sumAmount) ?sumCCAggregateAmount
+    where {
+      ?merchant p:transaction ?transaction;
+                p:merchantName ?merchantName .
+      ?transaction p:transactionDateTime ?trxDateTime;
+                   p:type "cash";
+                   p:amount ?amount .
+
+      {
+        select ?merchant (sum(?CCAggregateAmount) as ?sumCCAggregateAmount)
+        where {
+          ?merchant p:transaction ?transaction .
+          ?transaction p:transactionDateTime ?trxDateTime;
+                       p:type "CCAggregate";
+                       p:amount ?CCAggregateAmount .
+          filter (?trxDateTime &gt;= "2016-01-01T09:00:00"^^xsd:dateTime)
+        }
+        group by ?merchant
+      }
+
+      filter (?amount &gt;= 9000 &amp;&amp; ?amount &lt; 10000)
+      filter (?trxDateTime &gt;= "2016-01-01T09:00:00"^^xsd:dateTime)
+    }
+    group by ?merchant
+    having (?count &gt;= 3 &amp;&amp; ?sumAmount/(?sumAmount + ?sumCCAggregateAmount) &gt;= 0.80)
+</query><query name="Suspicious Restaurants 2 (XQY+SPARQL)" focus="false" listorder="7" taborder="9" active="true" database="7111507668735099406" server="1149688552922301636" database-name="FinancialServices" server-name="FinancialServices-XDBC-8030" mode="xquery">xquery version "1.0-ml";
+
+declare function local:get-restaurant-owners($restaurant-name) {
+  cts:search(
+    fn:collection(),
+    cts:and-query((
+      cts:element-value-query(xs:QName("businessType"), "restaurant"),
+      cts:element-value-query(xs:QName("name"), $restaurant-name)
+    ))
+  )/merchant/content/ownerName
+};
+
+let $suspicious-restaurant-report :=
+  sem:sparql('
+    prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+    prefix m: &lt;http://fin-def.com/merchant#&gt;
+    prefix p: &lt;http://fin-def.com/predicate#&gt;
+    prefix t: &lt;http://fin-def.com/transaction#&gt;
+
+    select ?merchant ?merchantName (count(?merchant) as ?count) (sum(?amount) as ?sumAmount) ?sumCCAggregateAmount
+    where {
+      ?merchant p:transaction ?transaction;
+                p:merchantName ?merchantName .
+      ?transaction p:transactionDateTime ?trxDateTime;
+                   p:type "cash";
+                   p:amount ?amount .
+
+      {
+        select ?merchant (sum(?CCAggregateAmount) as ?sumCCAggregateAmount)
+        where {
+          ?merchant p:transaction ?transaction .
+          ?transaction p:transactionDateTime ?trxDateTime;
+                       p:type "CCAggregate";
+                       p:amount ?CCAggregateAmount .
+          filter (?trxDateTime &gt;= "2016-01-01T09:00:00"^^xsd:dateTime)
+        }
+        group by ?merchant
+      }
+
+      filter (?amount &gt;= 9000 &amp;amp;&amp;amp; ?amount &lt; 10000)
+      filter (?trxDateTime &gt;= "2016-01-01T09:00:00"^^xsd:dateTime)
+    }
+    group by ?merchant
+    having (?count &gt;= 3 &amp;amp;&amp;amp; ?sumAmount/(?sumAmount + ?sumCCAggregateAmount) &gt;= 0.80)
+  ')
+return
+  element suspicious-restaurants {
+    $suspicious-restaurant-report !
+      &lt;suspicious-restaurant&gt;
+        &lt;name&gt;{map:get(., "merchantName")}&lt;/name&gt;
+        &lt;owners&gt;{local:get-restaurant-owners(map:get(., "merchantName"))}&lt;/owners&gt;
+      &lt;/suspicious-restaurant&gt;
+   }</query><query name="Suspicious Restaurants 2 (XQY)" focus="false" listorder="8" taborder="10" active="true" database="7111507668735099406" server="1149688552922301636" database-name="FinancialServices" server-name="FinancialServices-XDBC-8030" mode="xquery">xquery version "1.0-ml";
+
+let $date-range-query :=
+    cts:and-query((
+      cts:path-range-query("/transaction/content/transactionDateTime", "&gt;=", xs:dateTime("2016-01-01T00:00:00")),
+      cts:path-range-query("/transaction/content/transactionDateTime", "&lt;", xs:dateTime("2016-02-01T00:00:00"))
+    ))
+let $merchant-IDs :=
+  cts:values(
+    cts:path-reference("/transaction/content/merchant"),
+    (),
+    (),
+    $date-range-query
+  )
+return
+  element suspicious-restaurants {
+    for $merchant-ID in $merchant-IDs
+      let $count :=
+        cts:count-aggregate(
+          cts:element-reference(xs:QName("amount")),
+           (),
+          cts:and-query((
+            cts:element-value-query(xs:QName("merchant"), xs:string($merchant-ID)),
+            cts:element-range-query(xs:QName("amount"), "&gt;=", 9000),
+            cts:element-range-query(xs:QName("amount"), "&lt;", 10000),
+            cts:element-value-query(xs:QName("type"), "cash"),
+            $date-range-query
+          ))
+        )
+      let $cash-sum-value :=
+        cts:sum-aggregate(
+          cts:element-reference(xs:QName("amount")),
+          (),
+          cts:and-query((
+            cts:element-value-query(xs:QName("merchant"), xs:string($merchant-ID)),
+            cts:element-range-query(xs:QName("amount"), "&gt;=", 9000),
+            cts:element-range-query(xs:QName("amount"), "&lt;", 10000),
+            cts:element-value-query(xs:QName("type"), "cash"),
+            $date-range-query
+          ))
+        )  
+      let $CC-aggregate-value := 
+        cts:sum-aggregate(
+          cts:element-reference(xs:QName("amount")),
+          (),
+          cts:and-query((
+            cts:element-value-query(xs:QName("merchant"), xs:string($merchant-ID)),
+            cts:element-value-query(xs:QName("type"), "CCAggregate"),
+            $date-range-query
+          ))
+        )
+      let $ratio := $cash-sum-value div ($cash-sum-value + $CC-aggregate-value)
+      where ($count ge 3 and $ratio ge 0.80)
+      return
+        let $merchant := fn:doc()/merchant[@id eq $merchant-ID]
+        return
+          &lt;suspicious-restaurant merchant-ID="{$merchant-ID}" cash-sum-value="{$cash-sum-value}" CC-aggregate-value="{$CC-aggregate-value}" ratio="{$ratio}"&gt;
+            &lt;name&gt;{$merchant/content/name/fn:string()}&lt;/name&gt;
+            &lt;owners&gt;{$merchant/content/ownerName}&lt;/owners&gt;
+          &lt;/suspicious-restaurant&gt;
+  }</query><query name="Get Associates" focus="false" listorder="9" taborder="11" active="true" database="7111507668735099406" server="1149688552922301636" database-name="FinancialServices" server-name="FinancialServices-XDBC-8030" mode="xquery">xquery version "1.0-ml";
+
+let $suspicious-restaurants :=
+  &lt;suspicious-restaurants&gt;
+    &lt;suspicious-restaurant&gt;&lt;name&gt;Dodgianos&lt;/name&gt;&lt;owners&gt;&lt;ownerName&gt;Mickey Dodgiano&lt;/ownerName&gt;&lt;/owners&gt;&lt;/suspicious-restaurant&gt;
+    &lt;suspicious-restaurant&gt;&lt;name&gt;Straight and Narrow&lt;/name&gt;&lt;owners&gt;&lt;ownerName&gt;Honest John Smith&lt;/ownerName&gt;&lt;/owners&gt;&lt;/suspicious-restaurant&gt;
+  &lt;/suspicious-restaurants&gt;
+return
+  &lt;suspicious-restaurants&gt;{
+    for $suspicious-restaurant in $suspicious-restaurants/suspicious-restaurant
+      let $associates :=
+        cts:search(
+          fn:collection(), 
+          cts:and-not-query(cts:word-query($suspicious-restaurant/owners/ownerName), cts:collection-query("merchant"))
+        )//ownerName[. != $suspicious-restaurant/owners/ownerName]
+      where $associates
+      return
+        element suspicious-restaurant {
+          $suspicious-restaurant/*,
+          element associates { $associates ! element associate { . }  }
+        }
+  }&lt;/suspicious-restaurants&gt;</query><query name="Get Associate Data" focus="false" listorder="10" taborder="12" active="true" database="7111507668735099406" server="1149688552922301636" database-name="FinancialServices" server-name="FinancialServices-XDBC-8030" mode="xquery">xquery version "1.0-ml";
+
+let $suspicious-restaurants :=
+  &lt;suspicious-restaurants&gt;
+    &lt;suspicious-restaurant&gt;
+      &lt;name&gt;Dodgianos&lt;/name&gt;
+      &lt;owners&gt;
+        &lt;ownerName&gt;Mickey Dodgiano&lt;/ownerName&gt;
+      &lt;/owners&gt;
+      &lt;associates&gt;
+        &lt;ownerName&gt;Joey Badguy&lt;/ownerName&gt;
+      &lt;/associates&gt;
+    &lt;/suspicious-restaurant&gt;
+  &lt;/suspicious-restaurants&gt;
+let $names := $suspicious-restaurants//ownerName
+let $query := cts:word-query($names)
+for $doc in cts:search(fn:collection("police-report"), $query)
+return
+  $doc
+</query><query name="Add Link Data" focus="false" listorder="11" taborder="13" active="true" database="7111507668735099406" server="1149688552922301636" database-name="FinancialServices" server-name="FinancialServices-XDBC-8030" mode="sparql-update">prefix p: &lt;http://fin-def.com/predicate#&gt;
+prefix pn: &lt;http://fin-def.com/person#&gt;
+
+insert data {
+  pn:mickey-dodgiano p:associateOf pn:joey-badguy .
+  pn:joey-badguy p:personName "Joey Badguy"
+}</query><query name="Get Associate Data 2" focus="false" listorder="12" taborder="14" active="true" database="7111507668735099406" server="1149688552922301636" database-name="FinancialServices" server-name="FinancialServices-XDBC-8030" mode="xquery">xquery version "1.0-ml";
+
+let $suspicious-restaurants :=
+  &lt;suspicious-restaurants&gt;
+    &lt;suspicious-restaurant&gt;
+      &lt;name&gt;Dodgianos&lt;/name&gt;
+      &lt;owners&gt;
+        &lt;ownerName&gt;Mickey Dodgiano&lt;/ownerName&gt;
+      &lt;/owners&gt;
+    &lt;/suspicious-restaurant&gt;
+    &lt;suspicious-restaurant&gt;
+      &lt;name&gt;Straight and Narrow&lt;/name&gt;
+      &lt;owners&gt;
+        &lt;ownerName&gt;Honest John Smith&lt;/ownerName&gt;
+      &lt;/owners&gt;
+    &lt;/suspicious-restaurant&gt;
+  &lt;/suspicious-restaurants&gt;
+let $names :=
+  for $suspicious-restaurant in $suspicious-restaurants/suspicious-restaurant
+    return
+      $suspicious-restaurant//ownerName/fn:string()
+let $associates :=
+  sem:sparql(
+    'prefix p: &lt;http://fin-def.com/predicate#&gt;
+    prefix pn: &lt;http://fin-def.com/person#&gt;
+
+    select ?personName
+    where {
+      {
+        select ?personName
+        where {
+            ?person1 p:personName ?names;
+                     p:associateOf ?person2 .
+
+            ?person2 p:personName ?personName
+        }
+      }
+      union
+      {
+        select ?personName
+        where {
+            ?person1 p:personName ?personName;
+                     p:associateOf ?person2 .
+
+            ?person2 p:personName ?names
+        }
+      }
+    }',
+    map:new((
+      map:entry("names", $names)
+    ))
+  )
+let $query := cts:word-query($associates ! map:get(., "personName"))
+for $doc in cts:search(fn:collection("police-report"), $query)
+return
+  $doc
+</query><query name="Original Load" focus="true" listorder="13" taborder="15" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+
+let $docs :=
+  &lt;docs&gt;
+    &lt;merchant id="123"&gt;
+      &lt;name&gt;Dodgianos&lt;/name&gt;
+      &lt;ownerName&gt;Mickey Dodgiano&lt;/ownerName&gt;
+      &lt;triples&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#123&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#merchantName&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;Dodgianos&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#123&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#merchantOwner&lt;/sem:predicate&gt;
+          &lt;sem:object&gt;http://fin-def.com/person#mickey-dodgiano&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/person#mickey-dodgiano&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#personName&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;Mickey Dodgiano&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+      &lt;/triples&gt;
+    &lt;/merchant&gt;
+
+    &lt;merchant id="234"&gt;
+      &lt;name&gt;Legitees&lt;/name&gt;
+      &lt;ownerName&gt;Lucy Legitee&lt;/ownerName&gt;
+      &lt;triples&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#234&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#merchantName&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;Legitees&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#234&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#merchantOwner&lt;/sem:predicate&gt;
+          &lt;sem:object&gt;http://fin-def.com/person#lucy-legitee&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/person#lucy-legitee&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#personName&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;Lucy Legitee&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+      &lt;/triples&gt;
+    &lt;/merchant&gt;
+
+    &lt;merchant id="345"&gt;
+      &lt;name&gt;Straight and Narrow&lt;/name&gt;
+      &lt;ownerName&gt;Honest John Smith&lt;/ownerName&gt;
+      &lt;triples&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#345&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#merchantName&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;Straight and Narrow&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#345&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#merchantOwner&lt;/sem:predicate&gt;
+          &lt;sem:object&gt;http://fin-def.com/person#honest-john-smith&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/person#honest-john-smith&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#personName&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;Honest John Smith&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+      &lt;/triples&gt;
+    &lt;/merchant&gt;
+    
+    &lt;event id="100001"&gt;
+      &lt;type&gt;account creation&lt;/type&gt;
+      &lt;businessName&gt;The Green Paper Laundry&lt;/businessName&gt;
+      &lt;ownerName&gt;Mickey Dodgiano&lt;/ownerName&gt;
+      &lt;ownerName&gt;Splif Street-Walker&lt;/ownerName&gt;
+    &lt;/event&gt;
+
+    &lt;police-report id="pr-910212"&gt;
+      &lt;fileDateTime&gt;2016-01-08T09:00:00&lt;/fileDateTime&gt;
+      &lt;characters&gt;
+        &lt;character&gt;Splif Street-Walker&lt;/character&gt;
+      &lt;/characters&gt;
+      &lt;description&gt;
+        On the evening of January 8th 2016, officer Wasinski observed Splif Street-Walker, until that time unknown to the police, selling marijuana
+        to two teenage youths on the corner of 4th and Adams.  Officer Wasinski was able to apprehend Street-Walker and bring him in for questioning
+        whereupon Street-Walker confessed to being in possession of 1lb of marijuana with intent to sell.
+      &lt;/description&gt;
+      &lt;triples&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/person#splif-street-walker&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#personName&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;Splif Street-Walker&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+      &lt;/triples&gt;
+    &lt;/police-report&gt;
+
+    &lt;transaction id="100"&gt;
+      &lt;transactionDateTime&gt;2016-01-08T09:00:00&lt;/transactionDateTime&gt;
+      &lt;merchant&gt;123&lt;/merchant&gt;
+      &lt;type&gt;cash&lt;/type&gt;
+      &lt;amount&gt;9998.76&lt;/amount&gt;
+      &lt;triples&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#123&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+          &lt;sem:object&gt;http://fin-def.com/transaction#100&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#100&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-08T09:00:00&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#100&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#100&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9998.76&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+      &lt;/triples&gt;&gt;
+    &lt;/transaction&gt;
+
+    &lt;transaction id="101"&gt;
+      &lt;transactionDateTime&gt;2016-01-15T09:00:00&lt;/transactionDateTime&gt;
+      &lt;merchant&gt;123&lt;/merchant&gt;
+      &lt;type&gt;cash&lt;/type&gt;
+      &lt;amount&gt;9987.65&lt;/amount&gt;
+      &lt;triples&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#123&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+          &lt;sem:object&gt;http://fin-def.com/transaction#101&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#101&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-15T09:00:00&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#101&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#101&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9987.65&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+      &lt;/triples&gt;&gt;
+    &lt;/transaction&gt;
+
+    &lt;transaction id="102"&gt;
+      &lt;transactionDateTime&gt;2016-01-22T09:00:00&lt;/transactionDateTime&gt;
+      &lt;merchant&gt;123&lt;/merchant&gt;
+      &lt;type&gt;cash&lt;/type&gt;
+      &lt;amount&gt;9976.54&lt;/amount&gt;
+      &lt;triples&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#123&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+          &lt;sem:object&gt;http://fin-def.com/transaction#102&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#102&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-22T09:00:00&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#102&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#102&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9976.54&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+      &lt;/triples&gt;&gt;
+    &lt;/transaction&gt;
+
+    &lt;transaction id="103"&gt;
+      &lt;transactionDateTime&gt;2016-01-29T09:00:00&lt;/transactionDateTime&gt;
+      &lt;merchant&gt;123&lt;/merchant&gt;
+      &lt;type&gt;cash&lt;/type&gt;
+      &lt;amount&gt;9965.43&lt;/amount&gt;
+      &lt;triples&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#123&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+          &lt;sem:object&gt;http://fin-def.com/transaction#103&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#103&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-29T09:00:00&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#103&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#103&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9965.43&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+      &lt;/triples&gt;&gt;
+    &lt;/transaction&gt;
+
+    &lt;transaction id="104"&gt;
+      &lt;transactionDateTime&gt;2016-01-29T09:00:00&lt;/transactionDateTime&gt;
+      &lt;merchant&gt;123&lt;/merchant&gt;
+      &lt;type&gt;CCAggregate&lt;/type&gt;
+      &lt;amount&gt;4400&lt;/amount&gt;
+      &lt;triples&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#123&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+          &lt;sem:object&gt;http://fin-def.com/transaction#104&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#104&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-29T09:00:00&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#104&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;CCAggregate&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#104&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;4400&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+      &lt;/triples&gt;&gt;
+    &lt;/transaction&gt;
+
+    &lt;transaction id="105"&gt;
+      &lt;transactionDateTime&gt;2016-01-08T09:00:00&lt;/transactionDateTime&gt;
+      &lt;merchant&gt;234&lt;/merchant&gt;
+      &lt;type&gt;cash&lt;/type&gt;
+      &lt;amount&gt;9954.32&lt;/amount&gt;
+      &lt;triples&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#234&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+          &lt;sem:object&gt;http://fin-def.com/transaction#105&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#105&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-08T09:00:00&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#105&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#105&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9954.32&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+      &lt;/triples&gt;&gt;
+    &lt;/transaction&gt;
+
+    &lt;transaction id="106"&gt;
+      &lt;transactionDateTime&gt;2016-01-15T09:00:00&lt;/transactionDateTime&gt;
+      &lt;merchant&gt;234&lt;/merchant&gt;
+      &lt;type&gt;cash&lt;/type&gt;
+      &lt;amount&gt;9943.21&lt;/amount&gt;
+      &lt;triples&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#234&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+          &lt;sem:object&gt;http://fin-def.com/transaction#106&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#106&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-15T09:00:00&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#106&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#106&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9943.21&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+      &lt;/triples&gt;&gt;
+    &lt;/transaction&gt;
+
+    &lt;transaction id="107"&gt;
+      &lt;transactionDateTime&gt;2016-01-22T09:00:00&lt;/transactionDateTime&gt;
+      &lt;merchant&gt;234&lt;/merchant&gt;
+      &lt;type&gt;cash&lt;/type&gt;
+      &lt;amount&gt;10976.54&lt;/amount&gt;
+      &lt;triples&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#234&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+          &lt;sem:object&gt;http://fin-def.com/transaction#107&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#107&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-22T09:00:00&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#107&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#107&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;10976.54&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+      &lt;/triples&gt;&gt;
+    &lt;/transaction&gt;
+
+    &lt;transaction id="108"&gt;
+      &lt;transactionDateTime&gt;2016-01-29T09:00:00&lt;/transactionDateTime&gt;
+      &lt;merchant&gt;234&lt;/merchant&gt;
+      &lt;type&gt;cash&lt;/type&gt;
+      &lt;amount&gt;9932.1&lt;/amount&gt;
+      &lt;triples&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#234&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+          &lt;sem:object&gt;http://fin-def.com/transaction#108&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#108&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-29T09:00:00&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#108&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#108&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9932.1&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+      &lt;/triples&gt;&gt;
+    &lt;/transaction&gt;
+
+    &lt;transaction id="109"&gt;
+      &lt;transactionDateTime&gt;2016-01-29T09:00:00&lt;/transactionDateTime&gt;
+      &lt;merchant&gt;234&lt;/merchant&gt;
+      &lt;type&gt;CCAggregate&lt;/type&gt;
+      &lt;amount&gt;60000&lt;/amount&gt;
+      &lt;triples&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#234&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+          &lt;sem:object&gt;http://fin-def.com/transaction#109&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#109&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-29T09:00:00&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#109&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;CCAggregate&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#109&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;60000&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+      &lt;/triples&gt;&gt;
+    &lt;/transaction&gt;
+
+    &lt;transaction id="110"&gt;
+      &lt;transactionDateTime&gt;2016-01-08T09:00:00&lt;/transactionDateTime&gt;
+      &lt;merchant&gt;345&lt;/merchant&gt;
+      &lt;type&gt;cash&lt;/type&gt;
+      &lt;amount&gt;9965.43&lt;/amount&gt;
+      &lt;triples&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#345&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+          &lt;sem:object&gt;http://fin-def.com/transaction#110&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#110&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-08T09:00:00&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#110&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#110&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9965.43&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+      &lt;/triples&gt;&gt;
+    &lt;/transaction&gt;
+
+    &lt;transaction id="111"&gt;
+      &lt;transactionDateTime&gt;2016-01-15T09:00:00&lt;/transactionDateTime&gt;
+      &lt;merchant&gt;345&lt;/merchant&gt;
+      &lt;type&gt;cash&lt;/type&gt;
+      &lt;amount&gt;9954.32&lt;/amount&gt;
+      &lt;triples&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#345&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+          &lt;sem:object&gt;http://fin-def.com/transaction#111&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#111&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-15T09:00:00&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#111&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#111&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9954.32&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+      &lt;/triples&gt;&gt;
+    &lt;/transaction&gt;
+
+    &lt;transaction id="112"&gt;
+      &lt;transactionDateTime&gt;2016-01-22T09:00:00&lt;/transactionDateTime&gt;
+      &lt;merchant&gt;345&lt;/merchant&gt;
+      &lt;type&gt;cash&lt;/type&gt;
+      &lt;amount&gt;9943.21&lt;/amount&gt;
+      &lt;triples&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#345&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+          &lt;sem:object&gt;http://fin-def.com/transaction#112&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#112&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-22T09:00:00&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#112&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#112&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9943.21&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+      &lt;/triples&gt;&gt;
+    &lt;/transaction&gt;
+
+    &lt;transaction id="113"&gt;
+      &lt;transactionDateTime&gt;2016-01-29T09:00:00&lt;/transactionDateTime&gt;
+      &lt;merchant&gt;345&lt;/merchant&gt;
+      &lt;type&gt;cash&lt;/type&gt;
+      &lt;amount&gt;9932.10&lt;/amount&gt;
+      &lt;triples&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#345&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+          &lt;sem:object&gt;http://fin-def.com/transaction#113&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#113&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-29T09:00:00&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#113&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#113&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9932.10&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+      &lt;/triples&gt;&gt;
+    &lt;/transaction&gt;
+
+    &lt;transaction id="114"&gt;
+      &lt;transactionDateTime&gt;2016-01-29T09:00:00&lt;/transactionDateTime&gt;
+      &lt;merchant&gt;345&lt;/merchant&gt;
+      &lt;type&gt;CCAggregate&lt;/type&gt;
+      &lt;amount&gt;5600&lt;/amount&gt;
+      &lt;triples&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/merchant#345&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+          &lt;sem:object&gt;http://fin-def.com/transaction#114&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#114&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-29T09:00:00&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#114&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;CCAggregate&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+        &lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+          &lt;sem:subject&gt;http://fin-def.com/transaction#114&lt;/sem:subject&gt;
+          &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+          &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;5600&lt;/sem:object&gt;
+        &lt;/sem:triple&gt;
+      &lt;/triples&gt;&gt;
+    &lt;/transaction&gt;
+  &lt;/docs&gt;
+for $doc in $docs/element()
+  where fn:name($doc) ne "transaction"
+  return
+    xdmp:document-insert(
+      "/baml/data/" || fn:name($doc) || "/" || $doc/@id || ".xml",
+      $doc,
+      (),
+      fn:name($doc)
+    )</query><query name="Query 1" focus="false" listorder="" taborder="" active="false" database="" server="" database-name="" server-name="" mode="javascript">// test</query><query name="1. Load Merchant Data" focus="false" listorder="9" taborder="1" active="true" database="7111507668735099406" server="1149688552922301636" database-name="FinancialServices" server-name="FinancialServices-XDBC-8030" mode="xquery">xquery version "1.0-ml";
+
+let $merchants :=
+&lt;merchants&gt;
+&lt;merchant&gt;
+  &lt;id&gt;234&lt;/id&gt;
+  &lt;name&gt;Legitees&lt;/name&gt;
+  &lt;ownerName&gt;Lucy Legitee&lt;/ownerName&gt;
+  &lt;address&gt;22 Westway Walk Houston Texas&lt;/address&gt;
+  &lt;creditRating&gt;Good&lt;/creditRating&gt;
+  &lt;notes&gt;Previously located in Dallas&lt;/notes&gt;
+&lt;/merchant&gt;
+&lt;merchant&gt;
+  &lt;id&gt;123&lt;/id&gt;
+  &lt;name&gt;Dodgianos&lt;/name&gt;
+  &lt;ownerName&gt;Mickey Dodgiano&lt;/ownerName&gt;
+  &lt;address&gt;7 Deception Plaza Dallas Texas&lt;/address&gt;
+  &lt;creditRating&gt;Fair&lt;/creditRating&gt;
+  &lt;notes/&gt;
+&lt;/merchant&gt;
+&lt;merchant&gt;
+  &lt;id&gt;345&lt;/id&gt;
+  &lt;name&gt;Straight and Narrow&lt;/name&gt;
+  &lt;ownerName&gt;Honest John Smith&lt;/ownerName&gt;
+  &lt;address&gt;365 Safe Street Dallas Texas&lt;/address&gt;
+  &lt;creditRating&gt;Good&lt;/creditRating&gt;&lt;notes/&gt;
+&lt;/merchant&gt;
+&lt;/merchants&gt;
+
+let $docs := $merchants/merchant
+let $count := fn:count($docs)
+let $insert :=  
+       for $d at $idx in $docs 
+       let $uri := fn:concat("/data/merchant-",$idx,".xml")
+       return xdmp:document-insert($uri, &lt;merchant&gt;{$d/node()}&lt;/merchant&gt;, (), "merchant")
+ 
+return (
+ $insert,
+ fn:concat("You have just inserted ", $count, " merchant records into the database in the merchant collection.")
+  )
+
+ </query><query name="3. Load Transactions" focus="false" listorder="15" taborder="3" active="true" database="7111507668735099406" server="1149688552922301636" database-name="FinancialServices" server-name="FinancialServices-XDBC-8030" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+let $transactions := 
+&lt;transactions&gt;
+&lt;transaction id="108" source-system="System-XYZ"&gt;
+  &lt;content&gt;&lt;transactionDateTime&gt;2016-01-29T09:00:00&lt;/transactionDateTime&gt;&lt;merchant&gt;234&lt;/merchant&gt;&lt;type&gt;cash&lt;/type&gt;&lt;amount&gt;9932.1&lt;/amount&gt;&lt;/content&gt;&lt;meta&gt;&lt;triples&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/merchant#234&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+	  &lt;sem:object&gt;http://fin-def.com/transaction#108&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#108&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-29T09:00:00&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#108&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#108&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9932.1&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;/triples&gt;&lt;/meta&gt;
+  &lt;/transaction&gt;
+  &lt;transaction id="112" source-system="System-XYZ"&gt;
+    &lt;content&gt;&lt;transactionDateTime&gt;2016-01-22T09:00:00&lt;/transactionDateTime&gt;&lt;merchant&gt;345&lt;/merchant&gt;&lt;type&gt;cash&lt;/type&gt;&lt;amount&gt;9943.21&lt;/amount&gt;&lt;/content&gt;&lt;meta&gt;&lt;triples&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/merchant#345&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+	  &lt;sem:object&gt;http://fin-def.com/transaction#112&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#112&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-22T09:00:00&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#112&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#112&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9943.21&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;/triples&gt;&lt;/meta&gt;
+  &lt;/transaction&gt;
+  &lt;transaction id="114" source-system="System-XYZ"&gt;
+    &lt;content&gt;&lt;transactionDateTime&gt;2016-01-29T09:00:00&lt;/transactionDateTime&gt;&lt;merchant&gt;345&lt;/merchant&gt;&lt;type&gt;CCAggregate&lt;/type&gt;&lt;amount&gt;5600&lt;/amount&gt;&lt;/content&gt;&lt;meta&gt;&lt;triples&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/merchant#345&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+	  &lt;sem:object&gt;http://fin-def.com/transaction#114&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#114&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-29T09:00:00&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#114&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;CCAggregate&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#114&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;5600&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;/triples&gt;&lt;/meta&gt;
+  &lt;/transaction&gt;
+  &lt;transaction id="101" source-system="System-XYZ"&gt;
+    &lt;content&gt;&lt;transactionDateTime&gt;2016-01-15T09:00:00&lt;/transactionDateTime&gt;&lt;merchant&gt;123&lt;/merchant&gt;&lt;type&gt;cash&lt;/type&gt;&lt;amount&gt;9987.65&lt;/amount&gt;&lt;/content&gt;&lt;meta&gt;&lt;triples&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/merchant#123&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+	  &lt;sem:object&gt;http://fin-def.com/transaction#101&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#101&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-15T09:00:00&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#101&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#101&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9987.65&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;/triples&gt;&lt;/meta&gt;
+  &lt;/transaction&gt;
+  &lt;transaction id="103" source-system="System-XYZ"&gt;&lt;content&gt;&lt;transactionDateTime&gt;2016-01-29T09:00:00&lt;/transactionDateTime&gt;&lt;merchant&gt;123&lt;/merchant&gt;&lt;type&gt;cash&lt;/type&gt;&lt;amount&gt;9965.43&lt;/amount&gt;&lt;/content&gt;&lt;meta&gt;&lt;triples&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/merchant#123&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+	  &lt;sem:object&gt;http://fin-def.com/transaction#103&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#103&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-29T09:00:00&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#103&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#103&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9965.43&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;/triples&gt;&lt;/meta&gt;
+  &lt;/transaction&gt;
+  &lt;transaction id="105" source-system="System-XYZ"&gt;&lt;content&gt;&lt;transactionDateTime&gt;2016-01-08T09:00:00&lt;/transactionDateTime&gt;&lt;merchant&gt;234&lt;/merchant&gt;&lt;type&gt;cash&lt;/type&gt;&lt;amount&gt;9954.32&lt;/amount&gt;&lt;/content&gt;&lt;meta&gt;&lt;triples&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/merchant#234&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+	  &lt;sem:object&gt;http://fin-def.com/transaction#105&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#105&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-08T09:00:00&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#105&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#105&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9954.32&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;/triples&gt;&lt;/meta&gt;
+  &lt;/transaction&gt;
+  &lt;transaction id="107" source-system="System-XYZ"&gt;&lt;content&gt;&lt;transactionDateTime&gt;2016-01-22T09:00:00&lt;/transactionDateTime&gt;&lt;merchant&gt;234&lt;/merchant&gt;&lt;type&gt;cash&lt;/type&gt;&lt;amount&gt;10976.54&lt;/amount&gt;&lt;/content&gt;&lt;meta&gt;&lt;triples&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/merchant#234&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+	  &lt;sem:object&gt;http://fin-def.com/transaction#107&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#107&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-22T09:00:00&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#107&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#107&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;10976.54&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;/triples&gt;&lt;/meta&gt;
+  &lt;/transaction&gt;
+  &lt;transaction id="111" source-system="System-XYZ"&gt;&lt;content&gt;&lt;transactionDateTime&gt;2016-01-15T09:00:00&lt;/transactionDateTime&gt;&lt;merchant&gt;345&lt;/merchant&gt;&lt;type&gt;cash&lt;/type&gt;&lt;amount&gt;9954.32&lt;/amount&gt;&lt;/content&gt;&lt;meta&gt;&lt;triples&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/merchant#345&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+	  &lt;sem:object&gt;http://fin-def.com/transaction#111&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#111&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-15T09:00:00&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#111&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#111&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9954.32&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;/triples&gt;&lt;/meta&gt;
+  &lt;/transaction&gt;
+  &lt;transaction id="109" source-system="System-XYZ"&gt;&lt;content&gt;&lt;transactionDateTime&gt;2016-01-29T09:00:00&lt;/transactionDateTime&gt;&lt;merchant&gt;234&lt;/merchant&gt;&lt;type&gt;CCAggregate&lt;/type&gt;&lt;amount&gt;60000&lt;/amount&gt;&lt;/content&gt;&lt;meta&gt;&lt;triples&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/merchant#234&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+	  &lt;sem:object&gt;http://fin-def.com/transaction#109&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#109&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-29T09:00:00&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#109&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;CCAggregate&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#109&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;60000&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;/triples&gt;&lt;/meta&gt;
+  &lt;/transaction&gt;
+  &lt;transaction id="113" source-system="System-XYZ"&gt;&lt;content&gt;&lt;transactionDateTime&gt;2016-01-29T09:00:00&lt;/transactionDateTime&gt;&lt;merchant&gt;345&lt;/merchant&gt;&lt;type&gt;cash&lt;/type&gt;&lt;amount&gt;9932.10&lt;/amount&gt;&lt;/content&gt;&lt;meta&gt;&lt;triples&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/merchant#345&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+	  &lt;sem:object&gt;http://fin-def.com/transaction#113&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#113&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-29T09:00:00&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#113&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#113&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9932.1&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;/triples&gt;&lt;/meta&gt;
+  &lt;/transaction&gt;
+  &lt;transaction id="100" source-system="System-XYZ"&gt;&lt;content&gt;&lt;transactionDateTime&gt;2016-01-08T09:00:00&lt;/transactionDateTime&gt;&lt;merchant&gt;123&lt;/merchant&gt;&lt;type&gt;cash&lt;/type&gt;&lt;amount&gt;9998.76&lt;/amount&gt;&lt;/content&gt;&lt;meta&gt;&lt;triples&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/merchant#123&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+	  &lt;sem:object&gt;http://fin-def.com/transaction#100&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#100&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-08T09:00:00&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#100&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#100&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9998.76&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;/triples&gt;&lt;/meta&gt;
+  &lt;/transaction&gt;
+  &lt;transaction id="102" source-system="System-XYZ"&gt;&lt;content&gt;&lt;transactionDateTime&gt;2016-01-22T09:00:00&lt;/transactionDateTime&gt;&lt;merchant&gt;123&lt;/merchant&gt;&lt;type&gt;cash&lt;/type&gt;&lt;amount&gt;9976.54&lt;/amount&gt;&lt;/content&gt;&lt;meta&gt;&lt;triples&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/merchant#123&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+	  &lt;sem:object&gt;http://fin-def.com/transaction#102&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#102&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-22T09:00:00&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#102&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#102&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9976.54&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;/triples&gt;&lt;/meta&gt;
+  &lt;/transaction&gt;
+  &lt;transaction id="104" source-system="System-XYZ"&gt;&lt;content&gt;&lt;transactionDateTime&gt;2016-01-29T09:00:00&lt;/transactionDateTime&gt;&lt;merchant&gt;123&lt;/merchant&gt;&lt;type&gt;CCAggregate&lt;/type&gt;&lt;amount&gt;4400&lt;/amount&gt;&lt;/content&gt;&lt;meta&gt;&lt;triples&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/merchant#123&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+	  &lt;sem:object&gt;http://fin-def.com/transaction#104&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#104&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-29T09:00:00&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#104&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;CCAggregate&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#104&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;4400&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;/triples&gt;&lt;/meta&gt;
+  &lt;/transaction&gt;
+  &lt;transaction id="106" source-system="System-XYZ"&gt;&lt;content&gt;&lt;transactionDateTime&gt;2016-01-15T09:00:00&lt;/transactionDateTime&gt;&lt;merchant&gt;234&lt;/merchant&gt;&lt;type&gt;cash&lt;/type&gt;&lt;amount&gt;9943.21&lt;/amount&gt;&lt;/content&gt;&lt;meta&gt;&lt;triples&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/merchant#234&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+	  &lt;sem:object&gt;http://fin-def.com/transaction#106&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#106&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-15T09:00:00&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#106&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#106&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9943.21&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;/triples&gt;&lt;/meta&gt;
+  &lt;/transaction&gt;
+  &lt;transaction id="110" source-system="System-XYZ"&gt;&lt;content&gt;&lt;transactionDateTime&gt;2016-01-08T09:00:00&lt;/transactionDateTime&gt;&lt;merchant&gt;345&lt;/merchant&gt;&lt;type&gt;cash&lt;/type&gt;&lt;amount&gt;9965.43&lt;/amount&gt;&lt;/content&gt;&lt;meta&gt;&lt;triples&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/merchant#345&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transaction&lt;/sem:predicate&gt;
+	  &lt;sem:object&gt;http://fin-def.com/transaction#110&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#110&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#transactionDateTime&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#dateTime"&gt;2016-01-08T09:00:00&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#110&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#type&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#string"&gt;cash&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;sem:triple xmlns:sem="http://marklogic.com/semantics"&gt;
+	  &lt;sem:subject&gt;http://fin-def.com/transaction#110&lt;/sem:subject&gt;
+	  &lt;sem:predicate&gt;http://fin-def.com/predicate#amount&lt;/sem:predicate&gt;
+	  &lt;sem:object datatype="http://www.w3.org/2001/XMLSchema#decimal"&gt;9965.43&lt;/sem:object&gt;
+	&lt;/sem:triple&gt;&lt;/triples&gt;&lt;/meta&gt;
+ &lt;/transaction&gt;
+&lt;/transactions&gt;
+
+
+let $docs := $transactions/transaction
+let $count := fn:count($docs)
+let $insert :=  
+       for $d at $idx in $docs 
+       let $uri := fn:concat("/data/transaction-",$idx,".xml")
+       return xdmp:document-insert($uri, &lt;transaction&gt;{$d/node()}&lt;/transaction&gt;, (), "transaction")
+ 
+return (
+ $insert,
+ fn:concat("You have just inserted ", $count, " merchant records into the database in the transaction collection.")
+  )
+
+ </query></workspace></export>
