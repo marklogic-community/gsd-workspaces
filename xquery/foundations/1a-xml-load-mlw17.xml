@@ -131,7 +131,7 @@ return (
  $insert,
  fn:concat("You have just inserted ", $count, " address table records into the database.")
   )
-</query><query name="denormalize-customers" focus="false" listorder="3" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="denormalize-customers" focus="false" listorder="3" taborder="6" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : This script is a simple example of creating entities in MarkLogic by \\
  : denormalizing records loaded from separate tables.
@@ -162,7 +162,7 @@ let $insert :=
 return ($insert, 
         fn:concat("You have just created 3 customer entities and inserted them into the database.")
        )
-</query><query name="delete table collections" focus="true" listorder="4" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="delete table collections" focus="false" listorder="4" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: 
  :  This script deletes the collections containing the records we created
  :  our denormalized entities from.
@@ -196,4 +196,12 @@ customer_id,first_name,last_name,email,ssn,phone,billing_address_id,shipping_add
 We'll load the Customer data, then denormalize to create Customer entities. So you have an example of creating entities in MarkLogic from disparate tables.
 
 We'll proceed to the next workspace to load Orders and Products entities as-is.
-"</query></workspace></export>
+"</query><query name="query-XPATH" focus="false" listorder="6" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(:
+ : Show me the record having a /root/customer_id equal to '1'
+:)
+/root[customer_id = 1]</query><query name="query-Search" focus="true" listorder="7" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(:
+ : Show me any records that have the state 'texas' in them.
+:)
+cts:search(fn:collection(), "texas")</query></workspace></export>
