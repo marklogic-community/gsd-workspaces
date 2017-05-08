@@ -1,4 +1,4 @@
-<export><workspace name="4c-matchmaking-mlw17"><query name="1. Insert Documents" focus="false" listorder="1" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="4c-matchmaking-mlw17"><query name="1. Insert Documents" focus="false" listorder="1" taborder="2" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  Insert 2 additional documents into the database.  These documents come
  from different systems, so are inserted into separate collections.
@@ -74,9 +74,18 @@ let $customer-2-oracle :=
          xdmp:document-insert("/customer-5.xml", $customer-2-oracle,(), ("customer-match","oracle")),
          "You've added 2 additional customer documents to the database in the 'customer-match' collection."
          )
- </query><query name="2. Reverse Customer 1" focus="false" listorder="2" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+ </query><query name="2. Reverse Customer 1" focus="false" listorder="2" taborder="3" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : Find the matching customer from the perspective of the sql-server customer.
+ : Have: customer profile a
+ : Have: customer profile b
+ : Want: customer b profile that matches customer a profile
+ : Solution: matchmaking
+ :    Forwards query-what I want from you
+ :    Reverse query - what you need from me
+ :
+ : From documents =&gt; rules, rules =&gt; documents
+ : Tools: cts:search with both forwards and reverse query
 :)
 let $sql-server-doc := doc("/customer-4.xml")/customer
 for $match in cts:search(/customer,
@@ -85,7 +94,7 @@ for $match in cts:search(/customer,
     cts:reverse-query($sql-server-doc)
   ))
 )
-return (fn:base-uri($match), $match)</query><query name="3. Reverse Customer 2" focus="false" listorder="3" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+return (fn:base-uri($match), $match)</query><query name="3. Reverse Customer 2" focus="false" listorder="3" taborder="4" active="true" database="14942407515111994202" server="6240101570028256752" database-name="" server-name="" mode="xquery">xquery version "1.0-ml";
 (:
  : Find the matching customer from the perspective of the oracle customer.
 :)
@@ -97,16 +106,26 @@ for $match in cts:search(/customer,
     cts:reverse-query($oracle-doc)
   ))
 )
-return (fn:base-uri($match), $match)</query><query name="4. Cleanup" focus="false" listorder="4" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+return (fn:base-uri($match), $match)</query><query name="4. Cleanup" focus="false" listorder="4" taborder="5" active="true" database="14942407515111994202" server="6240101570028256752" database-name="" server-name="" mode="xquery">xquery version "1.0-ml";
 (:
  : Delete the customer-match collection.
 :)
 
-xdmp:collection-delete("customer-match")</query><query name="Intro" focus="true" listorder="5" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
+xdmp:collection-delete("customer-match")</query><query name="Intro" focus="true" listorder="5" taborder="1" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">"
 In this workspace we demonstrate a way to use the reverse index in matchmaker queries.
 This particular example comes to us from a use case that is helpful for data integration.
 
 When we have 2 customer documents that are similar, but no master customer identifier, we
 may know that if certain attributes have similar certain values, then we have 90% confidence
 this person is the same person.  We can use matchmaker queries to identify similar persons.
+
+ : Have: customer profile a
+ : Have: customer profile b
+ : Want: customer b profile that matches customer a profile
+ : Solution: Matchmaking
+ :    Forwards query-what I want from you
+ :    Reverse query - what you need from me
+ :
+ : From documents =&gt; rules, rules =&gt; documents
+ : Tools: cts:search with both forwards and reverse query
 "</query></workspace></export>
