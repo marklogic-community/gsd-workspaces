@@ -18,7 +18,7 @@ xdmp:sql("SELECT * from Product",
   Since the envelope documents contain the original documents verbatim, even data that has not
   been integrated into the canonical model can be used in search selection.
   :)
-sem:sparql("SELECT ?s ?p ?o WHERE { SPR?s ?p ?o }",
+sem:sparql("SELECT ?s ?p ?o WHERE { ?s ?p ?o }",
    (),
    (),
    cts:word-query("ants"))</query><query active="false" focus="false" mode="xquery" name="SQL + range query">declare namespace es = "http://marklogic.com/entity-services";
@@ -81,7 +81,7 @@ return
 xdmp:sql('select * from "order_orderlines" where total &gt;= @min and total &lt;= @max order by total', (), map:map()=&gt;map:with("min",$min)=&gt;map:with("max", $max))</query><query active="false" focus="false" mode="xquery" name="ranges and sparql">xquery version "1.0-ml";
 declare namespace es = "http://marklogic.com/entity-services";
 
-let $r := cts:path-reference("//es:instance/Order/orderDate")
+let $r := cts:path-reference("//es:instance/Order/orderDate", "type=date")
 for $orderDate in cts:values($r)
 return
 
@@ -90,7 +90,7 @@ sem:sparql('
   where { 
    ?s ?p ?o
   }
-', (), cts:range-query($r, "=", (), $orderDate))
+', (), (), cts:range-query($r, "=", $orderDate))
 </query><query active="false" focus="false" mode="xquery" name="search and match">(: Here are several very simple operations with the venerable cts:* API :)
 
 (: search all collections

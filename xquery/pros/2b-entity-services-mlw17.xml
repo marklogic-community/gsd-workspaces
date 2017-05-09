@@ -13,8 +13,10 @@ PREFIX es: &lt;http://marklogic.com/entity-services#&gt;
 
 SELECT ?s ?p ?o WHERE { 
   ?s a es:Model ;
- #     ?p ?o
+     ?p ?o
 }
+
+
 </query><query active="false" focus="false" mode="sparql" name="Type Query"># All aspects of model descriptors are surfaced as
 # triples.
 PREFIX es: &lt;http://marklogic.com/entity-services#&gt;
@@ -81,7 +83,8 @@ op:from-triples( (
    op:pattern( op:col("s"), $rdf("type"), $es("Model") ),
    op:pattern( op:col("s"), op:col("p"), op:col("o") )
    ) )
-=&gt;op:result()</query><query active="false" focus="false" mode="xquery" name="Optic Type">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+=&gt;op:result()</query><query active="false" focus="false" mode="xquery" name="Optic Type">import module namespace op = "http://marklogic.com/optic" 
+  at "/MarkLogic/optic.xqy";
 
 let $es := op:prefixer("http://marklogic.com/entity-services#")
 let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
@@ -91,7 +94,10 @@ op:from-triples( (
    op:pattern( op:col("s"), $rdf("type"), $es("EntityType") ),
    op:pattern( op:col("s"), op:col("p"), op:col("o") )
    ) )
-=&gt;op:result()</query><query active="false" focus="false" mode="xquery" name="Optic Property">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+=&gt;op:result()
+
+
+</query><query active="false" focus="false" mode="xquery" name="Optic Property">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
 
 let $es := op:prefixer("http://marklogic.com/entity-services#")
 let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
