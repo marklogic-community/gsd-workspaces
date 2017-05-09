@@ -37,12 +37,12 @@ let $model :=
           &lt;sem:triple&gt;
             &lt;sem:subject&gt;http://marklogic.com/example/ontology/ECommerce-0.0.3/Customer/lastName&lt;/sem:subject&gt;
             &lt;sem:predicate&gt;http://www.w3.org/2000/01/rdf-schema#subPropertyOf&lt;/sem:predicate&gt;
-            &lt;sem:object&gt;http://xmlns.com/foaf/0.1/lastName&lt;/sem:object&gt;
+            &lt;sem:object&gt;http://xmlns.com/foaf/0.1/familyName&lt;/sem:object&gt;
           &lt;/sem:triple&gt;
           &lt;sem:triple&gt;
             &lt;sem:subject&gt;http://marklogic.com/example/ontology/ECommerce-0.0.3/Customer/firstName&lt;/sem:subject&gt;
             &lt;sem:predicate&gt;http://www.w3.org/2000/01/rdf-schema#subPropertyOf&lt;/sem:predicate&gt;
-            &lt;sem:object&gt;http://xmlns.com/foaf/0.1/firstName&lt;/sem:object&gt;
+            &lt;sem:object&gt;http://xmlns.com/foaf/0.1/givenName&lt;/sem:object&gt;
           &lt;/sem:triple&gt;
         &lt;/sem:triples&gt;
     &lt;/Customer&gt;

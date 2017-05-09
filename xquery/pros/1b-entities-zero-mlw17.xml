@@ -261,7 +261,7 @@ return xdmp:invoke-function(function() {
 
 (:
  This buffer contains a conversion module.  It was generated, and then modified to conform to the source documents.
- :)</query><query active="false" focus="false" mode="xquery" name="harmonize">(: This query runs code in the instnace converter, harmonizing your source documents into canonical envelopes :)
+ :)</query><query active="false" focus="false" mode="xquery" name="Harmonize">(: This query runs code in the instnace converter, harmonizing your source documents into canonical envelopes :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 import module namespace my = "http://marklogic.com/tutorial-data/ECommerce-0.0.0" at "/ext/extractions-0.0.0.xqy";
 
@@ -384,4 +384,13 @@ op:from-triples( (
 =&gt;op:select( ($modelTitle, $modelVersion, $typeTitle, $instanceDoc) )
 =&gt;op:result()</query><query active="false" focus="false" mode="sql" name="SQL!">SELECT * FROM Ecommerce.Product;
 SELECT * FROM Ecommerce.Customer;
-SELECT * FROM Ecommerce.Order;</query></workspace></export>
+SELECT * FROM Ecommerce.Order;</query><query active="false" focus="false" mode="xquery" name="Browsing">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+
+
+fn:doc("/model-zero.xml")                              ,
+fn:doc("/envelope-0.0.0-1.xml")                        ,
+(/es:model/es:info/es:title/text())                    ,
+(/es:envelope/es:instance/es:info)[1 to 3]             ,
+(/es:envelope/es:instance/Customer)[1 to 3]            ,
+(/es:envelope/es:instance/Customer/id/data())[1 to 3]        
+</query></workspace></export>

@@ -513,7 +513,7 @@ They come from a hypothetical 'upstream system'.
 To view one, use the 'Explore' button and find '/product-1.xml'.")
        </query><query active="false" focus="false" mode="xquery" name="collection-count">xquery version "1.0-ml";
 (:
-: A simple script to return the collections 
+: A simple script to return the collections
  : loaded into the system with their counts.
 :)
 
@@ -526,9 +526,9 @@ return fn:concat($c," : ",fn:count(fn:collection($c)))</query><query active="fal
  : inadvertently run it.
  : This method of deletion is simple to read, 
  : but cannot run on a very large database becuase it is a single 
- : transaction.
+ : transaction. :)
 for $d in collection() return xdmp:document-delete(base-uri($d))
-:)</query><query active="true" focus="true" mode="xquery" name="Intro">"
+</query><query active="true" focus="true" mode="xquery" name="Intro">"
  This workspace simply contains the very first data to be loaded into the workshop.
  After running all the tabs (except 'clear database') you will have several customers
  orders, and products, in a form that will metamorphasize over the course of the workshop.

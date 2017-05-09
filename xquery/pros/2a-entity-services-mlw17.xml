@@ -411,11 +411,12 @@ $et)
 This workspace explore data modeling with Entity Services.
 
 You will create a model for Customers, Products, and other entities
-that underly the data already seen.
+with which to make a lens on the data already seen.
 
-Using that model, you will make an ingestion script to create canonical
-instances of this model from source documents, and then see how
-generated artifacts can speed development against these models.
+Using that model, you will make an ingestion script to 
+
+* create canonical instances of this model from source documents, and
+* see how generated artifacts can speed development against these models
 "</query><query active="false" focus="false" mode="xquery" name="Setup Indexes">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy";
 
 let $props := doc("/model.xml")=&gt;es:model-validate()=&gt;es:database-properties-generate()
