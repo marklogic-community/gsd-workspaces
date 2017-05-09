@@ -1,21 +1,8 @@
-<export><workspace name="1d-harmonize-mlw17"><query name="envelope-1" focus="false" listorder="1" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
-(: This script applies the envelope pattern to customer entitities.
- : We first test our envelope in Query Console.
+<export><workspace name="1d-harmonize-mlw17"><query name="envelope test" focus="false" listorder="2" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+
+(: This script tests applying the envelope pattern to customer entitities.
+ : We first test our envelope and view results in Query Console.
  : The root element is named for the type of entity we are enveloping.
-:)
-
-let $docs := fn:collection("customer")
-let $enveloped-docs :=
-   for $doc in $docs return
-   let $collections:= xdmp:document-get-collections($doc)
-   return
-     &lt;customer&gt;{
-      &lt;source&gt;{$doc/customer/*}&lt;/source&gt;
-   }&lt;/customer&gt;
-return $enveloped-docs
-</query><query name="envelope-2" focus="false" listorder="2" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
-
-(: This script applies the envelope pattern to customer entitities.
  : Here we use cts:uris() to return the URIs we want to envelope.
 :)
 
@@ -32,7 +19,7 @@ let $enveloped-docs :=
 return $enveloped-docs
 
 
-</query><query name="envelope-3" focus="false" listorder="3" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="envelope insert" focus="false" listorder="3" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: This script applies the envelope pattern to customer entitities
  : and inserts the results in the database.
  : Enveloped documents are added to the 'enveloped' collection.
@@ -52,7 +39,7 @@ let $enveloped-docs :=
    return xdmp:document-insert($uri, $doc, (), ($collections, "enveloped"))
 return ($enveloped-docs,
         fn:concat("You have just enveloped the ",$collection," collection entities.")
-       )</query><query name="uris-a" focus="false" listorder="4" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+       )</query><query name="uris" focus="false" listorder="4" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: This returns the URIs for the documents returned by a more complex query.
 :)
 
@@ -60,7 +47,7 @@ let $uris := cts:uris('','document', cts:and-query((cts:collection-query("custom
                                                    cts:collection-query("system-a"),
                                                    cts:collection-query("enveloped"))))
                                                    
-return $uris</query><query name="harmonize-a" focus="false" listorder="5" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+return $uris</query><query name="harmonize system-a 1" focus="false" listorder="6" taborder="6" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (: This script creates the canonical section for
  : our enveloped documents from system-a and 
@@ -73,10 +60,11 @@ let $uris := cts:uris('','document', cts:and-query((cts:collection-query("custom
 for $uri in $uris
 let $doc := fn:doc($uri)
 let $zip := $doc/customer/source/shipping_address/zip/text()
-let $header := &lt;canonical&gt;&lt;shipping-zip&gt;{$zip}&lt;/shipping-zip&gt;&lt;/canonical&gt;
+let $header := &lt;canonical&gt;
+                  &lt;shipping-zip&gt;{$zip}&lt;/shipping-zip&gt;
+               &lt;/canonical&gt;
 return xdmp:node-insert-before($doc/customer/source, $header);
-
-"You just added &lt;canonical&gt; sections to your enveloped documents from system-a";</query><query name="harmonize-b" focus="false" listorder="6" taborder="8" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+       "You just added &lt;canonical&gt; sections to your enveloped documents from system-a";</query><query name="harmonize system-b 1" focus="false" listorder="7" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: This script creates the canonical section for
  : our enveloped documents from system-b and 
  : inserts them before the &lt;source&gt; sections 
@@ -90,15 +78,17 @@ let $uris := cts:uris('','document', cts:and-query((cts:collection-query("custom
 for $uri in $uris
 let $doc := fn:doc($uri)
 let $zip := $doc/customer/source/postal/text()
-let $header := &lt;canonical&gt;&lt;shipping-zip&gt;{$zip}&lt;/shipping-zip&gt;&lt;/canonical&gt;
+let $header := &lt;canonical&gt;
+                 &lt;shipping-zip&gt;{$zip}&lt;/shipping-zip&gt;
+               &lt;/canonical&gt;
 return xdmp:node-insert-before($doc/customer/source, $header);
-
 "You just added &lt;canonical&gt; sections to your enveloped documents from system-b";
-</query><query name="header-a" focus="false" listorder="7" taborder="6" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="header only" focus="false" listorder="5" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (: This script mocks up the header section we'll add
- : to our enveloped documents to start storing a 
- : canonical model of the data within our envelopes.
+ : to our enveloped documents. This will allow us to make a
+ : start storing a canonical model of the data 
+ : within our envelopes.
 :)
 
 let $uris := cts:uris('','document', cts:and-query((cts:collection-query("customer"), 
@@ -108,8 +98,10 @@ let $uris := cts:uris('','document', cts:and-query((cts:collection-query("custom
 for $uri in $uris
 let $doc := fn:doc($uri)
 let $zip := $doc/customer/source/shipping_address/zip/text()
-let $header := &lt;canonical&gt;&lt;shipping-zip&gt;{$zip}&lt;/shipping-zip&gt;&lt;/canonical&gt;
-return ($header) (: , $doc) :)</query><query name="Intro" focus="false" listorder="8" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
+let $header := &lt;canonical&gt;
+                  &lt;shipping-zip&gt;{$zip}&lt;/shipping-zip&gt;
+               &lt;/canonical&gt;
+return $header </query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
 This workspace demonstrates applying the envelope pattern and harmonization 
 to douments in MarkLogic. Here we explore the building blocks and the
 underlying concepts.
@@ -123,7 +115,7 @@ automated to be scheduled as needed.
 The Data Hub Framework and Data Movement SDK can also be leveraged 
 for harmonization and enveloping.  
 
-"</query><query name="harmonize-a-2" focus="false" listorder="9" taborder="9" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+"</query><query name="harmonize system-a 2" focus="false" listorder="8" taborder="8" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (: This script adds an additional metadata section 
  : to our enveloped documents from system-a and 
@@ -145,7 +137,7 @@ let $metadata := &lt;metadata&gt;
 return  xdmp:node-insert-before($doc/customer/canonical, $metadata);
 
 "You just added &lt;metadata&gt; sections to your enveloped documents from system-a";
-</query><query name="harmonize-b-2" focus="true" listorder="10" taborder="10" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="harmonize system-b 2" focus="false" listorder="9" taborder="9" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: This script adds an additional metadata section 
  : to our enveloped documents from system-b and 
  : inserts them before the &lt;canonical&gt; section
@@ -165,4 +157,175 @@ let $metadata := &lt;metadata&gt;
                    &lt;lineage&gt;v01 transform&lt;/lineage&gt;
                  &lt;/metadata&gt;
 return  xdmp:node-insert-before($doc/customer/canonical, $metadata);
-"You just added &lt;metadata&gt; sections to your enveloped documents from system-b";</query></workspace></export>
+"You just added &lt;metadata&gt; sections to your enveloped documents from system-b";</query><query name="fn:doc()" focus="false" listorder="10" taborder="10" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(: This script provided for those who may already 
+ : have content in their Documents DB.
+ : Use this to view docs between updates to the document.
+ : Change URIs as appropriate to inspect your results.
+ :)
+
+fn:doc("/denormalized/customer-1.xml"),
+fn:doc("/customer-1.xml")</query><query name="reload customers" focus="false" listorder="11" taborder="11" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(: Use this tab to reinsert documents into the DB as they 
+ : were at the end of workspace 1c, 
+ : prior to starting this workspace.)
+ :)
+ 
+let $cust-a-records :=
+&lt;dataset&gt;
+  &lt;record&gt;
+    &lt;customer_id&gt;1&lt;/customer_id&gt;
+    &lt;first_name&gt;Nicholas&lt;/first_name&gt;
+    &lt;last_name&gt;Wheeler&lt;/last_name&gt;
+    &lt;email&gt;nwheeler0@cdbaby.com&lt;/email&gt;
+    &lt;ssn&gt;803-28-0354&lt;/ssn&gt;
+    &lt;phone&gt;1-(915)325-2812&lt;/phone&gt;
+    &lt;billing_address&gt;
+      &lt;street&gt;46958 Farwell Trail&lt;/street&gt;
+      &lt;city&gt;El Paso&lt;/city&gt;
+      &lt;state&gt;Texas&lt;/state&gt;
+      &lt;zip&gt;79950&lt;/zip&gt;
+      &lt;latitude&gt;31.6948&lt;/latitude&gt;
+      &lt;longitude&gt;-106.3&lt;/longitude&gt;
+    &lt;/billing_address&gt;
+    &lt;shipping_address&gt;
+      &lt;street&gt;9 Thierer Place&lt;/street&gt;
+      &lt;city&gt;Mobile&lt;/city&gt;
+      &lt;state&gt;Alabama&lt;/state&gt;
+      &lt;zip&gt;36628&lt;/zip&gt;
+      &lt;latitude&gt;30.6589&lt;/latitude&gt;
+      &lt;longitude&gt;-88.178&lt;/longitude&gt;
+    &lt;/shipping_address&gt;
+    &lt;region&gt;justo&lt;/region&gt;
+    &lt;segment&gt;top&lt;/segment&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;customer_id&gt;2&lt;/customer_id&gt;
+    &lt;first_name&gt;Richard&lt;/first_name&gt;
+    &lt;last_name&gt;Kennedy&lt;/last_name&gt;
+    &lt;email&gt;rkennedy1@apache.org&lt;/email&gt;
+    &lt;ssn&gt;253-66-8162&lt;/ssn&gt;
+    &lt;phone&gt;1-(815)551-8998&lt;/phone&gt;
+    &lt;billing_address&gt;
+      &lt;street&gt;01233 7th Parkway&lt;/street&gt;
+      &lt;city&gt;Rockford&lt;/city&gt;
+      &lt;state&gt;Illinois&lt;/state&gt;
+      &lt;zip&gt;61110&lt;/zip&gt;
+      &lt;latitude&gt;42.3254&lt;/latitude&gt;
+      &lt;longitude&gt;-89.1705&lt;/longitude&gt;
+    &lt;/billing_address&gt;
+    &lt;shipping_address&gt;
+      &lt;street&gt;19137 Superior Point&lt;/street&gt;
+      &lt;city&gt;Gulfport&lt;/city&gt;
+      &lt;state&gt;Mississippi&lt;/state&gt;
+      &lt;zip&gt;39505&lt;/zip&gt;
+      &lt;latitude&gt;30.4158&lt;/latitude&gt;
+      &lt;longitude&gt;-89.0684&lt;/longitude&gt;
+    &lt;/shipping_address&gt;
+    &lt;region&gt;in&lt;/region&gt;
+    &lt;segment&gt;regular&lt;/segment&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;customer_id&gt;3&lt;/customer_id&gt;
+    &lt;first_name&gt;Bonnie&lt;/first_name&gt;
+    &lt;last_name&gt;Clark&lt;/last_name&gt;
+    &lt;email&gt;bclark2@example.com&lt;/email&gt;
+    &lt;ssn&gt;947-95-7536&lt;/ssn&gt;
+    &lt;phone&gt;1-(515)755-7166&lt;/phone&gt;
+    &lt;billing_address&gt;
+      &lt;street&gt;4 Red Cloud Plaza&lt;/street&gt;
+      &lt;city&gt;Des Moines&lt;/city&gt;
+      &lt;state&gt;Iowa&lt;/state&gt;
+      &lt;zip&gt;50305&lt;/zip&gt;
+      &lt;latitude&gt;41.6727&lt;/latitude&gt;
+      &lt;longitude&gt;-93.5722&lt;/longitude&gt;
+    &lt;/billing_address&gt;
+    &lt;shipping_address&gt;
+      &lt;street&gt;96328 Sutteridge Court&lt;/street&gt;
+      &lt;city&gt;Richmond&lt;/city&gt;
+      &lt;state&gt;Virginia&lt;/state&gt;
+      &lt;zip&gt;23272&lt;/zip&gt;
+      &lt;latitude&gt;37.5242&lt;/latitude&gt;
+      &lt;longitude&gt;-77.4932&lt;/longitude&gt;
+    &lt;/shipping_address&gt;
+    &lt;region&gt;velit&lt;/region&gt;
+    &lt;segment&gt;coupon&lt;/segment&gt;
+  &lt;/record&gt;
+&lt;/dataset&gt;
+
+let $cust-a-docs := $cust-a-records/record
+let $count := fn:count($cust-a-docs)
+let $cust-a-reset :=
+        for $d at $idx in $cust-a-docs 
+        let $uri := fn:concat("/denormalized/customer-",$idx,".xml")
+        return  xdmp:document-insert($uri, &lt;customer&gt;{$d/node()}&lt;/customer&gt;, (), ("customer", "system-a"))
+        
+let $cust-b-records :=
+&lt;dataset&gt;
+  &lt;record&gt;
+    &lt;id&gt;82&lt;/id&gt;
+    &lt;fname&gt;Fanechka&lt;/fname&gt;
+    &lt;lname&gt;Applebee&lt;/lname&gt;
+    &lt;phone&gt;1-(915)318-6020&lt;/phone&gt;
+    &lt;ssn&gt;482-78-7787&lt;/ssn&gt;
+    &lt;street&gt;3833 Merchant Parkway&lt;/street&gt;
+    &lt;city&gt;El Paso&lt;/city&gt;
+    &lt;state&gt;Texas&lt;/state&gt;
+    &lt;postal&gt;79934&lt;/postal&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;42&lt;/id&gt;
+    &lt;fname&gt;Gunther&lt;/fname&gt;
+    &lt;lname&gt;Revely&lt;/lname&gt;
+    &lt;phone&gt;1-(251)551-0806&lt;/phone&gt;
+    &lt;ssn&gt;729-28-2635&lt;/ssn&gt;
+    &lt;street&gt;76291 Memorial Parkway&lt;/street&gt;
+    &lt;city&gt;Mobile&lt;/city&gt;
+    &lt;state&gt;Alabama&lt;/state&gt;
+    &lt;postal&gt;36628&lt;/postal&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;1&lt;/id&gt;
+    &lt;fname&gt;Richard&lt;/fname&gt;
+    &lt;lname&gt;Roostan&lt;/lname&gt;
+    &lt;phone&gt;1-(808)408-2422&lt;/phone&gt;
+    &lt;ssn&gt;120-59-9484&lt;/ssn&gt;
+    &lt;street&gt;2 Northwestern Road&lt;/street&gt;
+    &lt;city&gt;Honolulu&lt;/city&gt;
+    &lt;state&gt;Hawaii&lt;/state&gt;
+    &lt;postal&gt;96825&lt;/postal&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;9&lt;/id&gt;
+    &lt;fname&gt;Kristina&lt;/fname&gt;
+    &lt;lname&gt;Frankel&lt;/lname&gt;
+    &lt;phone&gt;1-(469)618-6671&lt;/phone&gt;
+    &lt;ssn&gt;355-62-0033&lt;/ssn&gt;
+    &lt;street&gt;889 Novick Center&lt;/street&gt;
+    &lt;city&gt;Dallas&lt;/city&gt;
+    &lt;state&gt;Texas&lt;/state&gt;
+    &lt;postal&gt;75226&lt;/postal&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;33&lt;/id&gt;
+    &lt;fname&gt;Kora&lt;/fname&gt;
+    &lt;lname&gt;McIntosh&lt;/lname&gt;
+    &lt;phone&gt;1-(806)259-1852&lt;/phone&gt;
+    &lt;ssn&gt;258-12-1494&lt;/ssn&gt;
+    &lt;street&gt;27 John Wall Street&lt;/street&gt;
+    &lt;city&gt;Lubbock&lt;/city&gt;
+    &lt;state&gt;Texas&lt;/state&gt;
+    &lt;postal&gt;79405&lt;/postal&gt;
+  &lt;/record&gt;
+&lt;/dataset&gt;
+
+let $cust-b-docs := $cust-b-records/record
+let $count := fn:count($cust-b-docs)
+let $cust-b-reset :=
+        for $d at $idx in $cust-b-docs 
+        let $uri := fn:concat("/customer-",$idx,".xml")
+        return xdmp:document-insert($uri, &lt;customer&gt;{$d/node()}&lt;/customer&gt;, (), ("customer", "system-b"))
+       
+
+return ($cust-a-reset, $cust-b-reset),
+       "You've just reloaded the system-a and system-b customer records as they originally were prior to using this workspace."</query></workspace></export>
