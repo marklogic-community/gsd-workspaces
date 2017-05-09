@@ -1,4 +1,4 @@
-<export><workspace name="5a-load-ttl-triples-mlw17"><query name="load-customer-data" focus="true" listorder="1" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="5a-load-ttl-triples-mlw17"><query name="load-customer-data" focus="false" listorder="2" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 import module namespace sem = "http://marklogic.com/semantics" at "/MarkLogic/semantics.xqy";
 (: 
  : A script to load triples for Customers serialized as turtle (.ttl)
@@ -92,7 +92,7 @@ ids:15 a :ShippingAddress ;
 return 
 sem:graph-insert(sem:iri("http://marklogic.com/example/graphs/customers"), $triples),
 "You've just loaded customer triples into the database in the http://marklogic.com/example/graphs/customers collection"
-</query><query name="load-order-data" focus="false" listorder="2" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="load-order-data" focus="false" listorder="3" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 import module namespace sem = "http://marklogic.com/semantics" at "/MarkLogic/semantics.xqy";
 (: 
  : A script to load triples for Orders serialized as turtle (.ttl)
@@ -203,7 +203,7 @@ return (
    "You've just loaded order triples into the database in the http://marklogic.com/example/graphs/orders collection",
    sem:graph-insert(sem:iri("http://marklogic.com/example/graphs/orders"), $triples),
    $triples
-)</query><query name="load-product-data" focus="false" listorder="3" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+)</query><query name="load-product-data" focus="false" listorder="4" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 import module namespace sem = "http://marklogic.com/semantics" at "/MarkLogic/semantics.xqy";
 (: 
  : A script to load triples for Products serialized as turtle (.ttl)
@@ -297,12 +297,6 @@ return
 )      
 
 (: note here, relatedTo points to bnodes that we don't know much about.  A refinement to these triples would be to model
-   ProductRelations, which would have a reference to a product and the enum as a type :)</query><query name="cleanup" focus="false" listorder="4" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
-
-(: Remove the triples we created from the database.:)
- 
-xdmp:collection-delete("http://marklogic.com/example/graphs/customers"),
-xdmp:collection-delete("http://marklogic.com/example/graphs/orders"),
-xdmp:collection-delete("http://marklogic.com/example/graphs/products")</query><query name="Intro" focus="false" listorder="5" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
+   ProductRelations, which would have a reference to a product and the enum as a type :)</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
 This workspaces loads triples from turtle (.ttl) into the database.
 " </query></workspace></export>
