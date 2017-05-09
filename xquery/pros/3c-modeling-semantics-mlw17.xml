@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<export><workspace name="3c-modeling-semantics-mlw17"><query active="true" focus="false" mode="xquery" name="Model">(: this model extends the second model with some triples.  They are embedded inline as triples XML.
+<export><workspace name="3c-modeling-semantics-mlw17"><query active="false" focus="false" mode="xquery" name="Model">(: this model extends the second model with some triples.  They are embedded inline as triples XML.
    One can also use constructor functions to create triples, or parse the popular RDF formats. 
    :) 
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
@@ -128,7 +128,7 @@ let $model :=
 return (xdmp:document-insert("/semantic-model.xml", $model, xdmp:default-permissions(), "http://marklogic.com/entity-services/models"),
 "You have now inserted the XML model in this tab info the database.  Here we validate it and show its JSON representation and its triples:",
 es:model-validate($model),
-cts:triples((), (), (), (), (), cts:document-query("/semantic-model.xml")))</query><query active="true" focus="false" mode="xquery" name="Intro">"
+cts:triples((), (), (), (), (), cts:document-query("/semantic-model.xml")))</query><query active="true" focus="true" mode="xquery" name="Intro">"
 The goal in this workspace to use a particular technique called
 semantic inference on a model in order to apply a lens to it.
 
@@ -136,7 +136,7 @@ The lens is a model that I've found in the public domain, which
 has some traction for describing people, organizations, and graphs
 among them.  It's known as "friend of a friend", or foaf.
 
-"</query><query active="true" focus="false" mode="xquery" name="instance-converter">(: This instance converter module accomodates the new Segment entity type :)
+"</query><query active="false" focus="false" mode="xquery" name="instance-converter">(: This instance converter module accomodates the new Segment entity type :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 let $edited-module := text { "
@@ -445,7 +445,7 @@ return xdmp:invoke-function(function() {
 "You have inserted an instance converter module into the modules database.
  It can be used by importing it from transforms or other integration code like this:
  import module namespace my = 'http://marklogic.com/tutorial-data/ECommerce-0.0.3' at '/ext/extractions-0.0.3.xqy';
-"</query><query active="true" focus="false" mode="xquery" name="harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+"</query><query active="false" focus="false" mode="xquery" name="harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 import module namespace my = "http://marklogic.com/example/ontology/ECommerce-0.0.3"
   at "/ext/extractions-0.0.3.xqy";
@@ -482,7 +482,7 @@ let $segments :=
 return (
 xdmp:document-insert("/segments.xml", $segments, xdmp:default-permissions(), "reference"),
 "You've inserted this reference data for customer segments:",
-$segments)</query><query active="true" focus="false" mode="xquery" name="Query the Inferred Model">(:
+$segments)</query><query active="false" focus="false" mode="xquery" name="Query the Inferred Model">(:
  : This SPARQL query uses inference rules to query the business ontology, rather than 
  : the entity services model directly.
  : The entity services model, supplemented with triples that tie it to RDFS modeling,
@@ -508,7 +508,7 @@ FILTER (?group = foaf:Group)
 }',
 (),
 (),
-sem:ruleset-store( ("inverseOf.rules", "subClassOf.rules", "subPropertyOf.rules"), sem:store()))</query><query active="true" focus="false" mode="xquery" name="Load FOAF Ontology">import module namespace sem = "http://marklogic.com/semantics" at "/MarkLogic/semantics.xqy"; 
+sem:ruleset-store( ("inverseOf.rules", "subClassOf.rules", "subPropertyOf.rules"), sem:store()))</query><query active="false" focus="false" mode="xquery" name="Load FOAF Ontology">import module namespace sem = "http://marklogic.com/semantics" at "/MarkLogic/semantics.xqy"; 
 let $foaf-ontology := 
 (: This is the FOAF formal vocabulary description, expressed using W3C RDFS and OWL markup. 
   For more information about FOAF:                                            
@@ -1122,7 +1122,7 @@ let $parsed := sem:rdf-parse($foaf-ontology, "rdfxml")
 return xdmp:document-insert("/foaf.xml", &lt;foaf&gt;&lt;sem:triples&gt;{$parsed}&lt;/sem:triples&gt;&lt;/foaf&gt;, xdmp:default-permissions(), "ontology")
 ;
 
-cts:triples( (), (), (), (), (), cts:document-query("/foaf.xml"))</query><query active="true" focus="true" mode="xquery" name="Setup TDE">(: One, save the default template :)
+cts:triples( (), (), (), (), (), cts:document-query("/foaf.xml"))</query><query active="false" focus="false" mode="xquery" name="Setup TDE">(: One, save the default template :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 declare namespace tde = "http://marklogic.com/xdmp/tde";
 

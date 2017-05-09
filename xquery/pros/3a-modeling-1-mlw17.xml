@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<export><workspace name="3a-modeling-1-mlw17"><query active="true" focus="true" mode="xquery" name="Model">(: this model extends the domain to include another domain type, a customer Segment. :) 
+<export><workspace name="3a-modeling-1-mlw17"><query active="false" focus="false" mode="xquery" name="Model">(: this model extends the domain to include another domain type, a customer Segment. :) 
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 let $model :=
@@ -414,7 +414,7 @@ return xdmp:invoke-function(function() {
 "You have inserted an instance converter module into the modules database.
  It can be used by importing it from transforms or other integration code like this:
  import module namespace my = 'http://marklogic.com/tutorial-data/ECommerce-0.0.2' at '/ext/extractions-0.0.2.xqy';
-"</query><query active="true" focus="false" mode="xquery" name="harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+"</query><query active="false" focus="false" mode="xquery" name="harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 import module namespace my = "http://marklogic.com/example/ontology/ECommerce-0.0.2"
   at "/ext/extractions-0.0.2.xqy";
@@ -451,10 +451,10 @@ let $segments :=
 return (
 xdmp:document-insert("/segments.xml", $segments, xdmp:default-permissions(), "reference"),
 "You've inserted this reference data for customer segments:",
-$segments)</query><query active="true" focus="false" mode="xquery" name="Reference Data">//Segments;
+$segments)</query><query active="false" focus="false" mode="xquery" name="Reference Data">//Segments;
 
 (: no triples in this workspaces :)
-cts:triples( (), (), (), (), (), cts:document-query( //Segments/base-uri(.)))</query><query active="true" focus="false" mode="xquery" name="Setup TDE">(: One, save the default template :)
+cts:triples( (), (), (), (), (), cts:document-query( //Segments/base-uri(.)))</query><query active="false" focus="false" mode="xquery" name="Setup TDE">(: One, save the default template :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 declare namespace tde = "http://marklogic.com/xdmp/tde";
 
@@ -546,7 +546,7 @@ return
  $modified-doc//tde:template,
  tde:template-insert("/e-Commerce.tdex", $modified-doc, xdmp:default-permissions())
    )
-</query><query active="true" focus="false" mode="sparql" name="Customer">PREFIX es: &lt;http://marklogic.com/entity-services#&gt; 
+</query><query active="false" focus="false" mode="sparql" name="Customer">PREFIX es: &lt;http://marklogic.com/entity-services#&gt; 
 PREFIX ecommerce: &lt;http://marklogic.com/example/ontology/ECommerce-0.0.2/&gt; 
 PREFIX customer: &lt;http://marklogic.com/example/ontology/ECommerce-0.0.2/Customer/&gt; 
 PREFIX segment: &lt;http://marklogic.com/example/ontology/ECommerce-0.0.2/Segment/&gt; 
@@ -562,12 +562,12 @@ WHERE {
   ?segmentType es:description ?descriptionOfSegment
   FILTER (?type = ecommerce:Customer)
 }
-</query><query active="true" focus="false" mode="sql" name="Segment Join">SELECT * FROM 
+</query><query active="false" focus="false" mode="sql" name="Segment Join">SELECT * FROM 
 ECommerce.Customer c, ECommerce.Segment s
 WHERE c.segment = s.code
 </query><query active="false" focus="false" mode="sql" name="Addresses">select * from ECommerce.Address</query><query active="false" focus="false" mode="sql" name="Address Join">SELECT firstName, lastName, zip 
 FROM ECommerce.Customer c, ECommerce.Address a
-WHERE c.billTo = a.hash</query><query active="true" focus="false" mode="xquery" name="Intro">"
+WHERE c.billTo = a.hash</query><query active="true" focus="true" mode="xquery" name="Intro">"
  This workspace concentrates on how to refactor or change a model.
  
  We consider how to change an entity services model over time, by
