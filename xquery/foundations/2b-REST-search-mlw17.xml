@@ -195,7 +195,7 @@ xdmp:http-post(fn:concat("http://localhost:8000/v1/search"),
                     &lt;/headers&gt;
                    &lt;/options&gt;,
                    document{ $structured-query }
-                ) [2]</query><query name="post-parse" focus="false" listorder="13" taborder="11" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+                ) [2]</query><query name="POST with cts:parse" focus="false" listorder="13" taborder="11" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
 cts:search(fn:collection("customer"),
   cts:element-pair-geospatial-query(xs:QName("billing_address"),
