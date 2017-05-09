@@ -30,10 +30,15 @@ op:from-triples(
    op:pattern( op:col("s"), op:col("p"), op:col("o"))
    )
 =&gt;op:limit(10)
-=&gt;op:result()</query><query name="cts" focus="false" listorder="4" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
-declare namespace html = "http://www.w3.org/1999/xhtml";
+=&gt;op:result()</query><query name="cts-triples simple" focus="false" listorder="4" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(:
+: Returns values from the triple index. 
+: If subject, predicate, and object are given, 
+: then only triples with those given component values are returned.
+: https://docs.marklogic.com/cts:triples
+:)
 
-cts:triples()[1 to 10]</query><query name="SPARQL-2" focus="false" listorder="5" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
+cts:triples()[1 to 10]</query><query name="SPARQL 2" focus="false" listorder="5" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
 PREFIX ids: &lt;http://marklogic.com/example/products/&gt; 
 PREFIX taxo: &lt;http://marklogic.com/example/taxonomies/&gt; 
 PREFIX xs: &lt;http:///www.w3.org/2001/&gt; 
@@ -46,7 +51,7 @@ WHERE
      :name ?name ;
      :sku ?sku .
 }
-LIMIT 10</query><query name="embedded SPARQL-2" focus="false" listorder="6" taborder="8" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">sem:sparql('PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
+LIMIT 10</query><query name="embedded SPARQL 2" focus="false" listorder="6" taborder="8" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">sem:sparql('PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
 PREFIX ids: &lt;http://marklogic.com/example/products/&gt; 
 PREFIX taxo: &lt;http://marklogic.com/example/taxonomies/&gt; 
 PREFIX xs: &lt;http:///www.w3.org/2001/&gt; 
@@ -59,7 +64,7 @@ WHERE
      :name ?name ;
      :sku ?sku .
 }
-LIMIT 10')</query><query name="Optic XQY-2" focus="true" listorder="7" taborder="9" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+LIMIT 10')</query><query name="Optic XQY 2" focus="false" listorder="7" taborder="9" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
 
@@ -74,7 +79,7 @@ op:from-triples( (
    ))
 =&gt;op:select(( "name", "sku" ) )
 =&gt;op:limit(10)
-=&gt;op:result()</query><query name="cts-2" focus="false" listorder="8" taborder="6" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+=&gt;op:result()</query><query name="cts-triples advanced" focus="false" listorder="8" taborder="6" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 import module namespace sem = "http://marklogic.com/semantics" at "/MarkLogic/semantics.xqy";
 
 let $o := function($n) { sem:iri("http://marklogic.com/example/ontology/"|| $n)}
@@ -87,7 +92,7 @@ where exists(
              sem:iri("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), 
              $o("Product")))
 order by sem:triple-subject($triple)
-return $triple</query><query name="Intro" focus="false" listorder="9" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">(:
+return $triple</query><query name="Intro" focus="true" listorder="9" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">(:
 
 This workspace has the most basic queries conceivable
 replicated using SPARQL, SPARQL-in a programming language, Optic (XQuery version), 
