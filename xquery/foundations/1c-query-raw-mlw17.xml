@@ -1,10 +1,10 @@
-<export><workspace name="1c-query-raw-mlw17"><query name="word-query-1" focus="false" listorder="1" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="1c-query-raw-mlw17"><query name="word query 1" focus="false" listorder="2" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : Show me any product records that have the text "Sonair".
  : Try changing what types of documents you're searching 
  : on as well as the text you're looking for within them.
 :)
-cts:search(/product, "Sonair")</query><query name="word-query-2" focus="false" listorder="2" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+cts:search(/product, "Sonair")</query><query name="word query 2" focus="false" listorder="3" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : Show me any product records that have the text "Sonair".
  : word-query-1 demonstrates a shorthand way of writing the
@@ -13,14 +13,14 @@ cts:search(/product, "Sonair")</query><query name="word-query-2" focus="false" l
 
 cts:search(/product, cts:word-query("Sonair"))
 
-(: cts:search(/customer, cts:word-query("Richard")):)</query><query name="element-query-2" focus="false" listorder="3" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(: cts:search(/customer, cts:word-query("Richard")):)</query><query name="element query 2" focus="false" listorder="5" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : Show me any records in the "customer" collection that have
  : a property "city" that includes the text "mobile".
 :)
 
 cts:search(fn:collection("customer"), 
-                 cts:element-query(xs:QName("city"), "mobile"))</query><query name="and-query-1" focus="false" listorder="4" taborder="6" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+                 cts:element-query(xs:QName("city"), "mobile"))</query><query name="and query 1" focus="false" listorder="6" taborder="6" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : We can use cts:query constructors to build queries up
    that are more complex.
@@ -33,32 +33,7 @@ cts:search(fn:collection("customer"),
             (cts:element-query(xs:QName("city"), "mobile"),
              cts:element-query(xs:QName("postal"), "36628"))
            )
-   )</query><query name="MOVE-geo query 1" focus="false" listorder="5" taborder="5" active="false" database="8469375127942903998" server="6240101570028256752" database-name="" server-name="" mode="xquery">xquery version "1.0-ml";
-
-(:Show me customers with a shipping address within a 20 mile radius of El Paso, TX
-  Document contains lat/long of 29.4413, -98.4793 
-  31.6948, -106.3
-:)
-
-cts:search(fn:collection("customer"),
-  cts:element-pair-geospatial-query(xs:QName("billing_address"),
-    xs:QName("latitude"), xs:QName("longitude"),  (cts:circle(20, cts:point(31.696275, -106.302553)))))
-    
-    </query><query name="MOVE-qeo query 2" focus="false" listorder="6" taborder="6" active="false" database="8469375127942903998" server="6240101570028256752" database-name="" server-name="" mode="xquery">xquery version "1.0-ml";
-(: Show me all documents with a shipping address within a polygon defined by the 3 points
-   defining a triangle in El Paso, TX. 
-   A minimum of 3 points required to make a polygon.
-:)
-let $points :=
- (cts:point(31.699492, -106.304141),
-  cts:point(31.691839, -106.302275),
-  cts:point(31.696111, -106.294442))
-
-  
-return 
-  cts:search(fn:collection(),
-     cts:element-pair-geospatial-query(xs:QName("billing_address"),
-        xs:QName("latitude"), xs:QName("longitude"),  cts:polygon($points)))</query><query name="and-query-2" focus="false" listorder="7" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+   )</query><query name="and query 2" focus="false" listorder="7" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : We can use cts:query constructors to build queries up
    that are more complex.
@@ -74,8 +49,9 @@ cts:search(fn:collection("customer"),
                   cts:element-query(xs:QName("zip"), "36628")
                   ))
              )))
+
            
-  </query><query name="element-query-1" focus="false" listorder="8" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+  </query><query name="element query 1" focus="false" listorder="4" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : Show me any records in the "order" collection that have
  : a property "status" that includes the text "in progress".
@@ -84,7 +60,7 @@ cts:search(fn:collection("customer"),
 :)
 
 cts:search(fn:collection("order"), 
-                 cts:element-query(xs:QName("status"), "in progress"))</query><query name="Intro" focus="true" listorder="9" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
+                 cts:element-query(xs:QName("status"), "in progress"))</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
 This workspace demonstrates searching and querying documents.
 Upon insert of any document, the Universal Index 
 can be used immediately for full text search and structured query.
