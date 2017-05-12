@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<export><workspace name="3c-modeling-semantics-mlw17"><query active="false" focus="false" mode="xquery" name="Model">(: this model extends the second model with some triples.  They are embedded inline as triples XML.
+<export><workspace name="3c-modeling-semantics-mlw17"><query active="true" focus="false" mode="xquery" name="1 Model">(: this model extends the second model with some triples.  They are embedded inline as triples XML.
    One can also use constructor functions to create triples, or parse the popular RDF formats. 
    :) 
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
@@ -128,7 +128,7 @@ let $model :=
 return (xdmp:document-insert("/semantic-model.xml", $model, xdmp:default-permissions(), "http://marklogic.com/entity-services/models"),
 "You have now inserted the XML model in this tab info the database.  Here we validate it and show its JSON representation and its triples:",
 es:model-validate($model),
-cts:triples((), (), (), (), (), cts:document-query("/semantic-model.xml")))</query><query active="true" focus="true" mode="xquery" name="Intro">"
+cts:triples((), (), (), (), (), cts:document-query("/semantic-model.xml")))</query><query active="true" focus="true" mode="xquery" name="0 Intro">"
 The goal in this workspace to use a particular technique called
 semantic inference on a model in order to apply a lens to it.
 
@@ -136,7 +136,7 @@ The lens is a model that I've found in the public domain, which
 has some traction for describing people, organizations, and graphs
 among them.  It's known as "friend of a friend", or foaf.
 
-"</query><query active="false" focus="false" mode="xquery" name="instance-converter">(: This instance converter module accomodates the new Segment entity type :)
+"</query><query active="true" focus="false" mode="xquery" name="2 instance-converter">(: This instance converter module accomodates the new Segment entity type :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 let $edited-module := text { "
@@ -445,7 +445,7 @@ return xdmp:invoke-function(function() {
 "You have inserted an instance converter module into the modules database.
  It can be used by importing it from transforms or other integration code like this:
  import module namespace my = 'http://marklogic.com/tutorial-data/ECommerce-0.0.3' at '/ext/extractions-0.0.3.xqy';
-"</query><query active="false" focus="false" mode="xquery" name="harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+"</query><query active="true" focus="false" mode="xquery" name="3 harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 import module namespace my = "http://marklogic.com/example/ontology/ECommerce-0.0.3"
   at "/ext/extractions-0.0.3.xqy";
@@ -482,7 +482,7 @@ let $segments :=
 return (
 xdmp:document-insert("/segments.xml", $segments, xdmp:default-permissions(), "reference"),
 "You've inserted this reference data for customer segments:",
-$segments)</query><query active="false" focus="false" mode="xquery" name="Query the Inferred Model">(:
+$segments)</query><query active="true" focus="false" mode="xquery" name="7 Query the Inferred Model">(:
  : This SPARQL query uses inference rules to query the business ontology, rather than 
  : the entity services model directly.
  : The entity services model, supplemented with triples that tie it to RDFS modeling,
@@ -501,14 +501,14 @@ WHERE
 ?s a ?group ;
    rdfs:label ?segment ;
    foaf:member ?person .
-   ?person foaf:firstName ?firstName ;
-           foaf:lastName ?lastName.
+   ?person foaf:givenName ?firstName ;
+           foaf:familyName ?lastName.
 # ?group ?p ?o
 FILTER (?group = foaf:Group)
 }',
 (),
 (),
-sem:ruleset-store( ("inverseOf.rules", "subClassOf.rules", "subPropertyOf.rules"), sem:store()))</query><query active="false" focus="false" mode="xquery" name="Load FOAF Ontology">import module namespace sem = "http://marklogic.com/semantics" at "/MarkLogic/semantics.xqy"; 
+sem:ruleset-store( ("inverseOf.rules", "subClassOf.rules", "subPropertyOf.rules"), sem:store()))</query><query active="true" focus="false" mode="xquery" name="5 Load FOAF Ontology">import module namespace sem = "http://marklogic.com/semantics" at "/MarkLogic/semantics.xqy"; 
 let $foaf-ontology := 
 (: This is the FOAF formal vocabulary description, expressed using W3C RDFS and OWL markup. 
   For more information about FOAF:                                            
@@ -1122,7 +1122,7 @@ let $parsed := sem:rdf-parse($foaf-ontology, "rdfxml")
 return xdmp:document-insert("/foaf.xml", &lt;foaf&gt;&lt;sem:triples&gt;{$parsed}&lt;/sem:triples&gt;&lt;/foaf&gt;, xdmp:default-permissions(), "ontology")
 ;
 
-cts:triples( (), (), (), (), (), cts:document-query("/foaf.xml"))</query><query active="false" focus="false" mode="xquery" name="Setup TDE">(: One, save the default template :)
+cts:triples( (), (), (), (), (), cts:document-query("/foaf.xml"))</query><query active="true" focus="false" mode="xquery" name="4 Setup TDE">(: One, save the default template :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 declare namespace tde = "http://marklogic.com/xdmp/tde";
 
@@ -1193,4 +1193,23 @@ return
  $modified-doc,
  tde:template-insert("/e-Commerce.tdex", $modified-doc, xdmp:default-permissions())
    )
-</query></workspace></export>
+</query><query active="true" focus="false" mode="sparql-update" name="6 Load some extra people">PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+PREFIX : &lt;http://marklogic.com/example/foaf-people/&gt;
+
+INSERT DATA {
+  
+  GRAPH &lt;http://marklogic.com/example/foaf-people&gt; {
+    :1 a :Person ; foaf:givenName "Vissarion"; foaf:familyName "Belinsky" .
+    :2 a :Person ; foaf:givenName "Julien"; foaf:familyName "Benda".
+    :3 a :Person ; foaf:givenName "Walter"; foaf:familyName "Benjamin" .   
+    :4 a :Person ; foaf:givenName "Nikolai"; foaf:familyName "Berdyaev" .
+    :5 a :Person ; foaf:givenName "Henri"; foaf:familyName "Bergson" .
+    :6 a :Person ; foaf:givenName "Eduard"; foaf:familyName "Bernstein" .
+    :7 a :Person ; foaf:givenName "Nathan"; foaf:familyName "Birnbaum" .
+    :philosophers a foaf:Group ;
+                  foaf:member :1, :2, :3, :4, :5, :6, :7 ; 
+                  rdfs:label "Philosophers" ;
+                  rdfs:comment "A group of philosophers" .
+  }
+}</query></workspace></export>
