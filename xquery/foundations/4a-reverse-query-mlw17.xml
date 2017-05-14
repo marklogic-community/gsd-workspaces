@@ -1,4 +1,4 @@
-<export><workspace name="4a-reverse-query-mlw17"><query name="reverse query contains" focus="false" listorder="2" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="4a-reverse-query-mlw17"><query name="reverse query contains" focus="false" listorder="2" taborder="3" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: Have: query for a type of dog
  : Want: documents that match our query (rule)
  : Solution: have the document match the rule
@@ -27,7 +27,7 @@ let $doc := &lt;dog&gt;
 return  cts:contains($query, cts:reverse-query($doc))
 
  
-</query><query name="insert queries and docs" focus="false" listorder="3" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="insert queries and docs" focus="false" listorder="3" taborder="4" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: 
  : After running, look below and open your query doc in
  : in the database to view its contents.
@@ -76,7 +76,7 @@ let $dogs :=
 return (xdmp:document-insert("/query-1.xml", $query, (), "queries"),
         for $dog at $idx in $dogs/*
         let $uri := fn:concat("/dog-",$idx,".xml")
-        return xdmp:document-insert($uri, $dog, (), "dogs"))</query><query name="reverse query" focus="false" listorder="4" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+        return xdmp:document-insert($uri, $dog, (), "dogs"))</query><query name="reverse query" focus="false" listorder="4" taborder="5" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: Run the below and view the results below.
  : To see the document URI for the search hit, 
   :  1) comment the first return statement
@@ -92,11 +92,15 @@ return cts:search(/query, cts:reverse-query($dogs))
   for $res in $results
   return ( xdmp:node-uri($res), $res )
 :)
-</query><query name="serializing queries" focus="false" listorder="5" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="serializing queries" focus="false" listorder="5" taborder="2" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 declare namespace html = "http://www.w3.org/1999/xhtml";
 
 let $query := &lt;xml-element&gt;{cts:word-query("hello")}&lt;/xml-element&gt;
 
-return $query</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
+return $query</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">"
  In this workspace we demonstrate how to use the reverse index with cts:reverse-query().
-"</query></workspace></export>
+"</query><query name="cleanup" focus="false" listorder="6" taborder="6" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+
+xdmp:collection-delete("dogs"),
+xdmp:collection-delete("queries")</query></workspace></export>
