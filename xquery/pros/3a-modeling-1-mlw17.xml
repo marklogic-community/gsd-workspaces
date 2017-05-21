@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<export><workspace name="3a-modeling-1-mlw17"><query active="false" focus="false" mode="xquery" name="Model">(: this model extends the domain to include another domain type, a customer Segment. :) 
+<export><workspace name="3a-modeling-1-mlw17"><query active="true" focus="false" mode="xquery" name="2 Model">(: this model extends the domain to include another domain type, a customer Segment. :) 
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 let $model :=
@@ -98,7 +98,7 @@ let $model :=
 return  (xdmp:document-insert("/extended-model.xml", $model, xdmp:default-permissions(), "http://marklogic.com/entity-services/models"),
 "You have now inserted the XML model in this tab info the database.  Here we validate it and show its JSON representation and its triples:",
 es:model-validate($model),
-cts:triples((), (), (), (), (), cts:document-query("/extended-model.xml")))</query><query active="false" focus="false" mode="xquery" name="instance converter">(: This instance converter module accomodates the new Segment entity type :)
+cts:triples((), (), (), (), (), cts:document-query("/extended-model.xml")))</query><query active="true" focus="false" mode="xquery" name="3 instance converter">(: This instance converter module accomodates the new Segment entity type :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 let $edited-module := text { "
@@ -414,7 +414,7 @@ return xdmp:invoke-function(function() {
 "You have inserted an instance converter module into the modules database.
  It can be used by importing it from transforms or other integration code like this:
  import module namespace my = 'http://marklogic.com/tutorial-data/ECommerce-0.0.2' at '/ext/extractions-0.0.2.xqy';
-"</query><query active="false" focus="false" mode="xquery" name="harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+"</query><query active="true" focus="false" mode="xquery" name="4 harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 import module namespace my = "http://marklogic.com/example/ontology/ECommerce-0.0.2"
   at "/ext/extractions-0.0.2.xqy";
@@ -451,10 +451,10 @@ let $segments :=
 return (
 xdmp:document-insert("/segments.xml", $segments, xdmp:default-permissions(), "reference"),
 "You've inserted this reference data for customer segments:",
-$segments)</query><query active="false" focus="false" mode="xquery" name="Reference Data">//Segments;
+$segments)</query><query active="true" focus="false" mode="xquery" name="5 Reference Data">//Segments;
 
-(: no triples in this workspaces :)
-cts:triples( (), (), (), (), (), cts:document-query( //Segments/base-uri(.)))</query><query active="false" focus="false" mode="xquery" name="Setup TDE">(: One, save the default template :)
+(: no triples in this workspace :)
+cts:triples( (), (), (), (), (), cts:document-query( //Segments/base-uri(.)))</query><query active="true" focus="false" mode="xquery" name="6 Setup TDE">(: One, save the default template :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 declare namespace tde = "http://marklogic.com/xdmp/tde";
 
@@ -543,10 +543,10 @@ import module namespace tde = "http://marklogic.com/xdmp/tde" at "/MarkLogic/tde
 let $modified-doc := doc("/e-commerce.tdex")
 return 
 ("Inserted extraction template into schemas database",
- $modified-doc//tde:template,
+ $modified-doc/tde:template,
  tde:template-insert("/e-Commerce.tdex", $modified-doc, xdmp:default-permissions())
    )
-</query><query active="false" focus="false" mode="sparql" name="Customer">PREFIX es: &lt;http://marklogic.com/entity-services#&gt; 
+</query><query active="true" focus="false" mode="sparql" name="7 Customer">PREFIX es: &lt;http://marklogic.com/entity-services#&gt; 
 PREFIX ecommerce: &lt;http://marklogic.com/example/ontology/ECommerce-0.0.2/&gt; 
 PREFIX customer: &lt;http://marklogic.com/example/ontology/ECommerce-0.0.2/Customer/&gt; 
 PREFIX segment: &lt;http://marklogic.com/example/ontology/ECommerce-0.0.2/Segment/&gt; 
@@ -562,12 +562,12 @@ WHERE {
   ?segmentType es:description ?descriptionOfSegment
   FILTER (?type = ecommerce:Customer)
 }
-</query><query active="false" focus="false" mode="sql" name="Segment Join">SELECT * FROM 
+</query><query active="true" focus="false" mode="sql" name="8 Segment Join">SELECT * FROM 
 ECommerce.Customer c, ECommerce.Segment s
 WHERE c.segment = s.code
-</query><query active="false" focus="false" mode="sql" name="Addresses">select * from ECommerce.Address</query><query active="false" focus="false" mode="sql" name="Address Join">SELECT firstName, lastName, zip 
+</query><query active="true" focus="false" mode="sql" name="9 Addresses">select * from ECommerce.Address</query><query active="true" focus="false" mode="sql" name="10 Address Join">SELECT firstName, lastName, street, zip, city, state 
 FROM ECommerce.Customer c, ECommerce.Address a
-WHERE c.billTo = a.hash</query><query active="true" focus="true" mode="xquery" name="Intro">"
+WHERE c.billTo = a.hash</query><query active="true" focus="true" mode="xquery" name="1 Intro">"
  This workspace concentrates on how to refactor or change a model.
  
  We consider how to change an entity services model over time, by
@@ -576,7 +576,7 @@ WHERE c.billTo = a.hash</query><query active="true" focus="true" mode="xquery" n
  Also in this workspace we change the harmonizations to extract related products
  from sparse data into instances, whereas in version 0.0.1 we dropped them on the floor
  as degenerate cases.
-"</query><query active="false" focus="false" mode="xquery" name="Setup Indexes">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy";
+"</query><query active="true" focus="false" mode="xquery" name="11 Setup Indexes">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy";
 
 let $props := doc("/extended-model.xml")=&gt;es:model-validate()=&gt;es:database-properties-generate()
 let $quoted := xdmp:quote($props)
@@ -606,8 +606,10 @@ xdmp:unquote($quoted)
   These database properties are most well-suited to Search applications.
   For each property configured as indexed or with a word lexicon, the generated
   properties will have a corresponding range index or word lexicon definition.
- :)</query><query active="false" focus="false" mode="sql" name="Products">SELECT *
-FROM ECommerce.Product l, ECommerce.Product_relatedProduct r
+ :)</query><query active="true" focus="false" mode="sql" name="12 Products">SELECT p.name, r.relationship, r.product
+FROM ECommerce.Product p, 
+ECommerce.Product_relatedProduct r
 WHERE
-l.sku = r.sku
+p.sku = r.sku
+
 </query></workspace></export>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<export><workspace name="3b-metadata-mlw17"><query active="true" focus="true" mode="xquery" name="Intro">"
+<export><workspace name="3b-metadata-mlw17"><query active="true" focus="true" mode="xquery" name="0 Intro">"
 
 This workspace considers metadata.
 
@@ -12,7 +12,7 @@ aor differences among models.  There is no limit really.
 Metadata about instances could cite source systems and decisions about value origins,
 confidence scores, or editorial.
 
-"</query><query active="false" focus="false" mode="xquery" name="Model">(: this model adds provenance metadata to the model. :) 
+"</query><query active="true" focus="false" mode="xquery" name="1 Model">(: this model adds provenance metadata to the model. :) 
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 let $model :=
@@ -110,7 +110,7 @@ let $model :=
 return  (xdmp:document-insert("/metadata-model.xml", $model, xdmp:default-permissions(), "http://marklogic.com/entity-services/models"),
 "You have now inserted the XML model in this tab info the database.  Here we validate it and show its JSON representation and its triples:",
 es:model-validate($model),
-cts:triples((), (), (), (), (), cts:document-query("/metadata-model.xml")))</query><query active="false" focus="false" mode="xquery" name="instance-converter">(: This instance converter module accomodates the new Segment entity type :)
+cts:triples((), (), (), (), (), cts:document-query("/metadata-model.xml")))</query><query active="true" focus="false" mode="xquery" name="2 instance-converter">(: This instance converter module accomodates the new Segment entity type :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 let $edited-module := text { "
@@ -419,7 +419,7 @@ return xdmp:invoke-function(function() {
 "You have inserted an instance converter module into the modules database.
  It can be used by importing it from transforms or other integration code like this:
  import module namespace my = 'http://marklogic.com/tutorial-data/ECommerce-0.0.4 at '/ext/extractions-0.0.4,xqy';
-"</query><query active="false" focus="false" mode="xquery" name="harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+"</query><query active="true" focus="false" mode="xquery" name="3 harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 import module namespace my = "http://marklogic.com/example/ontology/ECommerce-0.0.4"
   at "/ext/extractions-0.0.4.xqy";
@@ -456,7 +456,7 @@ let $segments :=
 return (
 xdmp:document-insert("/segments-4.xml", $segments, xdmp:default-permissions(), "reference"),
 "You've inserted this reference data for customer segments:",
-$segments)</query><query active="false" focus="false" mode="xquery" name="Setup TDE">(: One, save the default template :)
+$segments)</query><query active="true" focus="false" mode="xquery" name="4 Setup TDE">(: One, save the default template :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 declare namespace tde = "http://marklogic.com/xdmp/tde";
 
@@ -503,7 +503,7 @@ return
 ("Inserted extraction template into schemas database",
  $modified-doc,
  tde:template-insert("/e-Commerce.tdex", $modified-doc, xdmp:default-permissions())
-   )</query><query active="false" focus="false" mode="sparql" name="Provenance Query">PREFIX : &lt;http://marklogic.com/example/ontology/&gt;
+   )</query><query active="true" focus="false" mode="sparql" name="6 Provenance Query">PREFIX : &lt;http://marklogic.com/example/ontology/&gt;
 PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
 
 SELECT ?record ?sourceSystem ?description
@@ -515,7 +515,7 @@ where
            
   filter (?meta = :originSystem)
    
-}</query><query active="false" focus="false" mode="sparql-update" name="Ontology Data">PREFIX : &lt;http://marklogic.com/example/ontology/&gt;
+}</query><query active="true" focus="false" mode="sparql-update" name="5 Ontology Data">PREFIX : &lt;http://marklogic.com/example/ontology/&gt;
 PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
 
 INSERT DATA {
