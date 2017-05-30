@@ -532,4 +532,26 @@ for $d in collection() return xdmp:document-delete(base-uri($d))
  This workspace simply contains the very first data to be loaded into the workshop.
  After running all the tabs (except 'clear database') you will have several customers
  orders, and products, in a form that will metamorphasize over the course of the workshop.
-"</query></workspace></export>
+"</query><query active="true" focus="false" mode="xquery" name="6 challenges">(: Browsing Challenges
+
+1. What cities do customers have shipping addresses in?
+2. What is the most expensive product?
+3. How many orders were there on April 4, 2016?
+
+:)
+</query><query active="true" focus="false" mode="xquery" name="6 - some solutions">(: Exercises
+
+1. What cities do customers have shipping addresses in? 
+//shipping_address/city/text() :)
+
+(: 2. What is the most expensive product? 
+let $max-unit := max(//unit_price)
+let $product-ids := //*[unit_price=$max-unit]/product
+return ($max-unit, //product[id = $product-ids])
+:)
+
+(: 3. How many orders were there on April 4, 2016 
+count(//order[order_date="2016-04-04"])
+:)
+
+</query></workspace></export>

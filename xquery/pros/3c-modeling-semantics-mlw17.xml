@@ -128,7 +128,7 @@ let $model :=
 return (xdmp:document-insert("/semantic-model.xml", $model, xdmp:default-permissions(), "http://marklogic.com/entity-services/models"),
 "You have now inserted the XML model in this tab info the database.  Here we validate it and show its JSON representation and its triples:",
 es:model-validate($model),
-cts:triples((), (), (), (), (), cts:document-query("/semantic-model.xml")))</query><query active="true" focus="true" mode="xquery" name="0 Intro">"
+cts:triples((), (), (), (), (), cts:document-query("/semantic-model.xml")))</query><query active="true" focus="false" mode="xquery" name="0 Intro">"
 The goal in this workspace to use a particular technique called
 semantic inference on a model in order to apply a lens to it.
 
@@ -1122,12 +1122,18 @@ let $parsed := sem:rdf-parse($foaf-ontology, "rdfxml")
 return xdmp:document-insert("/foaf.xml", &lt;foaf&gt;&lt;sem:triples&gt;{$parsed}&lt;/sem:triples&gt;&lt;/foaf&gt;, xdmp:default-permissions(), "ontology")
 ;
 
-cts:triples( (), (), (), (), (), cts:document-query("/foaf.xml"))</query><query active="true" focus="false" mode="xquery" name="4 Setup TDE">(: One, save the default template :)
+cts:triples( (), (), (), (), (), cts:document-query("/foaf.xml"))</query><query active="true" focus="true" mode="xquery" name="4 Setup TDE">(: One, save the default template :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 declare namespace tde = "http://marklogic.com/xdmp/tde";
 
 let $et := doc("/semantic-model.xml")=&gt;es:model-from-xml()=&gt;es:extraction-template-generate()
 return xdmp:document-insert("/e-commerce.tdex", $et, xdmp:default-permissions(), "http://marklogic.com/xdmp/tde");
+
+(: make the view name unique :)
+import module namespace tde = "http://marklogic.com/xdmp/tde" at "/MarkLogic/tde.xqy";
+
+for $n in doc("/e-commerce.tdex")//tde:schema-name
+return xdmp:node-replace($n, &lt;tde:schema-name&gt;ECommerce3&lt;/tde:schema-name&gt;);
 
 (: two, insert triple patters into Customer template :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
@@ -1191,7 +1197,7 @@ let $modified-doc := doc("/e-commerce.tdex")
 return 
 ("Inserted extraction template into schemas database",
  $modified-doc,
- tde:template-insert("/e-Commerce.tdex", $modified-doc, xdmp:default-permissions())
+ tde:template-insert("/e-Commerce-3.tdex", $modified-doc, xdmp:default-permissions())
    )
 </query><query active="true" focus="false" mode="sparql-update" name="6 Load some extra people">PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;
 PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;

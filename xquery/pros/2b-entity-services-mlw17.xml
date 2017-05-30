@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<export><workspace name="2b-entity-services-mlw17"><query active="true" focus="false" mode="sql" name="1 Four-view join">SELECT * 
+<export><workspace name="2b-entity-services-mlw17"><query active="true" focus="true" mode="sql" name="1 Four-view join">SELECT * 
 FROM
-  ECommerce.Order l,
-  ECommerce.Order_orderLines ol,
-  ECommerce.Customer c,
-  ECommerce.Product p
+  ECommerce2.Order l,
+  ECommerce2.Order_orderLines ol,
+  ECommerce2.Customer c,
+  ECommerce2.Product p
 WHERE l.customer = c.id
   AND c.firstName like 'B%'
   AND ol.id = l.id
@@ -27,7 +27,7 @@ WHERE {
   ?s a es:EntityType ;
       ?p ?o
 }
-</query><query active="true" focus="true" mode="xquery" name="0 Intro">"
+</query><query active="true" focus="false" mode="xquery" name="0 Intro">"
 This workspace provides the basics of querying instance data created with 
 Entity Services.
 
@@ -35,10 +35,10 @@ You'll see how MarkLogic search built-ins can display index values,
 how SQL and SPARQL can query instance and model data, and how
 basic Optic API queries can help you navigate your models and instances.
 "</query><query active="true" focus="false" mode="sql" name="4 Customers">SELECT * from 
-ECommerce.Customer c
+ECommerce1.Customer c
 WHERE c.firstName like 'N%'
 ORDER BY c.id
-</query><query active="true" focus="false" mode="sql" name="5 Addresses">SELECT billTo, shipTo from ECommerce.Customer</query><query active="true" focus="false" mode="sparql" name="6 Instance Query"># generated extraction templates put instance data into classes
+</query><query active="true" focus="false" mode="sql" name="5 Addresses">SELECT billTo, shipTo from ECommerce1.Customer</query><query active="true" focus="false" mode="sparql" name="6 Instance Query"># generated extraction templates put instance data into classes
 PREFIX es: &lt;http://marklogic.com/entity-services#&gt; 
 PREFIX ecommerce: &lt;http://marklogic.com/example/ontology/ECommerce-0.0.1/&gt; 
 
