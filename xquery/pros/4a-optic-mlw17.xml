@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<export><workspace name="4a-optic-mlw17"><query active="true" focus="false" mode="xquery" name="0 Intro">"
-This workspace provides examples of the Optic API, which is new in MarkLogic 9.
+<export><workspace name="4a-optic-mlw17"><query active="true" focus="true" mode="xquery" name="0 Intro">"
+This workspace provides basic examples of the Optic API, which is new in MarkLogic 9.
 
-This API provides all of the query operators familiar to SQL or SPARQL developers,
-but in within a programming language.
+We'll work with these queries to get a familiarity with Optic basics.
 
-MarkLogic 9 provides the same Optic API in JavaScript, XQuery, and Java, so queries
-that you write can be easily ported from one language to another, and will run the
-same in any of the host languages, and regardless of whether the executing platform
-is MarkLogic enode or a client-side system.
-
-"</query><query active="true" focus="true" mode="xquery" name="3 Triples">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+"</query><query active="true" focus="false" mode="xquery" name="3 Triples">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
 
 let $es := op:prefixer("http://marklogic.com/entity-services#")
 let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
@@ -21,6 +15,7 @@ op:from-triples( (
    op:pattern( $type, $es("version"), op:col("version")),
    op:pattern( $type, $es("title"), op:col("typeTitle"))
 ))
+(: =&gt;op:where( op:eq($type, sem:iri("http://marklogic.com/example/ontology/ECommerce-0.0.1/Order"))) :)
 =&gt;op:result()
 
 (: try description, title, definitions, properties, datatype :)</query><query active="true" focus="false" mode="xquery" name="2 Query Building">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
@@ -45,4 +40,12 @@ op:from-view("sys", "sys_tables")
 =&gt;op:where(op:eq(op:col("schema"), "sys"))
 =&gt;op:result()
 
-(: explore the different system tables :)</query></workspace></export>
+(: explore the different system tables :)</query><query active="true" focus="false" mode="xquery" name="4 - group-by">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+op:from-view("ECommerce2", "Order_orderLines")
+=&gt;op:group-by(op:col("id"), op:sum(op:col("sum"), op:col("total")))
+=&gt;op:result()
+
+
+
+</query></workspace></export>

@@ -404,7 +404,7 @@ return
 ("Inserted extraction template into schemas database",
  $modified-doc/tde:template,
  tde:template-insert("/e-Commerce.tdex", $modified-doc, xdmp:default-permissions())
-   )</query><query active="true" focus="false" mode="xquery" name="0 Intro">"
+   )</query><query active="true" focus="true" mode="xquery" name="0 Intro">"
 This workspace explore data modeling with Entity Services.
 
 You will create a model for Customers, Products, and other entities
@@ -438,7 +438,7 @@ xdmp:http-put("http://localhost:8002/manage/v2/databases/Documents/properties",
 "You have just generated a database configuration for indexing the instance data, and sent
 that configuration to the REST Management API.  Here is the payload that Entity Services created:",
 xdmp:unquote($quoted)
-)</query><query active="true" focus="true" mode="xquery" name="System tables">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+)</query><query active="true" focus="false" mode="xquery" name="System tables">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
 
 op:from-view("SYS", "SYS_TABLES")
 =&gt;op:where(op:eq(op:col("schema"), "ECommerce"))

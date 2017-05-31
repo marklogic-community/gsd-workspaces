@@ -454,7 +454,7 @@ xdmp:document-insert("/segments.xml", $segments, xdmp:default-permissions(), "re
 $segments)</query><query active="true" focus="false" mode="xquery" name="5 Reference Data">//Segments;
 
 (: no triples in this workspace :)
-cts:triples( (), (), (), (), (), cts:document-query( //Segments/base-uri(.)))</query><query active="true" focus="true" mode="xquery" name="6 Setup TDE">(: One, save the default template :)
+cts:triples( (), (), (), (), (), cts:document-query( //Segments/base-uri(.)))</query><query active="true" focus="false" mode="xquery" name="6 Setup TDE">(: One, save the default template :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 declare namespace tde = "http://marklogic.com/xdmp/tde";
 
@@ -573,7 +573,7 @@ ECommerce2.Customer c, ECommerce2.Segment s
 WHERE c.segment = s.code
 </query><query active="true" focus="false" mode="sql" name="9 Addresses">select * from ECommerce2.Address</query><query active="true" focus="false" mode="sql" name="10 Address Join">SELECT firstName, lastName, street, zip, city, state 
 FROM ECommerce2.Customer c, ECommerce2.Address a
-WHERE c.billTo = a.hash</query><query active="true" focus="false" mode="xquery" name="1 Intro">"
+WHERE c.billTo = a.hash</query><query active="true" focus="true" mode="xquery" name="1 Intro">"
  This workspace concentrates on how to refactor or change a model.
  
  We consider how to change an entity services model over time, by

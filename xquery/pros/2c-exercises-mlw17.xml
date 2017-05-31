@@ -1,18 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<export><workspace name="2c-exercises-mlw17"><query active="true" focus="false" mode="sql" name="Query 1">SELECT * 
+<export><workspace name="2c-exercises-mlw17"><query active="true" focus="false" mode="sql" name="2 solution">SELECT orderDate, paymentTerms, count(ol.product) 
 FROM
   ECommerce2.Order l,
   ECommerce2.Order_orderLines ol
 WHERE
   l.id = ol.id
-ORDER BY l.id, paymentTerms, quantity</query><query active="true" focus="false" mode="sql" name="Query 2">SELECT * from SYS.SYS_TABLES</query><query active="true" focus="false" mode="xquery" name="tables">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+GROUP BY l.id
+ORDER BY l.id</query><query active="true" focus="false" mode="sql" name="3 system tables">-- find all the tables in the 'ECommerce' schema.
+-- how about the 'ECommerce3' schema?
+SELECT * from SYS.SYS_TABLES</query><query active="true" focus="false" mode="xquery" name="4 optic tables">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
 
 op:from-view("SYS", "SYS_TABLES")
 =&gt;op:where(op:eq(op:col("schema"), "ECommerce3"))
-=&gt;op:result()</query><query active="true" focus="false" mode="xquery" name="orderLines">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+=&gt;op:result()</query><query active="true" focus="false" mode="xquery" name="5 optic orderLines">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
 
 op:from-view("SYS", "SYS_COLUMNS")
 =&gt;op:where(op:eq(op:col("schema"), "ECommerce3"))
 =&gt;op:where(op:eq(op:col("table"), "Order_orderLines"))
-=&gt;op:result()</query><query active="true" focus="true" mode="sql" name="Query 5"># How much was sold in 2016?
-</query></workspace></export>
+=&gt;op:result()</query><query active="true" focus="false" mode="sql" name="1 aggregate sql"># How much was sold in the month of April?
+
+# What is Bonnie's last Name?</query><query active="true" focus="false" mode="sql" name="1 solutions">SELECT sum(total) 
+FROM 
+ECommerce3.Order a, 
+Ecommerce3.Order_orderLines b
+WHERE a.id = b.id
+AND MONTH(a.orderDate) = 4;
+
+
+SELECT firstName, lastName from Ecommerce3.Customer</query><query active="true" focus="false" mode="sql" name="2 group">SELECT orderDate, paymentTerms
+# ADD a column to report on the number of products in each order.
+FROM
+  ECommerce2.Order l,
+  ECommerce2.Order_orderLines ol
+WHERE
+  l.id = ol.id
+# ADD an aggregation to group by order
+ORDER BY l.id, paymentTerms, quantity</query><query active="true" focus="false" mode="sql" name="3 solution">-- find all the tables in the 'ECommerce' schema.
+-- how about the 'ECommerce3' schema?
+SELECT * from SYS.SYS_TABLES
+WHERE schema = 'ECommerce'</query><query active="true" focus="true" mode="xquery" name="Intro">"
+Some exercises to get your SQL and Optic Chops up
+"</query></workspace></export>

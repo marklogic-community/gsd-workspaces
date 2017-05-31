@@ -136,7 +136,7 @@ op:from-triples( (
 =&gt;op:where( op:eq(op:col("version"), "0.0.0")) 
 =&gt;op:order-by(("propertyLabel", "version", "typeTitle" ))
 =&gt;op:select( ("modelTitle", "version", "typeTitle", "propertyLabel" ))
-=&gt;op:result()</query><query active="true" focus="true" mode="xquery" name="4 project docs">xquery version "1.0-ml";
+=&gt;op:result()</query><query active="true" focus="false" mode="xquery" name="4 project docs">xquery version "1.0-ml";
 import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
 import module namespace ofn="http://marklogic.com/optic/expression/fn" at "/MarkLogic/optic/optic-fn.xqy";
 let $plan := op:from-view("ECommerce3", "Customer")
@@ -170,4 +170,6 @@ let $plan := op:from-view("ECommerce3", "Customer")
           op:prop("fullName", op:json-string(ofn:concat( (op:col("firstName"), " ", op:col("lastName")))))))))))
   
 let $result := $plan=&gt;op:result()
-return $result</query></workspace></export>
+return $result</query><query active="true" focus="true" mode="xquery" name="0 Intro">"
+This workspace has some simple Optic Exercises and solutions
+"</query></workspace></export>
