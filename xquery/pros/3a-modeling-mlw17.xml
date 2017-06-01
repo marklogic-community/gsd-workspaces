@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<export><workspace name="3a-modeling-1-mlw17"><query active="true" focus="false" mode="xquery" name="2 Model">(: this model extends the domain to include another domain type, a customer Segment. :) 
+<export><workspace name="3a-modeling-mlw17"><query active="true" focus="false" mode="xquery" name="2 Model">(: this model extends the domain to include another domain type, a customer Segment. :) 
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
 let $model :=
@@ -461,6 +461,12 @@ declare namespace tde = "http://marklogic.com/xdmp/tde";
 let $et := doc("/extended-model.xml")=&gt;es:model-from-xml()=&gt;es:extraction-template-generate()
 return xdmp:document-insert("/e-commerce.tdex", $et, xdmp:default-permissions(), "http://marklogic.com/xdmp/tde");
 
+(: make the view name unique :)
+import module namespace tde = "http://marklogic.com/xdmp/tde" at "/MarkLogic/tde.xqy";
+
+for $n in doc("/e-commerce.tdex")//tde:schema-name
+return xdmp:node-replace($n, &lt;tde:schema-name&gt;ECommerce2&lt;/tde:schema-name&gt;);
+
 (: two, insert triple patters into Customer template :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 declare namespace tde = "http://marklogic.com/xdmp/tde";
@@ -544,7 +550,7 @@ let $modified-doc := doc("/e-commerce.tdex")
 return 
 ("Inserted extraction template into schemas database",
  $modified-doc/tde:template,
- tde:template-insert("/e-Commerce.tdex", $modified-doc, xdmp:default-permissions())
+ tde:template-insert("/e-Commerce-2.tdex", $modified-doc, xdmp:default-permissions())
    )
 </query><query active="true" focus="false" mode="sparql" name="7 Customer">PREFIX es: &lt;http://marklogic.com/entity-services#&gt; 
 PREFIX ecommerce: &lt;http://marklogic.com/example/ontology/ECommerce-0.0.2/&gt; 
@@ -563,10 +569,10 @@ WHERE {
   FILTER (?type = ecommerce:Customer)
 }
 </query><query active="true" focus="false" mode="sql" name="8 Segment Join">SELECT * FROM 
-ECommerce.Customer c, ECommerce.Segment s
+ECommerce2.Customer c, ECommerce2.Segment s
 WHERE c.segment = s.code
-</query><query active="true" focus="false" mode="sql" name="9 Addresses">select * from ECommerce.Address</query><query active="true" focus="false" mode="sql" name="10 Address Join">SELECT firstName, lastName, street, zip, city, state 
-FROM ECommerce.Customer c, ECommerce.Address a
+</query><query active="true" focus="false" mode="sql" name="9 Addresses">select * from ECommerce2.Address</query><query active="true" focus="false" mode="sql" name="10 Address Join">SELECT firstName, lastName, street, zip, city, state 
+FROM ECommerce2.Customer c, ECommerce2.Address a
 WHERE c.billTo = a.hash</query><query active="true" focus="true" mode="xquery" name="1 Intro">"
  This workspace concentrates on how to refactor or change a model.
  
@@ -607,8 +613,8 @@ xdmp:unquote($quoted)
   For each property configured as indexed or with a word lexicon, the generated
   properties will have a corresponding range index or word lexicon definition.
  :)</query><query active="true" focus="false" mode="sql" name="12 Products">SELECT p.name, r.relationship, r.product
-FROM ECommerce.Product p, 
-ECommerce.Product_relatedProduct r
+FROM ECommerce2.Product p, 
+ECommerce2.Product_relatedProduct r
 WHERE
 p.sku = r.sku
 

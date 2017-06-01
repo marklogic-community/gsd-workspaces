@@ -89,14 +89,7 @@ let $model :=
 return (xdmp:document-insert("/model.xml", $model, xdmp:default-permissions(), "http://marklogic.com/entity-services/models"),
 "You have now inserted the XML model in this tab info the database.  Here I validate it and show its JSON representation and its triples:",
 es:model-validate($model),
-cts:triples( (), (), (), (), (),cts:document-query("/model.xml")))</query><query active="true" focus="false" mode="xquery" name="2 Generate-Test-Instances">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
-
-for $test-instance at $i in doc("/model.xml")=&gt;es:model-from-xml()=&gt;es:model-get-test-instances()
-let $uri := "/instance/"|| fn:local-name($test-instance) || "/" || $i
-return 
-xdmp:document-insert($uri, $test-instance, xdmp:default-permissions(), ("test-instances")),
-"You have generates some tests intances from your model using es:model-get-test-instances.
- Here is one of them:", doc('/instance/Customer/1')</query><query active="true" focus="false" mode="xquery" name="3 Setup-Instance-Converter">let $edited-module := text { "
+cts:triples( (), (), (), (), (),cts:document-query("/model.xml")))</query><query active="true" focus="false" mode="xquery" name="2 Setup-Instance-Converter">let $edited-module := text { "
 (: This buffer was created by running
    xdmp:save('/share/instance.xqy', doc('/model.xml')=&gt;es:model-from-xml()=&gt;es:instance-converter-generate() )
    and then editing the results :)
@@ -379,7 +372,7 @@ return xdmp:invoke-function(function() {
 "You have inserted an instance converter module into the modules database.
  It can be used by importing it from transforms or other integration code like this:
  import module namespace my = 'http://marklogic.com/tutorial-data/ECommerce-0.0.1' at '/ext/extractions-0.0.1.xqy';
-"</query><query active="true" focus="false" mode="xquery" name="4 harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+"</query><query active="true" focus="false" mode="xquery" name="3 harmonize">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 import module namespace my = "http://marklogic.com/tutorial-data/ECommerce-0.0.1" at "/ext/extractions-0.0.1.xqy";
  
 for $envelope at $i in 
@@ -393,21 +386,25 @@ xdmp:document-insert("/envelope-0.0.1-" || $i || ".xml", $envelope, xdmp:default
 
 "You have run extraction code to create envelopes from the upstream source documents like this:",
 (/*:envelope[*:instance[*:info/*:version="0.0.1"]])[1]
-</query><query active="true" focus="false" mode="xquery" name="5 Setup-TDE">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+</query><query active="true" focus="false" mode="xquery" name="4 Setup-TDE">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 import module namespace tde = "http://marklogic.com/xdmp/tde" at "/MarkLogic/tde.xqy";
 
 let $et := doc("/model.xml")=&gt;es:model-from-xml()=&gt;es:extraction-template-generate()
+return xdmp:document-insert("/e-commerce.tdex", $et, xdmp:default-permissions(), "http://marklogic.com/xdmp/tde");
 
-return
+import module namespace tde = "http://marklogic.com/xdmp/tde" at "/MarkLogic/tde.xqy";
 
-(
-tde:template-insert("/e-Commerce.tdex", $et)
-,
-"You have just generated an extraction template from the model and put it into
- the schemas database.  It will be used to create triples and rows from the envelope
- documents.  Here is the template:",
-$et) 
-</query><query active="true" focus="true" mode="xquery" name="0 Intro">"
+for $n in doc("/e-commerce.tdex")//tde:schema-name
+return xdmp:node-replace($n, &lt;tde:schema-name&gt;ECommerce1&lt;/tde:schema-name&gt;);
+
+(: store the modified TDE in Schemas DB :)
+import module namespace tde = "http://marklogic.com/xdmp/tde" at "/MarkLogic/tde.xqy";
+let $modified-doc := doc("/e-commerce.tdex")
+return 
+("Inserted extraction template into schemas database",
+ $modified-doc/tde:template,
+ tde:template-insert("/e-Commerce.tdex", $modified-doc, xdmp:default-permissions())
+   )</query><query active="true" focus="true" mode="xquery" name="0 Intro">"
 This workspace explore data modeling with Entity Services.
 
 You will create a model for Customers, Products, and other entities
@@ -417,7 +414,7 @@ Using that model, you will make an ingestion script to
 
 * create canonical instances of this model from source documents, and
 * see how generated artifacts can speed development against these models
-"</query><query active="true" focus="false" mode="xquery" name="6 Setup Indexes">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy";
+"</query><query active="true" focus="false" mode="xquery" name="5 Setup Indexes">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy";
 
 let $props := doc("/model.xml")=&gt;es:model-validate()=&gt;es:database-properties-generate()
 let $quoted := xdmp:quote($props)
@@ -441,4 +438,8 @@ xdmp:http-put("http://localhost:8002/manage/v2/databases/Documents/properties",
 "You have just generated a database configuration for indexing the instance data, and sent
 that configuration to the REST Management API.  Here is the payload that Entity Services created:",
 xdmp:unquote($quoted)
-)</query></workspace></export>
+)</query><query active="true" focus="false" mode="xquery" name="System tables">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+op:from-view("SYS", "SYS_TABLES")
+=&gt;op:where(op:eq(op:col("schema"), "ECommerce"))
+=&gt;op:result()</query></workspace></export>

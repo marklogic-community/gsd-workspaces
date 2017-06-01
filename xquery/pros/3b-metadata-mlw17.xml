@@ -463,6 +463,12 @@ declare namespace tde = "http://marklogic.com/xdmp/tde";
 let $et := doc("/metadata-model.xml")=&gt;es:model-from-xml()=&gt;es:extraction-template-generate()
 return xdmp:document-insert("/e-commerce.tdex", $et, xdmp:default-permissions(), "http://marklogic.com/xdmp/tde");
 
+(: make the view name unique :)
+import module namespace tde = "http://marklogic.com/xdmp/tde" at "/MarkLogic/tde.xqy";
+
+for $n in doc("/e-commerce.tdex")//tde:schema-name
+return xdmp:node-replace($n, &lt;tde:schema-name&gt;ECommerce4&lt;/tde:schema-name&gt;);
+
 (: two, insert triple patters into Customer template :)
 import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 declare namespace tde = "http://marklogic.com/xdmp/tde";
@@ -496,13 +502,35 @@ return
 (xdmp:node-replace($address-val/text(), text { ".//Address" }));
 
     
+(: six, correct context for order lines :)
+import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+declare namespace tde = "http://marklogic.com/xdmp/tde";
+
+for $orderLine in doc("/e-commerce.tdex")//tde:context[. = "./orderLines"]
+return
+(xdmp:node-replace($orderLine/text(), text { "./orderLines/OrderLine" }),
+ xdmp:node-replace($orderLine/..//tde:val[text() = "../id"], &lt;tde:val&gt;../../id&lt;/tde:val&gt;)
+);
+
+(: seven, correct context for related products :)
+import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+declare namespace tde = "http://marklogic.com/xdmp/tde";
+
+for $orderLine in doc("/e-commerce.tdex")//tde:context[. = "./relatedProduct"]
+return
+(xdmp:node-replace($orderLine/text(), text { "./relatedProduct/ProductRelation" }),
+ xdmp:node-replace($orderLine/..//tde:val[text() = "../sku"], &lt;tde:val&gt;../../sku&lt;/tde:val&gt;),
+ xdmp:node-replace($orderLine/..//tde:val[text() = "product/Product"], &lt;tde:val&gt;product/Product/name&lt;/tde:val&gt;)
+);
+
+
 (: store the modified TDE in Schemas DB :)
 import module namespace tde = "http://marklogic.com/xdmp/tde" at "/MarkLogic/tde.xqy";
 let $modified-doc := doc("/e-commerce.tdex")
 return 
 ("Inserted extraction template into schemas database",
  $modified-doc,
- tde:template-insert("/e-Commerce.tdex", $modified-doc, xdmp:default-permissions())
+ tde:template-insert("/e-Commerce-4.tdex", $modified-doc, xdmp:default-permissions())
    )</query><query active="true" focus="false" mode="sparql" name="6 Provenance Query">PREFIX : &lt;http://marklogic.com/example/ontology/&gt;
 PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
 

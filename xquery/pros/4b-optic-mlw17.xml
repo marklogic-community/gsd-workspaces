@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<export><workspace name="5-optic-mlw17"><query active="true" focus="true" mode="xquery" name="0 Intro">"
-This workspace provides examples of the Optic API, which is new in MarkLogic 9.
+<export><workspace name="4b-optic-mlw17"><query active="true" focus="true" mode="xquery" name="0 Intro">"
+This workspace provides more involved examples of the Optic API, which is new in MarkLogic 9.
 
 This API provides all of the query operators familiar to SQL or SPARQL developers,
 but in within a programming language.
@@ -10,7 +10,7 @@ that you write can be easily ported from one language to another, and will run t
 same in any of the host languages, and regardless of whether the executing platform
 is MarkLogic enode or a client-side system.
 
-"</query><query active="true" focus="false" mode="xquery" name="6 Your Models">(: This is an Optic query, crafted to report on the models in your database.  :)
+"</query><query active="true" focus="false" mode="xquery" name="5 Your Models">(: This is an Optic query, crafted to report on the models in your database.  :)
 import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
 
 let $es := op:prefixer("http://marklogic.com/entity-services#")
@@ -56,10 +56,7 @@ op:from-triples( (
 =&gt;op:where( op:eq(op:col("version"), "0.0.0")) 
 =&gt;op:order-by(("version", "typeTitle", "propertyLabel"))
 =&gt;op:select( ("modelTitle", "version", "typeTitle", "propertyLabel", "relationshipWith"))
-=&gt;op:result()
-
-
-(: can you filter this query by various versions of models? :)</query><query active="true" focus="false" mode="xquery" name="3 Triples - title,version">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+=&gt;op:result()</query><query active="true" focus="false" mode="xquery" name="2 Triples - title,version">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
 
 let $es := op:prefixer("http://marklogic.com/entity-services#")
 let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
@@ -79,7 +76,7 @@ op:from-triples( (
 =&gt;op:order-by("version")
 =&gt;op:select( ("modelTitle", "version", "description"))
 =&gt;op:where-distinct()
-=&gt;op:result()</query><query active="true" focus="false" mode="xquery" name="4 Counting instances">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+=&gt;op:result()</query><query active="true" focus="false" mode="xquery" name="3 Counting instances">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
 
 let $es := op:prefixer("http://marklogic.com/entity-services#")
 let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
@@ -99,49 +96,7 @@ op:from-triples( (
 =&gt;op:order-by("version")
 =&gt;op:select( ("typeTitle", "version", "ct"))
 =&gt;op:where-distinct()
-=&gt;op:result()</query><query active="true" focus="false" mode="xquery" name="8 Views introspection">(: This is an Optic query modified from the Model Report, that returns Entity Services view names
- :)
-import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
-
-let $es := op:prefixer("http://marklogic.com/entity-services#")
-let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
-let $model := op:col("model")
-let $type := op:col("type")
-let $plan-result :=
-  op:from-triples( (
-    op:pattern( $model, $rdf("type"), $es("Model") ),
-    op:pattern( $model, $es("definitions"), $type),
-    op:pattern( $type,  $es("title"), op:col("typeTitle")),
-    op:pattern( $model, $es("title"), op:col("modelTitle"))
-  ))
-  =&gt;op:select( ("modelTitle", "typeTitle"))
-  =&gt;op:result()
-return $plan-result
-
-(: Can you fetch all of the records in each view? 
- ! function($x) { 
-      try {
-        (: tde:get-view( $x=&gt;map:get("modelTitle"), $x=&gt;map:get("typeTitle") ), :)
-        op:from-view( $x=&gt;map:get("modelTitle"), $x=&gt;map:get("typeTitle") )=&gt;op:result()
-      } catch ($e) {
-        "Not a valid view - " || $x=&gt;map:get("modelTitle") || "," || $x=&gt;map:get("typeTitle")
-      }  
-    }(.)   :)</query><query active="true" focus="false" mode="xquery" name="1 Query Building">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
-
-op:from-view("ECommerce", "Order")
-  =&gt;op:where( op:lt(op:col("orderDate"), xs:date("2016-04-11")))
-  =&gt;op:order-by( op:col("id"))
-  =&gt;op:select( ( "id", "shipDate", "paymentTerms"))
-  =&gt;op:result()
-
-(:
-
-=&gt;op:where( op:lt(op:col("orderDate"), xs:date("2016-04-11")))
-=&gt;op:where( op:ge(op:col("orderDate"), xs:date("2016-04-11")))
-
-=&gt;op:order-by( op:col("shipDate"))
-=&gt;op:select( ( "id", "shipDate", "paymentTerms"))
-:)</query><query active="true" focus="false" mode="xquery" name="5 lexicon">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+=&gt;op:result()</query><query active="true" focus="false" mode="xquery" name="4 lexicon">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
 
 op:from-lexicons(
   map:entry("total", 
@@ -150,20 +105,36 @@ op:from-lexicons(
       "type=decimal", 
       map:entry("es", "http://marklogic.com/entity-services"))),
    "myview")
+(:
    =&gt;op:where( op:gt( "total", "80") )
    =&gt;op:order-by(op:desc("total"))
    =&gt;op:select( ("total") )
-   =&gt;op:result()
+:)
+=&gt;op:result()
    
-   </query><query active="true" focus="false" mode="xquery" name="2 View Joins">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+   </query><query active="true" focus="false" mode="xquery" name="6 Export Plan">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+let $plan := op:from-view("ECommerce", "Order")
+  =&gt;op:where( op:gt(op:col("orderDate"), xs:date("2016-04-11")))
+  =&gt;op:order-by( op:col("id"))
+  =&gt;op:select( ( "id", "shipDate", "paymentTerms"))
+
+let $exported := $plan=&gt;op:export()
+let $result := $plan=&gt;op:result()
+let $run-exported := $plan=&gt;op:result()
+return (
+$exported, $result, $run-exported
+)
+
+  </query><query active="true" focus="false" mode="xquery" name="1 View Joins">xquery version "1.0-ml";
+import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
 
 let $es := op:prefixer("http://marklogic.com/entity-services#")
 let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
-
-let $order := op:from-view("ECommerce", "Order")
-let $order-lines := op:from-view("ECommerce", "Order_orderLines")
-let $customers := op:from-view("ECommerce", "Customer")
-let $product := op:from-view("ECommerce", "Product")
+let $order := op:from-view("ECommerce2", "Order")
+let $order-lines := op:from-view("ECommerce2", "Order_orderLines")
+let $customers := op:from-view("ECommerce2", "Customer")
+let $product := op:from-view("ECommerce2", "Product")
 
 return 
   $order
@@ -178,23 +149,10 @@ return
   =&gt;op:select( ($order=&gt;op:col("id"), $order-lines=&gt;op:col("total"), "orderDate", "firstName", "lastName" ) )
   =&gt;op:result()
   
-(: Try taking out join-inners :)</query><query active="true" focus="false" mode="xquery" name="7 Export Plan">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
-
-let $plan := op:from-view("ECommerce", "Order")
-  =&gt;op:where( op:gt(op:col("orderDate"), xs:date("2016-04-11")))
-  =&gt;op:order-by( op:col("id"))
-  =&gt;op:select( ( "id", "shipDate", "paymentTerms"))
-
-let $exported := $plan=&gt;op:export()
-let $result := $plan=&gt;op:result()
-let $run-exported := $plan=&gt;op:result()
-return (
-$exported, $result, $run-exported
-)
-
-  </query><query active="true" focus="false" mode="xquery" name="9 Select Documents">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
-
-let $plan := op:from-view("ECommerce", "Customer")
+(: Try taking out join-inners :)</query><query active="true" focus="false" mode="xquery" name="7 Project Docs">xquery version "1.0-ml";
+import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+import module namespace ofn="http://marklogic.com/optic/expression/fn" at "/MarkLogic/optic/optic-fn.xqy";
+let $plan := op:from-view("ECommerce3", "Customer")
   =&gt;op:where( op:gt(op:col("id"), 1))
   =&gt;op:order-by( op:col("id"))
   
@@ -203,8 +161,9 @@ let $plan := op:from-view("ECommerce", "Customer")
       op:json-document(
         op:json-object((
 	        op:prop("id", op:json-string(op:col("id"))),
-          op:prop("firstName", op:json-array(
-          op:json-number(op:col("firstName"))))))))))
+          op:prop("firstName", op:json-string(op:col("firstName"))),
+          op:prop("lastName", op:json-string(op:col("lastName"))),
+          op:prop("fullName", op:json-string(ofn:concat(("firstName", " ", "lastName"))))))))))
   
 let $result := $plan=&gt;op:result()
 return $result</query></workspace></export>

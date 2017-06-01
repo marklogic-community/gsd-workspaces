@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export><workspace name="4c-optic-mlw17"><query active="true" focus="false" mode="xquery" name="2- solution">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+let $es := op:prefixer("http://marklogic.com/entity-services#")
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+
+let $order := op:from-view("ECommerce2", "Order")
+let $order-lines := op:from-view("ECommerce2", "Order_orderLines")
+let $customers := op:from-view("ECommerce2", "Customer")
+let $product := op:from-view("ECommerce2", "Product")
+
+(: get the total spent by each customer :)
+return 
+  $order
+  =&gt;op:join-inner($order-lines, 
+    op:on(
+      $order=&gt;op:col("id"),
+      $order-lines=&gt;op:col("id")))
+  =&gt;op:join-inner($customers, 
+    op:on("customer", 
+      $customers=&gt;op:col("id")))
+  =&gt;op:order-by( ($customers=&gt;op:col("lastName")) )
+  =&gt;op:group-by( ("firstName", "lastName"), op:sum("sum", $order-lines=&gt;op:col("total") ))
+  =&gt;op:select( ( "sum", "firstName", "lastName" ) )
+=&gt;op:result()</query><query active="true" focus="false" mode="xquery" name="1 - join">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+let $es := op:prefixer("http://marklogic.com/entity-services#")
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+
+let $order := op:from-view("ECommerce2", "Order")
+let $order-lines := op:from-view("ECommerce2", "Order_orderLines")
+let $customers := op:from-view("ECommerce2", "Customer")
+let $product := op:from-view("ECommerce2", "Product")
+
+(: return the order id and date for each order, along with the first name of its customer :)
+return
+$order
+=&gt;op:result()</query><query active="true" focus="false" mode="xquery" name="1 - solution">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+let $es := op:prefixer("http://marklogic.com/entity-services#")
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+
+let $order := op:from-view("ECommerce2", "Order")
+let $order-lines := op:from-view("ECommerce2", "Order_orderLines")
+let $customers := op:from-view("ECommerce2", "Customer")
+let $product := op:from-view("ECommerce2", "Product")
+
+(: return the order id and date for each order, along with the first name of its customer :)
+return
+$order
+=&gt;op:join-inner($customers, op:on($order=&gt;op:col("id"), $customers=&gt;op:col("id")))
+=&gt;op:select( ($order=&gt;op:col("id"), "firstName") )
+=&gt;op:result()</query><query active="true" focus="false" mode="xquery" name="2 - aggregate">import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+let $es := op:prefixer("http://marklogic.com/entity-services#")
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+
+let $order := op:from-view("ECommerce2", "Order")
+let $order-lines := op:from-view("ECommerce2", "Order_orderLines")
+let $customers := op:from-view("ECommerce2", "Customer")
+let $product := op:from-view("ECommerce2", "Product")
+
+(: get the total spent by each customer :)
+return 
+  $order
+  (:add join clause here :)
+  =&gt;op:join-inner($customers, 
+    op:on("customer", 
+      $customers=&gt;op:col("id")))
+  =&gt;op:order-by( ($customers=&gt;op:col("lastName")) )
+  (: add a group-by clause here :)
+  =&gt;op:select( ( (: add a column to hold the sum here :) "firstName", "lastName" ) )
+  =&gt;op:result()</query><query active="true" focus="false" mode="xquery" name="3 - model triples">xquery version "1.0-ml";
+
+import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+let $es := op:prefixer("http://marklogic.com/entity-services#")
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+
+(: Thes variables will be used to assemble the various joins I need :)
+let $model := op:col("model")
+let $type := op:col("type")
+let $property := op:col("property")
+
+(: The entity services graph connects models to types to properties :)
+return
+(: The first from-triples block contains columns I expect in each row. :)
+op:from-triples( (
+   (: from the model, get its metadata :)
+   op:pattern( $model, $rdf("type"), $es("Model") ),
+   op:pattern( $model, $es("definitions"), $type),
+   op:pattern( $model, $es("version"), op:col("version")),
+   op:pattern( $model, $es("title"), op:col("modelTitle")),
+
+   (: from the type, get the primary key and all the property objects :)
+   op:pattern( $type, $es("title"), op:col("typeTitle")),
+   op:pattern( $type, $es("primaryKey"), op:col("pk"))
+   
+   (: put patterns in for getting property labels here :)
+   
+   ))
+
+(: change this where clause to get the various versions of the model :)
+=&gt;op:where( op:eq(op:col("version"), "0.0.0")) 
+=&gt;op:order-by(("version", "typeTitle" ))
+=&gt;op:select( ("modelTitle", "version", "typeTitle" (:, add the property label here :) ))
+=&gt;op:result()</query><query active="true" focus="false" mode="xquery" name="3 - solution">xquery version "1.0-ml";
+
+import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+
+let $es := op:prefixer("http://marklogic.com/entity-services#")
+let $rdf := op:prefixer("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+
+(: Thes variables will be used to assemble the various joins I need :)
+let $model := op:col("model")
+let $type := op:col("type")
+let $property := op:col("property")
+
+(: The entity services graph connects models to types to properties :)
+return
+(: The first from-triples block contains columns I expect in each row. :)
+op:from-triples( (
+   (: from the model, get its metadata :)
+   op:pattern( $model, $rdf("type"), $es("Model") ),
+   op:pattern( $model, $es("definitions"), $type),
+   op:pattern( $model, $es("version"), op:col("version")),
+   op:pattern( $model, $es("title"), op:col("modelTitle")),
+
+   (: from the type, get the primary key and all the property objects :)
+   op:pattern( $type, $es("title"), op:col("typeTitle")),
+   op:pattern( $type, $es("primaryKey"), op:col("pk")),
+   op:pattern( $type, $es("property"), $property),
+   op:pattern( $property, $rdf("type"), $es("Property")),
+   op:pattern( $property, $es("title"), op:col("propertyLabel"))   
+   ))
+=&gt;op:where( op:eq(op:col("version"), "0.0.0")) 
+=&gt;op:order-by(("propertyLabel", "version", "typeTitle" ))
+=&gt;op:select( ("modelTitle", "version", "typeTitle", "propertyLabel" ))
+=&gt;op:result()</query><query active="true" focus="false" mode="xquery" name="4 project docs">xquery version "1.0-ml";
+import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+import module namespace ofn="http://marklogic.com/optic/expression/fn" at "/MarkLogic/optic/optic-fn.xqy";
+let $plan := op:from-view("ECommerce3", "Customer")
+  =&gt;op:where( op:gt(op:col("id"), 1))
+  =&gt;op:order-by( op:col("id"))
+  
+  =&gt;op:select(
+     op:as("doc", 
+      op:json-document(
+        op:json-object((
+        (: construct a json object as a projection, with email, id, firstName and lastName :)
+            op:prop("a", "B")
+        (: extra challenge - include a "fullName" property that concatenates first and last names :)
+        )))))
+let $result := $plan=&gt;op:result()
+return $result</query><query active="true" focus="false" mode="xquery" name="4 - solution">xquery version "1.0-ml";
+import module namespace op = "http://marklogic.com/optic" at "/MarkLogic/optic.xqy";
+import module namespace ofn="http://marklogic.com/optic/expression/fn" at "/MarkLogic/optic/optic-fn.xqy";
+let $plan := op:from-view("ECommerce3", "Customer")
+  =&gt;op:where( op:gt(op:col("id"), 1))
+  =&gt;op:order-by( op:col("id"))
+  
+  =&gt;op:select((
+     op:as("doc", 
+      op:json-document(
+        op:json-object((
+	        op:prop("id", op:json-string(op:col("id"))),
+          op:prop("email", op:json-string(op:col("email"))),
+          op:prop("firstName", op:json-string(op:col("firstName"))),
+          op:prop("lastName", op:json-string(op:col("lastName"))),
+          op:prop("fullName", op:json-string(ofn:concat( (op:col("firstName"), " ", op:col("lastName")))))))))))
+  
+let $result := $plan=&gt;op:result()
+return $result</query><query active="true" focus="true" mode="xquery" name="0 Intro">"
+This workspace has some simple Optic Exercises and solutions
+"</query></workspace></export>

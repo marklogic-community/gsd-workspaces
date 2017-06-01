@@ -43,7 +43,7 @@ let $model :=
 &lt;/es:model&gt;
 return (
   xdmp:document-insert("/model-zero.xml", $model, xdmp:default-permissions(), "http://marklogic.com/entity-services/models"),
-  "You have now inserted the XML model in this tab info the database.  Here I validate it and show its JSON representation and its triples:",
+  "You have now inserted the XML model in this tab into the database.  We validate it and show its JSON representation and its triples:",
   es:model-validate($model),
   cts:triples( (), (), (), (), (),cts:document-query("/model-zero.xml"))
 )
@@ -289,7 +289,7 @@ let $et := doc("/model-zero.xml")=&gt;es:model-from-xml()=&gt;es:extraction-temp
 return
 
 (
-tde:template-insert("/e-Commerce.tdex", $et)
+tde:template-insert("/e-Commerce-0.tdex", $et)
 ,
 "You have just generated an extraction template from the model and put it into
  the schemas database.  It will be used to create triples and rows from the envelope
@@ -388,20 +388,39 @@ op:from-triples( (
 =&gt;op:join-doc( $instanceDoc, op:col("instanceDocUri"))   
 =&gt;op:where( op:and(op:eq($modelTitle, "ECommerce"), op:eq($modelVersion, "0.0.0") ) )  
 =&gt;op:select( ($modelTitle, $modelVersion, $typeTitle, $instanceDoc) )
-=&gt;op:result()</query><query active="true" focus="false" mode="sql" name="8 SQL!">SELECT * FROM Ecommerce.Product;
+=&gt;op:result()</query><query active="true" focus="false" mode="sql" name="8 SQL!">SELECT * FROM Sys.Sys_tables;
+SELECT * FROM Ecommerce.Product;
 SELECT * FROM Ecommerce.Customer;
-SELECT * FROM Ecommerce.Order;</query><query active="true" focus="false" mode="xquery" name="9 Browsing">import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+SELECT * FROM Ecommerce.Order;</query><query active="true" focus="false" mode="xquery" name="9 some-solutions">xquery version "1.0-ml";
+import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
 
-(: try cut/pasting each of these to into a comment
-   to view them one at a time and try different access points :)
-fn:doc("/model-zero.xml")
-,(/es:envelope/es:instance/es:info)[1 to 3]
-,(/es:envelope/es:instance/Customer)[1 to 3]
+(: Here is the URI of the "model-zero" document :)
+"/model-zero.xml"
 
-(:
-,fn:doc("/envelope-0.0.0-1.xml")
-,(/es:model/es:info/es:title/text())
-,(/es:envelope/es:instance/Customer/id/data())[1 to 3]    
+(: the XQuery arrow syntax is used to send the output of one function to a second function, as its first  
+   argument :)   
+=&gt;fn:doc()
+(: use the es library to turn this into an in-memory model with model-from-xml or model-validate :)
+=&gt;es:model-from-xml()
 
+(: Here are the various codegen functions 
+=&gt;es:instance-converter-generate()
+=&gt;es:database-properties-generate()
+=&gt;es:extraction-template-generate()
+=&gt;es:database-properties-generate()
+=&gt;es:schema-generate()
 :)
-</query></workspace></export>
+</query><query active="true" focus="false" mode="xquery" name="9 - challenges">xquery version "1.0-ml";
+import module namespace es = "http://marklogic.com/entity-services" at "/MarkLogic/entity-services/entity-services.xqy"; 
+
+(: Here is the URI of the "model-zero" document :)
+"/model-zero.xml"
+
+(: the XQuery arrow syntax is used to send the output of one function to a second function, as its first  
+   argument :)   
+=&gt;fn:doc()
+
+(: use the es library to turn this into an in-memory model with model-from-xml or model-validate :)
+
+(: now, try the various es code-generation functions to see what they create. 
+  QConsole's code completion will help you find them when you type es: :)</query></workspace></export>
