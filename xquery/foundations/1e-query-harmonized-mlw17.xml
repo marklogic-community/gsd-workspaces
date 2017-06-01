@@ -75,32 +75,13 @@ xdmp:http-get(fn:concat("http://localhost:8000/v1/documents?uri=/denormalized/cu
                        &lt;username&gt;admin&lt;/username&gt;
                        &lt;password&gt;admin&lt;/password&gt;
                     &lt;/authentication&gt;
-                   &lt;/options&gt;)</query><query name="orders by key" focus="false" listorder="8" taborder="8" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
-(:
-Show me the Orders related to a particular Customer
-:)
-let $customer-doc := fn:doc("/denormalized/customer-3.xml")
-let $customer-id := $customer-doc/customer/source/customer_id
-let $orders := fn:collection("order")/order[customer_id eq $customer-id]
-return ($customer-doc, $orders )</query><query name="products by key" focus="false" listorder="9" taborder="9" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
-(:
-Show me the Products related to the Orders for a particular Customer
-:)
-
-let $customer-doc := fn:doc("/denormalized/customer-3.xml")
-let $customer-id := $customer-doc/customer/source/customer_id
-
-let $orders := fn:collection("order")/order[customer_id eq $customer-id]
-let $prod-ids := fn:distinct-values($orders/order_lines/order_line/product/text())
-
-let $products := fn:collection("product")/product[id eq $prod-ids]
-return $products/(&lt;prod&gt;{name, sku}&lt;/prod&gt;)</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
+                   &lt;/options&gt;)</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
 This workspace demonstrates searching and querying our harmonized documents.
 In addition, we start to explore querying our data via the REST API.
-"</query><query name="load customers" focus="false" listorder="2" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
-(: Use this tab to reinsert documents into the DB as they 
- : were at the end of workspace 1c, 
- : prior to starting this workspace.)
+"</query><query name="load customers, orders, products" focus="false" listorder="2" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(: Use this tab to reinsert customer entities into the DB as they 
+ : were at the end of workspace 1c, prior to starting this workspace, 
+ : as well as the orders and products.)
  :)
  
 let $cust-a-records :=
@@ -339,7 +320,223 @@ let $cust-b-reset :=
         let $uri := fn:concat("/customer-",$idx,".xml")
         return xdmp:document-insert($uri, &lt;customer&gt;{$d/node()}&lt;/customer&gt;, (), ("customer", "system-b", "enveloped", "harmonized"))
        
+       
+let $order-records :=
+&lt;dataset&gt;
+  &lt;record&gt;
+    &lt;id&gt;1&lt;/id&gt;
+    &lt;order_date&gt;2016-06-20&lt;/order_date&gt;
+    &lt;ship_date&gt;2016-06-25 06:09:29 UTC&lt;/ship_date&gt;
+    &lt;customer_id&gt;3&lt;/customer_id&gt;
+    &lt;payment_terms&gt;COD&lt;/payment_terms&gt;
+    &lt;order_lines&gt;
+      &lt;order_line&gt;
+        &lt;product&gt;4&lt;/product&gt;
+        &lt;quantity&gt;88&lt;/quantity&gt;
+        &lt;unit_price&gt;37.26&lt;/unit_price&gt;
+        &lt;discount&gt;0.02&lt;/discount&gt;
+        &lt;total&gt;65.58&lt;/total&gt;
+        &lt;notes&gt;Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl. Aenean lectus. Pellentesque eget nunc.&lt;/notes&gt;
+      &lt;/order_line&gt;
+      &lt;order_line&gt;
+        &lt;product&gt;2&lt;/product&gt;
+        &lt;quantity&gt;72&lt;/quantity&gt;
+        &lt;unit_price&gt;55.92&lt;/unit_price&gt;
+        &lt;discount&gt;0.98&lt;/discount&gt;
+        &lt;total&gt;3945.72&lt;/total&gt;
+        &lt;notes&gt;Nulla tellus.&lt;/notes&gt;
+      &lt;/order_line&gt;
+      &lt;order_line&gt;
+        &lt;product&gt;3&lt;/product&gt;
+        &lt;quantity&gt;23&lt;/quantity&gt;
+        &lt;unit_price&gt;44.36&lt;/unit_price&gt;
+        &lt;discount&gt;0.27&lt;/discount&gt;
+        &lt;total&gt;275.48&lt;/total&gt;
+        &lt;notes/&gt;
+      &lt;/order_line&gt;
+    &lt;/order_lines&gt;
+    &lt;notes/&gt;
+    &lt;status&gt;in progress&lt;/status&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;2&lt;/id&gt;
+    &lt;order_date&gt;2016-11-11&lt;/order_date&gt;
+    &lt;ship_date&gt;2016-11-16 00:54:48 UTC&lt;/ship_date&gt;
+    &lt;customer_id&gt;2&lt;/customer_id&gt;
+    &lt;payment_terms&gt;net30&lt;/payment_terms&gt;
+    &lt;order_lines&gt;
+      &lt;order_line&gt;
+        &lt;product&gt;1&lt;/product&gt;
+        &lt;quantity&gt;38&lt;/quantity&gt;
+        &lt;unit_price&gt;9.52&lt;/unit_price&gt;
+        &lt;discount&gt;0.76&lt;/discount&gt;
+        &lt;total&gt;274.94&lt;/total&gt;
+        &lt;notes&gt;Nulla tempus. Vivamus in felis eu sapien cursus vestibulum. Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem. Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit. Donec diam neque, vestibulum eget, vulputate ut, ultrices vel, augue.&lt;/notes&gt;
+      &lt;/order_line&gt;
+      &lt;order_line&gt;
+        &lt;product&gt;5&lt;/product&gt;
+        &lt;quantity&gt;41&lt;/quantity&gt;
+        &lt;unit_price&gt;91.9&lt;/unit_price&gt;
+        &lt;discount&gt;0.15&lt;/discount&gt;
+        &lt;total&gt;565.19&lt;/total&gt;
+        &lt;notes&gt;Vivamus in felis eu sapien cursus vestibulum. Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem. Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.&lt;/notes&gt;
+      &lt;/order_line&gt;
+    &lt;/order_lines&gt;
+    &lt;notes/&gt;
+    &lt;status&gt;new&lt;/status&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;3&lt;/id&gt;
+    &lt;order_date&gt;2016-04-04&lt;/order_date&gt;
+    &lt;ship_date&gt;2016-04-09 07:04:23 UTC&lt;/ship_date&gt;
+    &lt;customer_id&gt;3&lt;/customer_id&gt;
+    &lt;payment_terms&gt;PIA&lt;/payment_terms&gt;
+    &lt;order_lines&gt;
+      &lt;order_line&gt;
+        &lt;product&gt;4&lt;/product&gt;
+        &lt;quantity&gt;32&lt;/quantity&gt;
+        &lt;unit_price&gt;12.22&lt;/unit_price&gt;
+        &lt;discount&gt;0.33&lt;/discount&gt;
+        &lt;total&gt;129.04&lt;/total&gt;
+        &lt;notes&gt;Fusce lacus purus, aliquet at, feugiat non, pretium quis, lectus. Suspendisse potenti. In eleifend quam a odio. In hac habitasse platea dictumst. Maecenas ut massa quis augue luctus tincidunt. Nulla mollis molestie lorem. Quisque ut erat. Curabitur gravida nisi at nibh.&lt;/notes&gt;
+      &lt;/order_line&gt;
+      &lt;order_line&gt;
+        &lt;product&gt;5&lt;/product&gt;
+        &lt;quantity&gt;98&lt;/quantity&gt;
+        &lt;unit_price&gt;57.53&lt;/unit_price&gt;
+        &lt;discount&gt;0.04&lt;/discount&gt;
+        &lt;total&gt;225.52&lt;/total&gt;
+        &lt;notes/&gt;
+      &lt;/order_line&gt;
+      &lt;order_line&gt;
+        &lt;product&gt;2&lt;/product&gt;
+        &lt;quantity&gt;87&lt;/quantity&gt;
+        &lt;unit_price&gt;59.81&lt;/unit_price&gt;
+        &lt;discount&gt;0.89&lt;/discount&gt;
+        &lt;total&gt;4631.09&lt;/total&gt;
+        &lt;notes/&gt;
+      &lt;/order_line&gt;
+    &lt;/order_lines&gt;
+    &lt;notes/&gt;
+    &lt;status&gt;in progress&lt;/status&gt;
+  &lt;/record&gt;
+ &lt;/dataset&gt;
+let $orders := $order-records/record
+let $count := fn:count($orders)
+let $order-reset := for $d at $idx in $orders 
+                    let $uri := fn:concat("/order-",$idx,".xml")
+                    return xdmp:document-insert($uri, &lt;order&gt;{$d/node()}&lt;/order&gt;, (), "order")
+    
+ let $product-doc :=
+&lt;dataset&gt;
+  &lt;record&gt;
+    &lt;id&gt;1&lt;/id&gt;
+    &lt;name&gt;Refreshing AC&lt;/name&gt;
+    &lt;sku&gt;664229048-8&lt;/sku&gt;
+    &lt;category&gt;home central units&lt;/category&gt;
+    &lt;related_products&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;massive ac&lt;/product_name&gt;
+        &lt;relationship&gt;substitute&lt;/relationship&gt;
+      &lt;/related_product&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;central ac&lt;/product_name&gt;
+        &lt;relationship&gt;required&lt;/relationship&gt;
+      &lt;/related_product&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;high volume ac&lt;/product_name&gt;
+        &lt;relationship&gt;upgrade&lt;/relationship&gt;
+      &lt;/related_product&gt;
+    &lt;/related_products&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;2&lt;/id&gt;
+    &lt;name&gt;Biodex&lt;/name&gt;
+    &lt;sku&gt;949037899-2&lt;/sku&gt;
+    &lt;category&gt;home central units&lt;/category&gt;
+    &lt;related_products&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;dapibus 5000&lt;/product_name&gt;
+        &lt;relationship&gt;complement&lt;/relationship&gt;
+      &lt;/related_product&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;est air freshener&lt;/product_name&gt;
+        &lt;relationship&gt;required&lt;/relationship&gt;
+      &lt;/related_product&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;deluxe trails package&lt;/product_name&gt;
+        &lt;relationship&gt;upgrade&lt;/relationship&gt;
+      &lt;/related_product&gt;
+    &lt;/related_products&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;3&lt;/id&gt;
+    &lt;name&gt;Sonair&lt;/name&gt;
+    &lt;sku&gt;317294048-9&lt;/sku&gt;
+    &lt;category&gt;applications&lt;/category&gt;
+    &lt;related_products&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;foehammer online quest&lt;/product_name&gt;
+        &lt;relationship&gt;complement&lt;/relationship&gt;
+      &lt;/related_product&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;nam staff of logic&lt;/product_name&gt;
+        &lt;relationship&gt;upgrade&lt;/relationship&gt;
+      &lt;/related_product&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;lucky trail adventure pack&lt;/product_name&gt;
+        &lt;relationship&gt;complement&lt;/relationship&gt;
+      &lt;/related_product&gt;
+    &lt;/related_products&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;4&lt;/id&gt;
+    &lt;name&gt;Zaam-Dox&lt;/name&gt;
+    &lt;sku&gt;405785176-3&lt;/sku&gt;
+    &lt;category&gt;proin&lt;/category&gt;
+    &lt;related_products&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;feugiat&lt;/product_name&gt;
+        &lt;relationship&gt;substitute&lt;/relationship&gt;
+      &lt;/related_product&gt;
+    &lt;/related_products&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;5&lt;/id&gt;
+    &lt;name&gt;Domainer&lt;/name&gt;
+    &lt;sku&gt;189152305-8&lt;/sku&gt;
+    &lt;category&gt;quis&lt;/category&gt;
+    &lt;related_products&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;metus&lt;/product_name&gt;
+        &lt;relationship&gt;upgrade&lt;/relationship&gt;
+      &lt;/related_product&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;sit&lt;/product_name&gt;
+        &lt;relationship&gt;upgrade&lt;/relationship&gt;
+      &lt;/related_product&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;sit&lt;/product_name&gt;
+        &lt;relationship&gt;upgrade&lt;/relationship&gt;
+      &lt;/related_product&gt;
+    &lt;/related_products&gt;
+  &lt;/record&gt;
+&lt;/dataset&gt;
 
-return ($cust-a-reset, $cust-b-reset),
-       "You've just reloaded the enveloped and harmonized system-a and system-b customer records."
-       </query></workspace></export>
+let $prod-docs := $product-doc/record
+let $count := fn:count($prod-docs)
+let $prod-doc-reset :=
+        for $d at $idx in $prod-docs 
+        let $uri := fn:concat("/product-",$idx,".xml")
+        return xdmp:document-insert($uri, &lt;product&gt;{$d/node()}&lt;/product&gt;, (), "product")
+        
+return ($cust-a-reset, $cust-b-reset, $prod-doc-reset, $order-reset),
+       "You've just loaded the following into the Documents DB:
+        - the enveloped and harmonized system-a and system-b customer records
+        - enveloped order documents containing triples
+        - updated product documents "</query><query name="cleanup" focus="false" listorder="8" taborder="8" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+
+xdmp:collection-delete("customer"),
+xdmp:collection-delete("order"),
+xdmp:collection-delete("product")</query></workspace></export>

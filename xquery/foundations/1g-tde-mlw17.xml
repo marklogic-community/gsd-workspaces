@@ -846,4 +846,8 @@ return ($cust-a-reset, $cust-b-reset, $prod-doc-reset),
        "You've just loaded the following into the Documents DB:
         - the enveloped and harmonized system-a and system-b customer records
         - enveloped order documents containing triples
-        - updated product documents "</query></workspace></export>
+        - updated product documents "</query><query name="cleanup" focus="false" listorder="16" taborder="16" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+
+let $uris := cts:uris('','document', cts:and-query(()))
+for $uri in $uris 
+return xdmp:document-delete($uri)</query></workspace></export>

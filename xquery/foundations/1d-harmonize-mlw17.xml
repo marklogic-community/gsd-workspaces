@@ -165,7 +165,7 @@ return  xdmp:node-insert-before($doc/customer/canonical, $metadata);
  :)
 
 fn:doc("/denormalized/customer-1.xml"),
-fn:doc("/customer-1.xml")</query><query name="reload customers" focus="false" listorder="11" taborder="11" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+fn:doc("/customer-1.xml")/customer/source</query><query name="reload customers" focus="false" listorder="11" taborder="11" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: Use this tab to reinsert documents into the DB as they 
  : were at the end of workspace 1c, 
  : prior to starting this workspace.)
@@ -328,4 +328,9 @@ let $cust-b-reset :=
        
 
 return ($cust-a-reset, $cust-b-reset),
-       "You've just reloaded the system-a and system-b customer records as they originally were prior to using this workspace."</query></workspace></export>
+       "You've just reloaded the system-a and system-b customer records as they originally were prior to using this workspace."</query><query name="cleanup" focus="false" listorder="12" taborder="12" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+
+xdmp:collection-delete("customer"),
+xdmp:collection-delete("order"),
+xdmp:collection-delete("product")</query></workspace></export>
