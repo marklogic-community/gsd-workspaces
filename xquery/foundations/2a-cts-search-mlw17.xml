@@ -25,7 +25,7 @@ cts:search(fn:collection("product"),
             (cts:element-query(xs:QName("relationship"), "complement"),
              cts:element-query(xs:QName("name"), "Sonair"))
            )
-   )</query><query name="geo query circle" focus="false" listorder="8" taborder="8" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+   )</query><query name="geo query circle" focus="false" listorder="8" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (:Show me customers with a billing address within a 
   20 mile radius of downtown El Paso, TX  (31.760423, -106.485124)
@@ -37,7 +37,7 @@ cts:search(fn:collection("customer"),
     xs:QName("latitude"), xs:QName("longitude"),  cts:circle(20, cts:point(31.760423, -106.485124))))
     
 
- </query><query name="geo query polygon" focus="false" listorder="9" taborder="9" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+ </query><query name="geo query polygon" focus="false" listorder="9" taborder="8" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: Show me all documents with a shipping address within a polygon defined by the 3 points
    defining a triangle bound within  Richmond VA 
    Document contains 37.5242,-77.4932 . - Bonnie Clark
@@ -51,7 +51,7 @@ let $points :=
 return 
   cts:search(fn:collection(),
      cts:element-pair-geospatial-query(xs:QName("shipping_address"),
-        xs:QName("latitude"), xs:QName("longitude"),  cts:polygon($points)))</query><query name="geo distance query" focus="false" listorder="10" taborder="10" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+        xs:QName("latitude"), xs:QName("longitude"),  cts:polygon($points)))</query><query name="geo distance query" focus="false" listorder="10" taborder="9" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 let $nick := cts:point(31.6948, -106.3)
 let $bonnie :=  
@@ -64,7 +64,7 @@ geo:shortest-distance(
   $nick,
   cts:polygon($bonnie))
   
-  </query><query name="and-not query" focus="false" listorder="7" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+  </query><query name="and-not query" focus="false" listorder="7" taborder="" active="false" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: Show me any entities in the product collection 
  : containing the text 'complement' occurring as a value 
  : for the 'relationship' element BUT DOES NOT have the text 
@@ -76,7 +76,7 @@ cts:search(fn:collection("product"),
              cts:element-query(xs:QName("relationship"), "complement"),
              cts:element-query(xs:QName("name"), "Sonair")
            )
-   )</query><query name="basic sum" focus="false" listorder="12" taborder="12" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+   )</query><query name="basic sum" focus="false" listorder="12" taborder="11" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (: For each Order show me the sum for the 'total' element 
  : for all order lines within the order.
@@ -100,7 +100,7 @@ and query.
 We will also use the Management API to add a range index
 on a numeric attribute of our Order entities so we can
 calculate some quick sums.
-"</query><query name="add range index" focus="false" listorder="11" taborder="11" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+"</query><query name="add range index" focus="false" listorder="11" taborder="10" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: In MarkLogic 9 the collection lexicon and triple index are enabled by default.
  : Here we use the management API to add a range index on 'total' for our orders.
  : We also enable fast reverse searches to use the reverse index for
@@ -668,7 +668,11 @@ return ($cust-a-reset, $cust-b-reset, $prod-doc-reset),
        "You've just loaded the following into the Documents DB:
         - the enveloped and harmonized system-a and system-b customer records
         - enveloped order documents containing triples
-        - updated product documents "</query><query name="phrase query" focus="false" listorder="4" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+        - product documents "</query><query name="phrase query" focus="false" listorder="4" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 declare namespace html = "http://www.w3.org/1999/xhtml";
 
-cts:search(/product, "lucky trail adventure pack")</query></workspace></export>
+cts:search(/product, "lucky trail adventure pack")</query><query name="cleanup" focus="false" listorder="13" taborder="12" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+
+let $uris := cts:uris('','document', cts:and-query(()))
+for $uri in $uris 
+return xdmp:document-delete($uri)</query></workspace></export>
