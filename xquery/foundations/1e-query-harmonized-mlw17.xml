@@ -75,10 +75,10 @@ xdmp:http-get(fn:concat("http://localhost:8000/v1/documents?uri=/denormalized/cu
                        &lt;username&gt;admin&lt;/username&gt;
                        &lt;password&gt;admin&lt;/password&gt;
                     &lt;/authentication&gt;
-                   &lt;/options&gt;)</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
+                   &lt;/options&gt;)</query><query name="Intro" focus="false" listorder="1" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
 This workspace demonstrates searching and querying our harmonized documents.
 In addition, we start to explore querying our data via the REST API.
-"</query><query name="load customers, orders, products" focus="false" listorder="2" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+"</query><query name="load customers, orders, products" focus="true" listorder="2" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: Use this tab to reinsert customer entities into the DB as they 
  : were at the end of workspace 1c, prior to starting this workspace, 
  : as well as the orders and products.)
@@ -533,8 +533,8 @@ let $prod-doc-reset :=
 return ($cust-a-reset, $cust-b-reset, $prod-doc-reset, $order-reset),
        "You've just loaded the following into the Documents DB:
         - the enveloped and harmonized system-a and system-b customer records
-        - enveloped order documents containing triples
-        - updated product documents "</query><query name="cleanup" focus="false" listorder="8" taborder="8" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+        - order documents
+        - product documents "</query><query name="cleanup" focus="false" listorder="8" taborder="8" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 declare namespace html = "http://www.w3.org/1999/xhtml";
 
 xdmp:collection-delete("customer"),

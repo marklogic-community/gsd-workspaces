@@ -229,7 +229,7 @@ WHERE {
   ?customer :label $lname .
 	?customer :placed ?order .
 	?order :contains ?product .
-  $product :label "Domainer". }</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
+  $product :label "Domainer". }</query><query name="Intro" focus="false" listorder="1" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
 This workspace illustrates Semantics by demonstrating how we can
 create and query triples using thesem:* API.
 
@@ -790,7 +790,7 @@ return ($cust-a-reset, $cust-b-reset, $prod-doc-reset),
        "You've just loaded the following into the Documents DB:
         - the enveloped and harmonized system-a and system-b customer records
         - enveloped order documents containing triples
-        - updated product documents "</query><query name="load customers, orders, and products" focus="false" listorder="19" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+        - updated product documents "</query><query name="load customers, orders, and products" focus="true" listorder="19" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: Use this tab to reinsert entities into the DB as they 
  : were at the end of workspace 1e. )
  :)
@@ -1244,8 +1244,8 @@ let $prod-doc-reset :=
 return ($cust-a-reset, $cust-b-reset, $prod-doc-reset, $order-reset),
        "You've just loaded the following into the Documents DB:
         - the enveloped and harmonized system-a and system-b customer records
-        - enveloped order documents containing triples
-        - updated product documents "</query><query name="cleanup" focus="false" listorder="20" taborder="20" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+        - order documents
+        - product documents "</query><query name="cleanup" focus="false" listorder="20" taborder="20" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 declare namespace html = "http://www.w3.org/1999/xhtml";
 
 let $uris := cts:uris('','document', cts:and-query(()))
