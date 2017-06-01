@@ -1,11 +1,4 @@
-<export><workspace name="5c-create-triples-from-docs-mlw17"><query name="delete collections" focus="false" listorder="2" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
-
-(: Delete Triples loaded from ttl in workspace 5a :)
-
-xdmp:collection-delete("http://marklogic.com/example/graphs/customers"),
-xdmp:collection-delete("http://marklogic.com/example/graphs/orders"),
-xdmp:collection-delete("http://marklogic.com/example/graphs/products"),
-xdmp:collection-delete("http://marklogic.com/semantics#default-graph")</query><query name="create-customer-triples" focus="false" listorder="3" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="5c-create-triples-from-docs-mlw17"><query name="create-customer-triples" focus="false" listorder="3" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 import module namespace sem = "http://marklogic.com/semantics"
    at "/MarkLogic/semantics.xqy";
 (: 
@@ -167,7 +160,7 @@ return ("You've just loaded customer triples into the database in the http://mar
         sem:graph-insert(sem:iri("http://marklogic.com/example/graphs/customers"), $insert) )
        
         
-        </query><query name="create-order-triples" focus="false" listorder="4" taborder="3" active="false" database="8469375127942903998" server="12590722383439523806" database-name="" server-name="" mode="xquery">xquery version "1.0-ml";&#13;declare namespace html = "http://www.w3.org/1999/xhtml";&#13;&lt;p&gt;hello world&lt;/p&gt;</query><query name="create-product-triples" focus="false" listorder="5" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+        </query><query name="create-order-triples" focus="false" listorder="4" taborder="3" active="false" database="8469375127942903998" server="12590722383439523806" database-name="" server-name="" mode="xquery">xquery version "1.0-ml";&#13;declare namespace html = "http://www.w3.org/1999/xhtml";&#13;&lt;p&gt;hello world&lt;/p&gt;</query><query name="create-product-triples" focus="false" listorder="5" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 import module "http://marklogic.com/xdmp/tde" at "/MarkLogic/tde.xqy";
 
 (: This script creates triples by Template Driven Extraction (TDE)
@@ -237,7 +230,7 @@ return ( tde:template-insert(
   ),
    "You just saved your TDE template template to the Schemas database.",
    "Change your database to Schemas, and click 'Explore' to view the template URI."
-)</query><query name="SPARQL" focus="false" listorder="6" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
+)</query><query name="SPARQL products" focus="false" listorder="6" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
 PREFIX ids: &lt;http://marklogic.com/example/products/&gt; 
 PREFIX taxo: &lt;http://marklogic.com/example/taxonomies/&gt; 
 PREFIX xs: &lt;http:///www.w3.org/2001/&gt; 
@@ -254,7 +247,7 @@ WHERE
 }
 LIMIT 10</query><query name="tde:node-extract" focus="false" listorder="8" taborder="6" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 declare namespace html = "http://www.w3.org/1999/xhtml";
-tde:node-data-extract(fn:doc("/product-2.xml"))</query><query name="cleanup schemas" focus="false" listorder="7" taborder="8" active="true" database="14059993161380782136" server="12590722383439523806" database-name="Schemas" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+tde:node-data-extract(fn:doc("/product-2.xml"))</query><query name="cleanup schemas" focus="false" listorder="7" taborder="9" active="true" database="14059993161380782136" server="12590722383439523806" database-name="Schemas" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : Template documents can be safely deleted once 
  : they have been disabled and after enough time has 
@@ -271,7 +264,7 @@ xdmp:collection-delete( "TDE-Semantics" ),
   
 The triples created are the same as the ones we loaded from raw .ttl in workspace 5a.
 After loading, you can go back to 5b and query your newly created triples using SPARQL, Optic API, or cts:triples()
-"</query><query name="disable template" focus="false" listorder="9" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+"</query><query name="disable template" focus="false" listorder="9" taborder="8" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (:
  : Templates can be enabled and disabled by modifying the &lt;enabled&gt; 
@@ -345,4 +338,478 @@ return
   ),
    "You've just disabled your TDE template.",
    "Run a SPARQL query and you will find your product triples are no longer available."
-   )</query></workspace></export>
+   )</query><query name="load customers, orders, products" focus="false" listorder="9" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(: Use this tab to reinsert entities into the DB 
+ :)
+ 
+let $cust-a-records :=
+&lt;dataset&gt;
+   &lt;customer&gt;
+     &lt;metadata&gt;
+       &lt;source&gt;POS&lt;/source&gt;
+       &lt;date&gt;2017-05-09-04:00&lt;/date&gt;
+       &lt;lineage&gt;v01 transform&lt;/lineage&gt;
+     &lt;/metadata&gt;
+     &lt;canonical&gt;
+      &lt;shipping-zip&gt;36628&lt;/shipping-zip&gt;
+     &lt;/canonical&gt;
+     &lt;source&gt;
+       &lt;customer_id&gt;1&lt;/customer_id&gt;
+       &lt;first_name&gt;Nicholas&lt;/first_name&gt;
+       &lt;last_name&gt;Wheeler&lt;/last_name&gt;
+       &lt;email&gt;nwheeler0@cdbaby.com&lt;/email&gt;
+       &lt;ssn&gt;803-28-0354&lt;/ssn&gt;
+       &lt;phone&gt;1-(915)325-2812&lt;/phone&gt;
+       &lt;billing_address&gt;
+         &lt;street&gt;46958 Farwell Trail&lt;/street&gt;
+         &lt;city&gt;El Paso&lt;/city&gt;
+         &lt;state&gt;Texas&lt;/state&gt;
+         &lt;zip&gt;79950&lt;/zip&gt;
+         &lt;latitude&gt;31.6948&lt;/latitude&gt;
+         &lt;longitude&gt;-106.3&lt;/longitude&gt;
+       &lt;/billing_address&gt;
+       &lt;shipping_address&gt;
+         &lt;street&gt;9 Thierer Place&lt;/street&gt;
+         &lt;city&gt;Mobile&lt;/city&gt;
+         &lt;state&gt;Alabama&lt;/state&gt;
+         &lt;zip&gt;36628&lt;/zip&gt;
+         &lt;latitude&gt;30.6589&lt;/latitude&gt;
+         &lt;longitude&gt;-88.178&lt;/longitude&gt;
+       &lt;/shipping_address&gt;
+       &lt;region&gt;justo&lt;/region&gt;
+       &lt;segment&gt;top&lt;/segment&gt;
+      &lt;/source&gt;
+     &lt;/customer&gt;
+   &lt;customer&gt;
+      &lt;metadata&gt;
+         &lt;source&gt;POS&lt;/source&gt;
+         &lt;date&gt;2017-05-09-04:00&lt;/date&gt;
+         &lt;lineage&gt;v01 transform&lt;/lineage&gt;
+     &lt;/metadata&gt;
+     &lt;canonical&gt;
+        &lt;shipping-zip&gt;39505&lt;/shipping-zip&gt;
+     &lt;/canonical&gt;
+     &lt;source&gt;
+        &lt;customer_id&gt;2&lt;/customer_id&gt;
+        &lt;first_name&gt;Richard&lt;/first_name&gt;
+        &lt;last_name&gt;Kennedy&lt;/last_name&gt;
+        &lt;email&gt;rkennedy1@apache.org&lt;/email&gt;
+        &lt;ssn&gt;253-66-8162&lt;/ssn&gt;
+        &lt;phone&gt;1-(815)551-8998&lt;/phone&gt;
+        &lt;billing_address&gt;
+           &lt;street&gt;01233 7th Parkway&lt;/street&gt;
+           &lt;city&gt;Rockford&lt;/city&gt;
+           &lt;state&gt;Illinois&lt;/state&gt;
+           &lt;zip&gt;61110&lt;/zip&gt;
+           &lt;latitude&gt;42.3254&lt;/latitude&gt;
+           &lt;longitude&gt;-89.1705&lt;/longitude&gt;
+        &lt;/billing_address&gt;
+        &lt;shipping_address&gt;
+           &lt;street&gt;19137 Superior Point&lt;/street&gt;
+           &lt;city&gt;Gulfport&lt;/city&gt;
+           &lt;state&gt;Mississippi&lt;/state&gt;
+           &lt;zip&gt;39505&lt;/zip&gt;
+           &lt;latitude&gt;30.4158&lt;/latitude&gt;
+           &lt;longitude&gt;-89.0684&lt;/longitude&gt;
+        &lt;/shipping_address&gt;
+        &lt;region&gt;in&lt;/region&gt;
+        &lt;segment&gt;regular&lt;/segment&gt;
+     &lt;/source&gt;
+    &lt;/customer&gt;
+    &lt;customer&gt;
+        &lt;metadata&gt;
+           &lt;source&gt;POS&lt;/source&gt;
+           &lt;date&gt;2017-05-09-04:00&lt;/date&gt;
+           &lt;lineage&gt;v01 transform&lt;/lineage&gt;
+        &lt;/metadata&gt;
+        &lt;canonical&gt;
+           &lt;shipping-zip&gt;23272&lt;/shipping-zip&gt;
+        &lt;/canonical&gt;
+        &lt;source&gt;
+           &lt;customer_id&gt;3&lt;/customer_id&gt;
+           &lt;first_name&gt;Bonnie&lt;/first_name&gt;
+           &lt;last_name&gt;Clark&lt;/last_name&gt;
+           &lt;email&gt;bclark2@example.com&lt;/email&gt;
+           &lt;ssn&gt;947-95-7536&lt;/ssn&gt;
+          &lt;phone&gt;1-(515)755-7166&lt;/phone&gt;
+          &lt;billing_address&gt;
+             &lt;street&gt;4 Red Cloud Plaza&lt;/street&gt;
+             &lt;city&gt;Des Moines&lt;/city&gt;
+             &lt;state&gt;Iowa&lt;/state&gt;
+             &lt;zip&gt;50305&lt;/zip&gt;
+             &lt;latitude&gt;41.6727&lt;/latitude&gt;
+             &lt;longitude&gt;-93.5722&lt;/longitude&gt;
+          &lt;/billing_address&gt;
+          &lt;shipping_address&gt;
+             &lt;street&gt;96328 Sutteridge Court&lt;/street&gt;
+             &lt;city&gt;Richmond&lt;/city&gt;
+             &lt;state&gt;Virginia&lt;/state&gt;
+             &lt;zip&gt;23272&lt;/zip&gt;
+             &lt;latitude&gt;37.5242&lt;/latitude&gt;
+             &lt;longitude&gt;-77.4932&lt;/longitude&gt;
+          &lt;/shipping_address&gt;
+          &lt;region&gt;velit&lt;/region&gt;
+          &lt;segment&gt;coupon&lt;/segment&gt;
+        &lt;/source&gt;
+      &lt;/customer&gt;
+&lt;/dataset&gt;
+
+let $cust-a-docs := $cust-a-records/customer
+let $count := fn:count($cust-a-docs)
+let $cust-a-reset :=
+        for $d at $idx in $cust-a-docs 
+        let $uri := fn:concat("/denormalized/customer-",$idx,".xml")
+        return  xdmp:document-insert($uri, &lt;customer&gt;{$d/node()}&lt;/customer&gt;, (), ("customer", "system-a", "enveloped", "harmonized"))
+      
+ 
+let $cust-b-records :=
+&lt;dataset&gt;
+  &lt;customer&gt;
+    &lt;metadata&gt;
+      &lt;source&gt;Finance&lt;/source&gt;
+      &lt;date&gt;2017-05-09-04:00&lt;/date&gt;
+      &lt;lineage&gt;v01 transform&lt;/lineage&gt;
+    &lt;/metadata&gt;
+    &lt;canonical&gt;
+      &lt;shipping-zip&gt;79934&lt;/shipping-zip&gt;
+    &lt;/canonical&gt;
+    &lt;source&gt;
+      &lt;id&gt;82&lt;/id&gt;
+      &lt;fname&gt;Fanechka&lt;/fname&gt;
+      &lt;lname&gt;Applebee&lt;/lname&gt;
+      &lt;phone&gt;1-(915)318-6020&lt;/phone&gt;
+      &lt;ssn&gt;482-78-7787&lt;/ssn&gt;
+      &lt;street&gt;3833 Merchant Parkway&lt;/street&gt;
+      &lt;city&gt;El Paso&lt;/city&gt;
+      &lt;state&gt;Texas&lt;/state&gt;
+      &lt;postal&gt;79934&lt;/postal&gt;
+    &lt;/source&gt;
+  &lt;/customer&gt;
+  &lt;customer&gt;
+    &lt;metadata&gt;
+      &lt;source&gt;Finance&lt;/source&gt;
+      &lt;date&gt;2017-05-09-04:00&lt;/date&gt;
+      &lt;lineage&gt;v01 transform&lt;/lineage&gt;
+    &lt;/metadata&gt;
+    &lt;canonical&gt;
+      &lt;shipping-zip&gt;36628&lt;/shipping-zip&gt;
+    &lt;/canonical&gt;
+    &lt;source&gt;
+      &lt;id&gt;42&lt;/id&gt;
+      &lt;fname&gt;Gunther&lt;/fname&gt;
+      &lt;lname&gt;Revely&lt;/lname&gt;
+      &lt;phone&gt;1-(251)551-0806&lt;/phone&gt;
+      &lt;ssn&gt;729-28-2635&lt;/ssn&gt;
+      &lt;street&gt;76291 Memorial Parkway&lt;/street&gt;
+      &lt;city&gt;Mobile&lt;/city&gt;
+      &lt;state&gt;Alabama&lt;/state&gt;
+      &lt;postal&gt;36628&lt;/postal&gt;
+    &lt;/source&gt;
+  &lt;/customer&gt;
+  &lt;customer&gt;
+    &lt;metadata&gt;
+      &lt;source&gt;Finance&lt;/source&gt;
+      &lt;date&gt;2017-05-09-04:00&lt;/date&gt;
+      &lt;lineage&gt;v01 transform&lt;/lineage&gt;
+    &lt;/metadata&gt;
+    &lt;canonical&gt; 
+      &lt;shipping-zip&gt;96825&lt;/shipping-zip&gt;
+    &lt;/canonical&gt;
+    &lt;source&gt;
+      &lt;id&gt;1&lt;/id&gt;
+      &lt;fname&gt;Richard&lt;/fname&gt;
+      &lt;lname&gt;Roostan&lt;/lname&gt;
+      &lt;phone&gt;1-(808)408-2422&lt;/phone&gt;
+      &lt;ssn&gt;120-59-9484&lt;/ssn&gt;
+      &lt;street&gt;2 Northwestern Road&lt;/street&gt;
+      &lt;city&gt;Honolulu&lt;/city&gt;
+      &lt;state&gt;Hawaii&lt;/state&gt;
+      &lt;postal&gt;96825&lt;/postal&gt;
+    &lt;/source&gt;
+  &lt;/customer&gt;
+  &lt;customer&gt;
+    &lt;metadata&gt;
+      &lt;source&gt;Finance&lt;/source&gt;
+      &lt;date&gt;2017-05-09-04:00&lt;/date&gt;
+      &lt;lineage&gt;v01 transform&lt;/lineage&gt;
+    &lt;/metadata&gt;
+    &lt;canonical&gt;
+      &lt;shipping-zip&gt;75226&lt;/shipping-zip&gt;
+    &lt;/canonical&gt;
+    &lt;source&gt;
+      &lt;id&gt;9&lt;/id&gt;
+      &lt;fname&gt;Kristina&lt;/fname&gt;
+      &lt;lname&gt;Frankel&lt;/lname&gt;
+      &lt;phone&gt;1-(469)618-6671&lt;/phone&gt;
+      &lt;ssn&gt;355-62-0033&lt;/ssn&gt;
+      &lt;street&gt;889 Novick Center&lt;/street&gt;
+      &lt;city&gt;Dallas&lt;/city&gt;
+      &lt;state&gt;Texas&lt;/state&gt;
+      &lt;postal&gt;75226&lt;/postal&gt;
+    &lt;/source&gt;
+  &lt;/customer&gt; 
+  &lt;customer&gt;
+    &lt;metadata&gt;
+      &lt;source&gt;Finance&lt;/source&gt;
+      &lt;date&gt;2017-05-09-04:00&lt;/date&gt;
+      &lt;lineage&gt;v01 transform&lt;/lineage&gt;
+    &lt;/metadata&gt;
+    &lt;canonical&gt;
+      &lt;shipping-zip&gt;79405&lt;/shipping-zip&gt;
+    &lt;/canonical&gt;
+      &lt;source&gt;
+      &lt;id&gt;33&lt;/id&gt;
+      &lt;fname&gt;Kora&lt;/fname&gt;
+      &lt;lname&gt;McIntosh&lt;/lname&gt;
+      &lt;phone&gt;1-(806)259-1852&lt;/phone&gt;
+      &lt;ssn&gt;258-12-1494&lt;/ssn&gt;
+      &lt;street&gt;27 John Wall Street&lt;/street&gt;
+      &lt;city&gt;Lubbock&lt;/city&gt;
+      &lt;state&gt;Texas&lt;/state&gt;
+      &lt;postal&gt;79405&lt;/postal&gt;
+    &lt;/source&gt;
+    &lt;/customer&gt;
+&lt;/dataset&gt;
+
+let $cust-b-docs := $cust-b-records/customer
+let $count := fn:count($cust-b-docs)
+let $cust-b-reset :=
+        for $d at $idx in $cust-b-docs 
+        let $uri := fn:concat("/customer-",$idx,".xml")
+        return xdmp:document-insert($uri, &lt;customer&gt;{$d/node()}&lt;/customer&gt;, (), ("customer", "system-b", "enveloped", "harmonized"))
+       
+       
+let $order-records :=
+&lt;dataset&gt;
+  &lt;record&gt;
+    &lt;id&gt;1&lt;/id&gt;
+    &lt;order_date&gt;2016-06-20&lt;/order_date&gt;
+    &lt;ship_date&gt;2016-06-25 06:09:29 UTC&lt;/ship_date&gt;
+    &lt;customer_id&gt;3&lt;/customer_id&gt;
+    &lt;payment_terms&gt;COD&lt;/payment_terms&gt;
+    &lt;order_lines&gt;
+      &lt;order_line&gt;
+        &lt;product&gt;4&lt;/product&gt;
+        &lt;quantity&gt;88&lt;/quantity&gt;
+        &lt;unit_price&gt;37.26&lt;/unit_price&gt;
+        &lt;discount&gt;0.02&lt;/discount&gt;
+        &lt;total&gt;65.58&lt;/total&gt;
+        &lt;notes&gt;Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl. Aenean lectus. Pellentesque eget nunc.&lt;/notes&gt;
+      &lt;/order_line&gt;
+      &lt;order_line&gt;
+        &lt;product&gt;2&lt;/product&gt;
+        &lt;quantity&gt;72&lt;/quantity&gt;
+        &lt;unit_price&gt;55.92&lt;/unit_price&gt;
+        &lt;discount&gt;0.98&lt;/discount&gt;
+        &lt;total&gt;3945.72&lt;/total&gt;
+        &lt;notes&gt;Nulla tellus.&lt;/notes&gt;
+      &lt;/order_line&gt;
+      &lt;order_line&gt;
+        &lt;product&gt;3&lt;/product&gt;
+        &lt;quantity&gt;23&lt;/quantity&gt;
+        &lt;unit_price&gt;44.36&lt;/unit_price&gt;
+        &lt;discount&gt;0.27&lt;/discount&gt;
+        &lt;total&gt;275.48&lt;/total&gt;
+        &lt;notes/&gt;
+      &lt;/order_line&gt;
+    &lt;/order_lines&gt;
+    &lt;notes/&gt;
+    &lt;status&gt;in progress&lt;/status&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;2&lt;/id&gt;
+    &lt;order_date&gt;2016-11-11&lt;/order_date&gt;
+    &lt;ship_date&gt;2016-11-16 00:54:48 UTC&lt;/ship_date&gt;
+    &lt;customer_id&gt;2&lt;/customer_id&gt;
+    &lt;payment_terms&gt;net30&lt;/payment_terms&gt;
+    &lt;order_lines&gt;
+      &lt;order_line&gt;
+        &lt;product&gt;1&lt;/product&gt;
+        &lt;quantity&gt;38&lt;/quantity&gt;
+        &lt;unit_price&gt;9.52&lt;/unit_price&gt;
+        &lt;discount&gt;0.76&lt;/discount&gt;
+        &lt;total&gt;274.94&lt;/total&gt;
+        &lt;notes&gt;Nulla tempus. Vivamus in felis eu sapien cursus vestibulum. Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem. Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit. Donec diam neque, vestibulum eget, vulputate ut, ultrices vel, augue.&lt;/notes&gt;
+      &lt;/order_line&gt;
+      &lt;order_line&gt;
+        &lt;product&gt;5&lt;/product&gt;
+        &lt;quantity&gt;41&lt;/quantity&gt;
+        &lt;unit_price&gt;91.9&lt;/unit_price&gt;
+        &lt;discount&gt;0.15&lt;/discount&gt;
+        &lt;total&gt;565.19&lt;/total&gt;
+        &lt;notes&gt;Vivamus in felis eu sapien cursus vestibulum. Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem. Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.&lt;/notes&gt;
+      &lt;/order_line&gt;
+    &lt;/order_lines&gt;
+    &lt;notes/&gt;
+    &lt;status&gt;new&lt;/status&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;3&lt;/id&gt;
+    &lt;order_date&gt;2016-04-04&lt;/order_date&gt;
+    &lt;ship_date&gt;2016-04-09 07:04:23 UTC&lt;/ship_date&gt;
+    &lt;customer_id&gt;3&lt;/customer_id&gt;
+    &lt;payment_terms&gt;PIA&lt;/payment_terms&gt;
+    &lt;order_lines&gt;
+      &lt;order_line&gt;
+        &lt;product&gt;4&lt;/product&gt;
+        &lt;quantity&gt;32&lt;/quantity&gt;
+        &lt;unit_price&gt;12.22&lt;/unit_price&gt;
+        &lt;discount&gt;0.33&lt;/discount&gt;
+        &lt;total&gt;129.04&lt;/total&gt;
+        &lt;notes&gt;Fusce lacus purus, aliquet at, feugiat non, pretium quis, lectus. Suspendisse potenti. In eleifend quam a odio. In hac habitasse platea dictumst. Maecenas ut massa quis augue luctus tincidunt. Nulla mollis molestie lorem. Quisque ut erat. Curabitur gravida nisi at nibh.&lt;/notes&gt;
+      &lt;/order_line&gt;
+      &lt;order_line&gt;
+        &lt;product&gt;5&lt;/product&gt;
+        &lt;quantity&gt;98&lt;/quantity&gt;
+        &lt;unit_price&gt;57.53&lt;/unit_price&gt;
+        &lt;discount&gt;0.04&lt;/discount&gt;
+        &lt;total&gt;225.52&lt;/total&gt;
+        &lt;notes/&gt;
+      &lt;/order_line&gt;
+      &lt;order_line&gt;
+        &lt;product&gt;2&lt;/product&gt;
+        &lt;quantity&gt;87&lt;/quantity&gt;
+        &lt;unit_price&gt;59.81&lt;/unit_price&gt;
+        &lt;discount&gt;0.89&lt;/discount&gt;
+        &lt;total&gt;4631.09&lt;/total&gt;
+        &lt;notes/&gt;
+      &lt;/order_line&gt;
+    &lt;/order_lines&gt;
+    &lt;notes/&gt;
+    &lt;status&gt;in progress&lt;/status&gt;
+  &lt;/record&gt;
+ &lt;/dataset&gt;
+let $orders := $order-records/record
+let $count := fn:count($orders)
+let $order-reset := for $d at $idx in $orders 
+                    let $uri := fn:concat("/order-",$idx,".xml")
+                    return xdmp:document-insert($uri, &lt;order&gt;{$d/node()}&lt;/order&gt;, (), "order")
+    
+ let $product-doc :=
+&lt;dataset&gt;
+  &lt;record&gt;
+    &lt;id&gt;1&lt;/id&gt;
+    &lt;name&gt;Refreshing AC&lt;/name&gt;
+    &lt;sku&gt;664229048-8&lt;/sku&gt;
+    &lt;category&gt;home central units&lt;/category&gt;
+    &lt;related_products&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;massive ac&lt;/product_name&gt;
+        &lt;relationship&gt;substitute&lt;/relationship&gt;
+      &lt;/related_product&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;central ac&lt;/product_name&gt;
+        &lt;relationship&gt;required&lt;/relationship&gt;
+      &lt;/related_product&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;high volume ac&lt;/product_name&gt;
+        &lt;relationship&gt;upgrade&lt;/relationship&gt;
+      &lt;/related_product&gt;
+    &lt;/related_products&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;2&lt;/id&gt;
+    &lt;name&gt;Biodex&lt;/name&gt;
+    &lt;sku&gt;949037899-2&lt;/sku&gt;
+    &lt;category&gt;home central units&lt;/category&gt;
+    &lt;related_products&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;dapibus 5000&lt;/product_name&gt;
+        &lt;relationship&gt;complement&lt;/relationship&gt;
+      &lt;/related_product&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;est air freshener&lt;/product_name&gt;
+        &lt;relationship&gt;required&lt;/relationship&gt;
+      &lt;/related_product&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;deluxe trails package&lt;/product_name&gt;
+        &lt;relationship&gt;upgrade&lt;/relationship&gt;
+      &lt;/related_product&gt;
+    &lt;/related_products&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;3&lt;/id&gt;
+    &lt;name&gt;Sonair&lt;/name&gt;
+    &lt;sku&gt;317294048-9&lt;/sku&gt;
+    &lt;category&gt;applications&lt;/category&gt;
+    &lt;related_products&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;foehammer online quest&lt;/product_name&gt;
+        &lt;relationship&gt;complement&lt;/relationship&gt;
+      &lt;/related_product&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;nam staff of logic&lt;/product_name&gt;
+        &lt;relationship&gt;upgrade&lt;/relationship&gt;
+      &lt;/related_product&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;lucky trail adventure pack&lt;/product_name&gt;
+        &lt;relationship&gt;complement&lt;/relationship&gt;
+      &lt;/related_product&gt;
+    &lt;/related_products&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;4&lt;/id&gt;
+    &lt;name&gt;Zaam-Dox&lt;/name&gt;
+    &lt;sku&gt;405785176-3&lt;/sku&gt;
+    &lt;category&gt;proin&lt;/category&gt;
+    &lt;related_products&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;feugiat&lt;/product_name&gt;
+        &lt;relationship&gt;substitute&lt;/relationship&gt;
+      &lt;/related_product&gt;
+    &lt;/related_products&gt;
+  &lt;/record&gt;
+  &lt;record&gt;
+    &lt;id&gt;5&lt;/id&gt;
+    &lt;name&gt;Domainer&lt;/name&gt;
+    &lt;sku&gt;189152305-8&lt;/sku&gt;
+    &lt;category&gt;quis&lt;/category&gt;
+    &lt;related_products&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;metus&lt;/product_name&gt;
+        &lt;relationship&gt;upgrade&lt;/relationship&gt;
+      &lt;/related_product&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;sit&lt;/product_name&gt;
+        &lt;relationship&gt;upgrade&lt;/relationship&gt;
+      &lt;/related_product&gt;
+      &lt;related_product&gt;
+        &lt;product_name&gt;sit&lt;/product_name&gt;
+        &lt;relationship&gt;upgrade&lt;/relationship&gt;
+      &lt;/related_product&gt;
+    &lt;/related_products&gt;
+  &lt;/record&gt;
+&lt;/dataset&gt;
+
+let $prod-docs := $product-doc/record
+let $count := fn:count($prod-docs)
+let $prod-doc-reset :=
+        for $d at $idx in $prod-docs 
+        let $uri := fn:concat("/product-",$idx,".xml")
+        return xdmp:document-insert($uri, &lt;product&gt;{$d/node()}&lt;/product&gt;, (), "product")
+        
+return ($cust-a-reset, $cust-b-reset, $prod-doc-reset, $order-reset),
+       "You've just loaded the following into the Documents DB:
+        - the enveloped and harmonized system-a and system-b customer records
+        - order documents
+        - product documents "</query><query name="SPARQL customers" focus="false" listorder="10" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
+PREFIX ids: &lt;http://marklogic.com/example/products/&gt; 
+PREFIX taxo: &lt;http://marklogic.com/example/taxonomies/&gt; 
+PREFIX xs: &lt;http:///www.w3.org/2001/&gt; 
+
+
+SELECT 
+ ?customer $o
+WHERE
+{
+  ?customer :street "46958 Farwell Trail"
+}
+LIMIT 10</query><query name="cleanup" focus="false" listorder="11" taborder="11" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+
+(: Remove the documents we created from the database.:)
+
+let $uris := cts:uris('','document', cts:and-query(()))
+for $uri in $uris 
+return xdmp:document-delete($uri)
+
+</query></workspace></export>

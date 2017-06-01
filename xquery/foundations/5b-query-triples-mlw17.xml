@@ -8,9 +8,18 @@ SELECT
 WHERE
 {
    ?s a :Product.
-  ?s ?p ?o
+   ?s $p ?o
 }
-LIMIT 100</query><query name="embedded SPARQL" focus="false" listorder="3" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">sem:sparql('PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
+LIMIT 100
+
+#SELECT 
+# ?s
+#WHERE
+#{
+#   ?s a :Product.
+#   ?s :category taxo:proin
+#}
+#LIMIT 100</query><query name="embedded SPARQL" focus="false" listorder="3" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">sem:sparql('PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
 PREFIX ids: &lt;http://marklogic.com/example/products/&gt; 
 PREFIX taxo: &lt;http://marklogic.com/example/taxonomies/&gt; 
 PREFIX xs: &lt;http:///www.w3.org/2001/&gt; 
@@ -99,14 +108,16 @@ a SPARQL REST endpoint and using cts:triples() directly.
 "</query><query name="cleanup" focus="false" listorder="10" taborder="12" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (: Remove the triples we created from the database.:)
- 
-xdmp:collection-delete("http://marklogic.com/example/graphs/customers"),
-xdmp:collection-delete("http://marklogic.com/example/graphs/orders"),
-xdmp:collection-delete("http://marklogic.com/example/graphs/products")</query><query name="REST graphs" focus="false" listorder="11" taborder="10" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+
+let $uris := cts:uris('','document', cts:and-query(()))
+for $uri in $uris 
+return xdmp:document-delete($uri)
+
+</query><query name="REST graphs" focus="false" listorder="11" taborder="10" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: Using the graphs endpoint to return a given graph.
  :)
 
-xdmp:http-get( "http://localhost:8000/v1/graphs?graph=order-details", 
+xdmp:http-get( "http://localhost:8000/v1/graphs?graph=http://marklogic.com/example/graphs/customers", 
                    &lt;options xmlns="xdmp:http"&gt;
                     &lt;authentication&gt;
                        &lt;username&gt;admin&lt;/username&gt;
@@ -117,7 +128,6 @@ xdmp:http-get( "http://localhost:8000/v1/graphs?graph=order-details",
 (: Using the sparql endpoint to return the results to a SPARQL query.
 :)
 
-(: let $sparql := xdmp:url-encode('SELECT $s WHERE { ?s &lt;http://www.marklogic.com/orders#placed&gt; &lt;http://www.marklogic.com/orders#Order1&gt; .}') :)
 
 let $sparql := 
    xdmp:url-encode('SELECT $s ?name ?sku
