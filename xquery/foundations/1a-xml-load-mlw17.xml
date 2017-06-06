@@ -128,9 +128,9 @@ let $insert :=
        return xdmp:document-insert($uri, &lt;root&gt;{$d/node()}&lt;/root&gt;, (), ("address-table","system-a"))
        
 return (
- $insert,
- fn:concat("You have just inserted ", $count, " address table records into the database.")
-  )
+  $insert,
+  fn:concat("You have just inserted ", $count, " address table records into the database.")
+)
 </query><query name="denormalize customers" focus="false" listorder="4" taborder="6" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : This script is a simple example of creating entities in MarkLogic by \\
@@ -139,25 +139,26 @@ return (
 
 let $uris := cts:uris('','document',cts:collection-query("customer-table"))
 let $insert :=
- for $uri in $uris
- let $customer  := fn:doc($uri) 
- let $new-uri := fn:concat("/denormalized", $uri)
+  for $uri in $uris
+  let $customer  := fn:doc($uri) 
+  let $new-uri := fn:concat("/denormalized", $uri)
 
- let $customer-bill-id := fn:string($customer/root/billing_address_id)
- let $customer-ship-id :=  fn:string($customer/root/shipping_address_id)
+  let $customer-bill-id := fn:string($customer/root/billing_address_id)
+  let $customer-ship-id :=  fn:string($customer/root/shipping_address_id)
 
- let $bill-info := fn:collection("address-table")/root[address-id eq $customer-bill-id]/(* except address_id)
- let $ship-info := fn:collection("address-table")/root[address-id eq $customer-ship-id]/(* except address_id)
+  let $bill-info := fn:collection("address-table")/root[address-id eq $customer-bill-id]/(* except address_id)
+  let $ship-info := fn:collection("address-table")/root[address-id eq $customer-ship-id]/(* except address_id)
 
- let $final :=
-       &lt;customer&gt;           
-         {$customer/root/*,   
+  let $final :=
+      &lt;customer&gt;           
+        {
+          $customer/root/*,
           &lt;billing-address&gt;{$bill-info}&lt;/billing-address&gt;,
           &lt;shipping-address&gt;{$ship-info}&lt;/shipping-address&gt;
-          }
-       &lt;/customer&gt;
+        }
+      &lt;/customer&gt;
 
- return   xdmp:document-insert($new-uri,$final,(),("customer","system-a"))
+  return xdmp:document-insert($new-uri,$final,(),("customer","system-a"))
 
 return ($insert, 
         fn:concat("You have just created 3 customer entities and inserted them into the database.")
