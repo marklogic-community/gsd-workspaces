@@ -1,4 +1,4 @@
-<export><workspace name="1f-semantics-mlw17"><query name="create triples test 1" focus="false" listorder="4" taborder="3" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="1f-semantics-mlw17"><query name="create triples test 1" focus="false" listorder="5" taborder="5" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 import module namespace sem = "http://marklogic.com/semantics"
    at "/MarkLogic/semantics.xqy";
    
@@ -23,7 +23,7 @@ let $triples := (
 )
 
 
-return $triples</query><query name="create triples header test" focus="false" listorder="6" taborder="5" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+return $triples</query><query name="create triples header test" focus="false" listorder="7" taborder="7" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 import module namespace sem = "http://marklogic.com/semantics"
    at "/MarkLogic/semantics.xqy";
 (: Creating triples using sem:triples()
@@ -55,7 +55,7 @@ let $triples := (
 let $triple-header := &lt;triples&gt;
                        {$triples}
                       &lt;/triples&gt;
-return $triple-header</query><query name="create triples test 2" focus="false" listorder="5" taborder="4" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+return $triple-header</query><query name="create triples test 2" focus="false" listorder="6" taborder="6" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 import module namespace sem = "http://marklogic.com/semantics"
    at "/MarkLogic/semantics.xqy";
 (: Creating triples using sem:triples()
@@ -82,7 +82,7 @@ let $triples := (
 )
 
 
-return $triples</query><query name="add triples to orders" focus="false" listorder="7" taborder="6" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+return $triples</query><query name="add triples to orders" focus="false" listorder="8" taborder="8" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 import module namespace sem = "http://marklogic.com/semantics"
    at "/MarkLogic/semantics.xqy";
 (: This script creates the triples and places them in a
@@ -119,7 +119,7 @@ for $uri in $uris
       &lt;/order&gt;
   
 return  xdmp:document-insert($uri, $harmonized, (), ("order","enveloped")),
-        "You've just enveloped your orders and added triples to them."</query><query name="SPARQL SELECT" focus="false" listorder="8" taborder="7" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="sparql"># query
+        "You've just enveloped your orders and added triples to them."</query><query name="SPARQL SELECT" focus="false" listorder="9" taborder="9" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="sparql"># query
 # Show me the Customers who placed an Order 
 # containing Product5
 
@@ -129,7 +129,7 @@ SELECT ?customer
 WHERE {
 	?customer :placed ?order .
 	?order :contains :Product5 }
-</query><query name="SPARQL CONSTRUCT" focus="false" listorder="9" taborder="8" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="sparql"># Creating a new fact/relationshipos
+</query><query name="SPARQL CONSTRUCT" focus="false" listorder="10" taborder="10" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="sparql"># Creating a new fact/relationshipos
 # Create a relationship that defines when a Customer places an Order
 # that contains a Product, we can state the Customer "bought"
 # the Product
@@ -141,7 +141,7 @@ WHERE {
 	?customer :placed ?order .
 	?order :contains ?product }
 
-</query><query name="SPARQL INSERT" focus="false" listorder="10" taborder="9" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="sparql-update"># SPARQL UPDATE
+</query><query name="SPARQL INSERT" focus="false" listorder="11" taborder="11" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="sparql-update"># SPARQL UPDATE
 # Insert our new triples into the database
 
 PREFIX : &lt;http://www.marklogic.com/orders#&gt;  
@@ -152,13 +152,13 @@ INSERT
 	  ?customer :placed ?order .
 	  ?order :contains ?product 
 }
-</query><query name="SPARQL bought query" focus="false" listorder="11" taborder="10" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="sparql"># query
+</query><query name="SPARQL bought query" focus="false" listorder="12" taborder="12" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="sparql"># query
 # Show me customers who have bought Product5
 
 PREFIX : &lt;http://www.marklogic.com/orders#&gt;  
 
 SELECT ?customer
-WHERE { ?customer :bought :Product5 } </query><query name="add meaning to relationships" focus="false" listorder="12" taborder="11" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="sparql-update">## SPARQL UPDATE
+WHERE { ?customer :bought :Product5 } </query><query name="add meaning to relationships" focus="false" listorder="13" taborder="13" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="sparql-update">## SPARQL UPDATE
 # add comments to the database to define the meaning of what 
 # our predicates/relatioships mean
 
@@ -172,14 +172,14 @@ INSERT DATA {
   }
 }
  
-</query><query name="query comment" focus="false" listorder="13" taborder="12" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="sparql">#query our comment for the 'placed' predicate
+</query><query name="query comment" focus="false" listorder="14" taborder="14" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="sparql">#query our comment for the 'placed' predicate
 PREFIX : &lt;http://www.marklogic.com/orders#&gt;  
 
 SELECT $comment
 WHERE{
     :placed :comment $comment
      }
- </query><query name="add labels" focus="false" listorder="14" taborder="13" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+ </query><query name="add labels" focus="false" listorder="15" taborder="15" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 import module namespace sem = "http://marklogic.com/semantics"
    at "/MarkLogic/semantics.xqy";
 (: Add additional labels for our Products and Customers so we can 
@@ -211,17 +211,17 @@ let $cust-triples :=
    return $triple
 
 return sem:rdf-insert(( $cust-triples, $prod-triples ),(),(), "order-details")
-  </query><query name="fn:doc()" focus="false" listorder="15" taborder="14" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+  </query><query name="fn:doc()" focus="false" listorder="16" taborder="16" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: Query the /triplestore/document.xml created in the previous tab, "Add Labels" 
  : Update the "/" with the URI of the document to fetch. 
 :)
-fn:doc("/")</query><query name="SPARQL query labels" focus="false" listorder="16" taborder="15" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="sparql">#Show me the product name for Product5
+fn:doc("/triplestore/ce5c43f58d7ddb1.xml")</query><query name="SPARQL query labels" focus="false" listorder="17" taborder="17" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="sparql">#Show me the product name for Product5
 PREFIX : &lt;http://www.marklogic.com/orders#&gt;  
 
 SELECT   ?productname
 WHERE {
 	:Product5 :label ?productname .
-  }</query><query name="SPARQL query labels 2" focus="false" listorder="17" taborder="16" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="sparql">#Show me the name of the customers which purchased the product "Domainer"
+  }</query><query name="SPARQL query labels 2" focus="false" listorder="18" taborder="18" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="sparql">#Show me the name of the customers which purchased the product "Domainer"
 PREFIX : &lt;http://www.marklogic.com/orders#&gt;  
 
 SELECT   ?lname
@@ -241,14 +241,14 @@ OrderID contains ProductID.
 
 We additionally add comments to our relationships and labels for our Customers and Products.
 
-"</query><query name="orders by key" focus="false" listorder="3" taborder="2" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+"</query><query name="orders by key" focus="false" listorder="3" taborder="3" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
 Show me the Orders related to a particular Customer
 :)
 let $customer-doc := fn:doc("/denormalized/customer-3.xml")
 let $customer-id := $customer-doc/customer/source/customer_id
 let $orders := fn:collection("order")/order[customer_id eq $customer-id]
-return ($customer-doc, $orders )</query><query name="products by key" focus="false" listorder="18" taborder="3" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+return ($customer-doc, $orders )</query><query name="products by key" focus="false" listorder="4" taborder="4" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
 Show me the Products related to the Orders for a particular Customer
 :)
@@ -715,7 +715,7 @@ return ($cust-a-reset, $cust-b-reset, $prod-doc-reset, $order-reset),
        "You've just loaded the following into the Documents DB:
         - the enveloped and harmonized system-a and system-b customer records
         - order documents
-        - product documents "</query><query name="cleanup" focus="false" listorder="20" taborder="20" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+        - product documents "</query><query name="cleanup" focus="false" listorder="19" taborder="19" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 declare namespace html = "http://www.w3.org/1999/xhtml";
 
 let $uris := cts:uris('','document', cts:and-query(()))
