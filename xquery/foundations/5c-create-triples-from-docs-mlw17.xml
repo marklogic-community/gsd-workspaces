@@ -1,4 +1,4 @@
-<export><workspace name="5c-create-triples-from-docs-mlw17"><query name="create-customer-triples" focus="false" listorder="3" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="5c-create-triples-from-docs-mlw17"><query name="create-customer-triples" focus="false" listorder="3" taborder="3" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 import module namespace sem = "http://marklogic.com/semantics"
    at "/MarkLogic/semantics.xqy";
 (: 
@@ -22,7 +22,6 @@ let $insert :=
   let $ids-prefix := "http://marklogic.com/example/customers/"
   let $ont-prefix :=    "http://marklogic.com/example/ontology/"
   let $rdf-prefix := "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-  let $xs-prefix := "http:///www.w3.org/2001/"  (: contrast with xs:long() :)
 
   let $id := $doc/customer/source/customer_id/fn:string(.)
   let $first-name := $doc/source/customer/first_name/fn:string(.)
@@ -160,7 +159,7 @@ return ("You've just loaded customer triples into the database in the http://mar
         sem:graph-insert(sem:iri("http://marklogic.com/example/graphs/customers"), $insert) )
        
         
-        </query><query name="create-order-triples" focus="false" listorder="4" taborder="3" active="false" database="8469375127942903998" server="12590722383439523806" database-name="" server-name="" mode="xquery">xquery version "1.0-ml";&#13;declare namespace html = "http://www.w3.org/1999/xhtml";&#13;&lt;p&gt;hello world&lt;/p&gt;</query><query name="create-product-triples" focus="false" listorder="5" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+        </query><query name="create-product-triples" focus="false" listorder="5" taborder="5" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 import module "http://marklogic.com/xdmp/tde" at "/MarkLogic/tde.xqy";
 
 (: This script creates triples by Template Driven Extraction (TDE)
@@ -230,7 +229,7 @@ return ( tde:template-insert(
   ),
    "You just saved your TDE template template to the Schemas database.",
    "Change your database to Schemas, and click 'Explore' to view the template URI."
-)</query><query name="SPARQL products" focus="false" listorder="6" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
+)</query><query name="SPARQL products" focus="false" listorder="7" taborder="7" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
 PREFIX ids: &lt;http://marklogic.com/example/products/&gt; 
 PREFIX taxo: &lt;http://marklogic.com/example/taxonomies/&gt; 
 PREFIX xs: &lt;http:///www.w3.org/2001/&gt; 
@@ -245,9 +244,9 @@ WHERE
      :name ?name ;
      :sku ?sku .
 }
-LIMIT 10</query><query name="tde:node-extract" focus="false" listorder="8" taborder="6" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+LIMIT 10</query><query name="tde:node-extract" focus="false" listorder="6" taborder="6" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 declare namespace html = "http://www.w3.org/1999/xhtml";
-tde:node-data-extract(fn:doc("/product-2.xml"))</query><query name="cleanup schemas" focus="false" listorder="7" taborder="9" active="true" database="14059993161380782136" server="12590722383439523806" database-name="Schemas" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+tde:node-data-extract(fn:doc("/product-2.xml"))</query><query name="cleanup schemas" focus="false" listorder="9" taborder="9" active="true" database="4283521037270987855" server="6240101570028256752" database-name="Schemas" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : Template documents can be safely deleted once 
  : they have been disabled and after enough time has 
@@ -256,7 +255,7 @@ tde:node-data-extract(fn:doc("/product-2.xml"))</query><query name="cleanup sche
  : Run this with the Schemas database selected.
 :)
 xdmp:collection-delete( "TDE-Semantics" ),
-"You have deleted your template from the Schemas Database."</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
+"You have deleted your template from the Schemas Database."</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">"
  This workspace demonstrates 2 ways to create triples from documents.
  
   1) using the sem:* API
@@ -264,7 +263,7 @@ xdmp:collection-delete( "TDE-Semantics" ),
   
 The triples created are the same as the ones we loaded from raw .ttl in workspace 5a.
 After loading, you can go back to 5b and query your newly created triples using SPARQL, Optic API, or cts:triples()
-"</query><query name="disable template" focus="false" listorder="9" taborder="8" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+"</query><query name="disable template" focus="false" listorder="8" taborder="8" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (:
  : Templates can be enabled and disabled by modifying the &lt;enabled&gt; 
@@ -338,7 +337,7 @@ return
   ),
    "You've just disabled your TDE template.",
    "Run a SPARQL query and you will find your product triples are no longer available."
-   )</query><query name="load customers, orders, products" focus="false" listorder="9" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+   )</query><query name="load customers, orders, products" focus="false" listorder="2" taborder="2" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: Use this tab to reinsert entities into the DB 
  :)
  
@@ -792,19 +791,19 @@ return ($cust-a-reset, $cust-b-reset, $prod-doc-reset, $order-reset),
        "You've just loaded the following into the Documents DB:
         - the enveloped and harmonized system-a and system-b customer records
         - order documents
-        - product documents "</query><query name="SPARQL customers" focus="false" listorder="10" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
+        - product documents "</query><query name="SPARQL customers" focus="false" listorder="4" taborder="4" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="sparql">PREFIX : &lt;http://marklogic.com/example/ontology/&gt;  
 PREFIX ids: &lt;http://marklogic.com/example/products/&gt; 
 PREFIX taxo: &lt;http://marklogic.com/example/taxonomies/&gt; 
 PREFIX xs: &lt;http:///www.w3.org/2001/&gt; 
 
 
 SELECT 
- ?customer $o
+ ?customer
 WHERE
 {
   ?customer :street "46958 Farwell Trail"
 }
-LIMIT 10</query><query name="cleanup" focus="false" listorder="11" taborder="11" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+LIMIT 10</query><query name="cleanup" focus="false" listorder="10" taborder="10" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (: Remove the documents we created from the database.:)
 
