@@ -1,4 +1,4 @@
-<export><workspace name="1e-query-harmonized-mlw17"><query name="shipping-zip cts query" focus="false" listorder="4" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="1e-query-harmonized-mlw17"><query name="shipping-zip cts query" focus="false" listorder="4" taborder="4" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : Show me any customer records having a shipping-zip equal to 36628
 :)
@@ -7,7 +7,7 @@
 cts:search(
   fn:collection("customer"), 
   cts:element-word-query(xs:QName("shipping-zip"),"36628") 
-    )</query><query name="shipping-zip xpath query" focus="false" listorder="3" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+    )</query><query name="shipping-zip xpath query" focus="false" listorder="3" taborder="3" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  :Show me any customer records having a shipping-zip equal to 36628
  :
@@ -16,7 +16,7 @@ cts:search(
  : Where customer.canonical.shipping-zip = 36628
 :)
 
-/customer[canonical/shipping-zip eq "36628"]</query><query name="REST GET query" focus="false" listorder="5" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+/customer[canonical/shipping-zip eq "36628"]</query><query name="REST GET query" focus="false" listorder="5" taborder="5" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: Search with REST
  :
  : Show me any customer records containing the text 'alabama'
@@ -31,7 +31,7 @@ xdmp:http-get(fn:concat("http://localhost:8000/v1/search?q=alabama"),
                    &lt;/options&gt;)
  
   
-(: Change alabama to 36628, then texas, view results :)</query><query name="REST POST structured-query" focus="false" listorder="6" taborder="6" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+(: Change alabama to 36628, then texas, view results :)</query><query name="REST POST structured-query" focus="false" listorder="6" taborder="6" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
    Structured Search with REST
 :)
@@ -64,7 +64,7 @@ xdmp:http-post(fn:concat("http://localhost:8000/v1/search"),
                     &lt;/headers&gt;
                    &lt;/options&gt;,
                    document{ $structured-query }
-                )(: [2] :)</query><query name="REST POST document" focus="false" listorder="7" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+                )(: [2] :)</query><query name="REST GET document" focus="false" listorder="7" taborder="7" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
    Return a document/entity with REST
 :)
@@ -75,10 +75,10 @@ xdmp:http-get(fn:concat("http://localhost:8000/v1/documents?uri=/denormalized/cu
                        &lt;username&gt;admin&lt;/username&gt;
                        &lt;password&gt;admin&lt;/password&gt;
                     &lt;/authentication&gt;
-                   &lt;/options&gt;)</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
+                   &lt;/options&gt;)</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">"
 This workspace demonstrates searching and querying our harmonized documents.
 In addition, we start to explore querying our data via the REST API.
-"</query><query name="load customers, orders, products" focus="false" listorder="2" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+"</query><query name="load customers, orders, products" focus="false" listorder="2" taborder="2" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: Use this tab to reinsert customer entities into the DB as they 
  : were at the end of workspace 1c, prior to starting this workspace, 
  : as well as the orders and products.)
@@ -534,7 +534,7 @@ return ($cust-a-reset, $cust-b-reset, $prod-doc-reset, $order-reset),
        "You've just loaded the following into the Documents DB:
         - the enveloped and harmonized system-a and system-b customer records
         - order documents
-        - product documents "</query><query name="cleanup" focus="false" listorder="8" taborder="8" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+        - product documents "</query><query name="cleanup" focus="false" listorder="8" taborder="8" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 declare namespace html = "http://www.w3.org/1999/xhtml";
 
 xdmp:collection-delete("customer"),
