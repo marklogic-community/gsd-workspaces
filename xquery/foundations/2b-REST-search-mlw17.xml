@@ -1,4 +1,4 @@
-<export><workspace name="2b-REST-search-mlw17"><query name="GET search" focus="false" listorder="2" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="2b-REST-search-mlw17"><query name="GET search" focus="false" listorder="3" taborder="5" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: Using REST to search the database.  
  : For more info see https://docs.marklogic.com/REST/GET/v1/search
  :)
@@ -9,7 +9,7 @@ xdmp:http-get( "http://localhost:8000/v1/search?q=36628",
                        &lt;password&gt;admin&lt;/password&gt;
                     &lt;/authentication&gt;
                    &lt;/options&gt;)
-</query><query name="GET search collection" focus="false" listorder="5" taborder="6" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="GET search collection" focus="false" listorder="4" taborder="6" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: Using REST to search the database within a particular collection.
  :)
 
@@ -20,7 +20,7 @@ xdmp:http-get( "http://localhost:8000/v1/search?q=Zaam-Dox&amp;amp;collection=pr
                        &lt;password&gt;admin&lt;/password&gt;
                     &lt;/authentication&gt;
                    &lt;/options&gt;)[2]
-</query><query name="GET format JSON" focus="false" listorder="6" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="GET format JSON" focus="false" listorder="5" taborder="7" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: Using REST to search the database within a particular collection,
    specifying the return type as JSON.
  :)
@@ -31,10 +31,10 @@ xdmp:http-get( "http://localhost:8000/v1/search?q=Zaam-Dox&amp;amp;collection=pr
                        &lt;password&gt;admin&lt;/password&gt;
                     &lt;/authentication&gt;
                    &lt;/options&gt;)[2]
-</query><query name="fn:doc()" focus="false" listorder="7" taborder="8" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="fn:doc()" focus="false" listorder="6" taborder="8" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: Use this to explore document URIs returned in the search response. :)
 
-fn:doc("/product-3.xml")</query><query name="POST element value-query" focus="false" listorder="8" taborder="9" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+fn:doc("/product-3.xml")</query><query name="POST element value-query" focus="false" listorder="7" taborder="9" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : Structured Search with REST
  : Here the structured query is JSON
@@ -68,7 +68,7 @@ xdmp:http-post(fn:concat("http://localhost:8000/v1/search"),
                     &lt;/headers&gt;
                    &lt;/options&gt;,
                    document{ $structured-query }
-                ) [2]</query><query name="POST and-query" focus="false" listorder="9" taborder="10" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+                ) [2]</query><query name="POST and-query" focus="false" listorder="8" taborder="10" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
 
 Structured search with REST.  This script is the RESTful
@@ -126,7 +126,7 @@ xdmp:http-post(fn:concat("http://localhost:8000/v1/search"),
                    document{ $structured-query }
                 ) [2]
                 
-                </query><query name="POST geo query JSON" focus="false" listorder="10" taborder="11" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+                </query><query name="POST geo query JSON" focus="false" listorder="9" taborder="11" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
 cts:search(fn:collection("customer"),
   cts:element-pair-geospatial-query(xs:QName("billing_address"),
@@ -163,7 +163,7 @@ xdmp:http-post(fn:concat("http://localhost:8000/v1/search"),
                     &lt;/headers&gt;
                    &lt;/options&gt;,
                    document{ $structured-query }
-                ) [2]</query><query name="POST geo query XML" focus="false" listorder="11" taborder="12" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+                ) [2]</query><query name="POST geo query XML" focus="false" listorder="10" taborder="12" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
 cts:search(fn:collection("customer"),
   cts:element-pair-geospatial-query(xs:QName("billing_address"),
@@ -195,7 +195,7 @@ xdmp:http-post(fn:concat("http://localhost:8000/v1/search"),
                     &lt;/headers&gt;
                    &lt;/options&gt;,
                    document{ $structured-query }
-                ) [2]</query><query name="POST with cts:parse" focus="false" listorder="13" taborder="14" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+                ) [2]</query><query name="POST with cts:parse" focus="false" listorder="12" taborder="14" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 let $structured-query := cts:parse("merchant NEAR/5 parkway AND texas")
 return 
@@ -211,7 +211,7 @@ xdmp:http-post(fn:concat("http://localhost:8000/v1/search"),
                    &lt;/options&gt;,
                    document{ $structured-query }
                 ) [2]
-</query><query name="cts:parse" focus="false" listorder="12" taborder="13" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="cts:parse" focus="false" listorder="11" taborder="13" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: cts:parse() parses a query string and returns a cts:query which
  : can be serialized as our structured query document
  : http://docs.marklogic.com/cts:parse
@@ -220,10 +220,10 @@ xdmp:http-post(fn:concat("http://localhost:8000/v1/search"),
 :)
 
 cts:parse("merchant NEAR/5 parkway AND texas"),
-&lt;document&gt;{cts:parse("merchant NEAR/5 parkway AND texas")}&lt;/document&gt;</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
+&lt;document&gt;{cts:parse("merchant NEAR/5 parkway AND texas")}&lt;/document&gt;</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">"
 In this workspace we continue to explore search and query
 with a focus on using the REST API.
-"</query><query name="load customers, orders, and products" focus="false" listorder="12" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+"</query><query name="load customers, orders, and products" focus="false" listorder="2" taborder="2" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: Use this tab to reinsert customer, order, and product documents 
  : into the DB prior to starting this workspace. 
  :)
@@ -748,7 +748,7 @@ return ($cust-a-reset, $cust-b-reset, $prod-doc-reset),
        "You've just loaded the following into the Documents DB:
         - the enveloped and harmonized system-a and system-b customer records
         - enveloped order documents containing triples
-        - product documents "</query><query name="cleanup" focus="false" listorder="13" taborder="15" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+        - product documents "</query><query name="cleanup" focus="false" listorder="13" taborder="15" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 let $uris := cts:uris('','document', cts:and-query(()))
 for $uri in $uris 
