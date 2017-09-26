@@ -1,4 +1,4 @@
-<export><workspace name="1a-xml-load-mlw17"><query name="load customer table" focus="false" listorder="2" taborder="2" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+<export><workspace name="1a-xml-load-mlw17"><query name="load customer table" focus="false" listorder="2" taborder="2" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: This script loads rows from a customer table. The table has the shape:
  : customer_id,first_name,last_name,email,ssn,phone,billing_address_id,shipping_address_id,region,segment
  : and was exported to the filesystem as a csv.  Loading with content pump, the records loaded
@@ -59,7 +59,7 @@ return (
             "Click ""Explore"" above to see the documents inserted listed.",
             "Click on one of the URIs to view the contents of the document"
   )
-</query><query name="load address table" focus="false" listorder="3" taborder="3" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="load address table" focus="false" listorder="3" taborder="3" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: This script loads rows from an address table. :)
 
 let $doc :=
@@ -131,7 +131,7 @@ return (
   $insert,
   fn:concat("You have just inserted ", $count, " address table records into the database.")
 )
-</query><query name="denormalize customers" focus="false" listorder="4" taborder="6" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="denormalize customers" focus="false" listorder="6" taborder="6" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : This script is a simple example of creating entities in MarkLogic by \\
  : denormalizing records loaded from separate tables.
@@ -163,7 +163,7 @@ let $insert :=
 return ($insert, 
         fn:concat("You have just created 3 customer entities and inserted them into the database.")
        )
-</query><query name="delete table collections" focus="false" listorder="5" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+</query><query name="delete table collections" focus="false" listorder="7" taborder="7" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: 
  :  This script deletes the collections containing the records we created
  :  our denormalized entities from.
@@ -179,7 +179,7 @@ return ($insert,
 
 xdmp:collection-delete("customer-table"),
 xdmp:collection-delete("address-table"),
-"You've just deleted the customer-table and address-table collections."</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">"
+"You've just deleted the customer-table and address-table collections."</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">"
 This workspace starts by demonstrating inserting data into MarkLogic.
 
 Generally we'll load data into MarkLogic using Client APIs such as Java or REST.  We can also load documents directly from Query Console.
@@ -197,20 +197,20 @@ customer_id,first_name,last_name,email,ssn,phone,billing_address_id,shipping_add
 We'll load the Customer data, then denormalize to create Customer entities. So you have an example of creating entities in MarkLogic from disparate tables.
 
 We'll proceed to the next workspace to load Orders and Products entities as-is.
-"</query><query name="query XPath" focus="false" listorder="6" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+"</query><query name="query XPath" focus="false" listorder="4" taborder="4" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : Show me the record having a /root/customer_id equal to '1'
 :)
-/root[customer_id = 1]</query><query name="query Search" focus="false" listorder="7" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+/root[customer_id = 1]</query><query name="query Search" focus="false" listorder="5" taborder="5" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : Show me any records that have the state 'texas' in them.
 :)
-cts:search(fn:collection(), "texas")</query><query name="cleanup" focus="false" listorder="8" taborder="8" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+cts:search(fn:collection(), "texas")</query><query name="cleanup" focus="false" listorder="8" taborder="8" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 
 (: Delete customers :) 
 
 xdmp:collection-delete("customer"),
-"You've just deleted the customer collections."</query><query name="fn:collection()" focus="false" listorder="9" taborder="9" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+"You've just deleted the customer collections."</query><query name="fn:collection()" focus="false" listorder="9" taborder="9" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: For those who may have documents in your
  : Documents database already.  Use this to explore what we  
  : load, create, and insert into the DB in the previous tabs. 
