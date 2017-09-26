@@ -9,12 +9,12 @@
 let $uris := cts:uris('','document', cts:collection-query("customer"))
 
 let $enveloped-docs :=
-   for $uri in $uris 
-   let $source := fn:doc($uri)
-   return
-     &lt;customer&gt;{
+  for $uri in $uris 
+  let $source := fn:doc($uri)
+  return
+    &lt;customer&gt;{
       &lt;source&gt;{$source/customer/*}&lt;/source&gt;
-   }&lt;/customer&gt;
+    }&lt;/customer&gt;
    
 return $enveloped-docs
 
@@ -29,14 +29,14 @@ let $collection := "customer"
 let $uris := cts:uris('','document', cts:collection-query($collection))
 
 let $enveloped-docs :=
-   for $uri in $uris 
-   let $collections := xdmp:document-get-collections($uri)
-   let $source := fn:doc($uri)
-   let $doc := 
+  for $uri in $uris 
+  let $collections := xdmp:document-get-collections($uri)
+  let $source := fn:doc($uri)
+  let $doc := 
                 &lt;customer&gt;{
                   &lt;source&gt;{$source/customer/*}&lt;/source&gt;
                 }&lt;/customer&gt;
-   return xdmp:document-insert($uri, $doc, (), ($collections, "enveloped"))
+  return xdmp:document-insert($uri, $doc, (), ($collections, "enveloped"))
 return ($enveloped-docs,
         fn:concat("You have just enveloped the ",$collection," collection entities.")
        )</query><query name="uris" focus="false" listorder="4" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
@@ -55,8 +55,8 @@ return $uris</query><query name="harmonize system-a 1" focus="false" listorder="
  : within our envelopes.
 :)
 let $uris := cts:uris('','document', cts:and-query((cts:collection-query("customer"), 
-                                                   cts:collection-query("system-a"),
-                                                   cts:collection-query("enveloped"))))
+                                                    cts:collection-query("system-a"),
+                                                    cts:collection-query("enveloped"))))
 for $uri in $uris
 let $doc := fn:doc($uri)
 let $zip := $doc/customer/source/shipping_address/zip/text()
@@ -72,8 +72,8 @@ return xdmp:node-insert-before($doc/customer/source, $header);
 :)
 
 let $uris := cts:uris('','document', cts:and-query((cts:collection-query("customer"), 
-                                                   cts:collection-query("system-b"),
-                                                   cts:collection-query("enveloped"))))
+                                                    cts:collection-query("system-b"),
+                                                    cts:collection-query("enveloped"))))
                                                    
 for $uri in $uris
 let $doc := fn:doc($uri)
@@ -92,8 +92,8 @@ return xdmp:node-insert-before($doc/customer/source, $header);
 :)
 
 let $uris := cts:uris('','document', cts:and-query((cts:collection-query("customer"), 
-                                                   cts:collection-query("system-a"),
-                                                   cts:collection-query("enveloped"))))
+                                                    cts:collection-query("system-a"),
+                                                    cts:collection-query("enveloped"))))
                                                    
 for $uri in $uris
 let $doc := fn:doc($uri)
@@ -108,7 +108,7 @@ underlying concepts.
 
 Traditionally, we test our envelopes and harmonizations in Query Console. 
 We develop our code here, then move them over to modules
-for CORB (Content Reprocessing in Bulk) or other libraries for use
+for CORB2 (Content Reprocessing in Bulk) or other libraries for use
 by APIs so that enveloping and harmonization can perform at scale and be
 automated to be scheduled as needed.
 
@@ -124,8 +124,8 @@ for harmonization and enveloping.
 :)
 
 let $uris := cts:uris('','document', cts:and-query((cts:collection-query("customer"), 
-                                                   cts:collection-query("system-a"),
-                                                   cts:collection-query("enveloped"))))
+                                                    cts:collection-query("system-a"),
+                                                    cts:collection-query("enveloped"))))
                                                    
 for $uri in $uris
 let $doc := fn:doc($uri)
@@ -134,7 +134,7 @@ let $metadata := &lt;metadata&gt;
                    &lt;date&gt;{fn:current-date()}&lt;/date&gt;
                    &lt;lineage&gt;v01 transform&lt;/lineage&gt;
                  &lt;/metadata&gt;
-return  xdmp:node-insert-before($doc/customer/canonical, $metadata);
+return xdmp:node-insert-before($doc/customer/canonical, $metadata);
 
 "You just added &lt;metadata&gt; sections to your enveloped documents from system-a";
 </query><query name="harmonize system-b 2" focus="false" listorder="9" taborder="9" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
@@ -146,8 +146,8 @@ return  xdmp:node-insert-before($doc/customer/canonical, $metadata);
 
 
 let $uris := cts:uris('','document', cts:and-query((cts:collection-query("customer"), 
-                                                   cts:collection-query("system-b"),
-                                                   cts:collection-query("enveloped"))))
+                                                    cts:collection-query("system-b"),
+                                                    cts:collection-query("enveloped"))))
                                                    
 for $uri in $uris
 let $doc := fn:doc($uri)
@@ -156,7 +156,7 @@ let $metadata := &lt;metadata&gt;
                    &lt;date&gt;{fn:current-date()}&lt;/date&gt;
                    &lt;lineage&gt;v01 transform&lt;/lineage&gt;
                  &lt;/metadata&gt;
-return  xdmp:node-insert-before($doc/customer/canonical, $metadata);
+return xdmp:node-insert-before($doc/customer/canonical, $metadata);
 "You just added &lt;metadata&gt; sections to your enveloped documents from system-b";</query><query name="fn:doc()" focus="false" listorder="10" taborder="10" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: This script provided for those who may already 
  : have content in their Documents DB.

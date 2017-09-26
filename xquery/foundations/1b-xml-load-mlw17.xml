@@ -411,8 +411,8 @@ let $docs := $doc/record
 let $count := fn:count($docs)
 return (for $d at $idx in $docs 
         let $uri := fn:concat("/order-",$idx,".xml")
-          return xdmp:document-insert($uri, &lt;order&gt;{$d/node()}&lt;/order&gt;, (), "order"),
-       fn:concat("You just inserted ", $count, " order records into the database.")
+        return xdmp:document-insert($uri, &lt;order&gt;{$d/node()}&lt;/order&gt;, (), "order"),
+        fn:concat("You just inserted ", $count, " order records into the database.")
         )
 </query><query name="load product data" focus="false" listorder="4" taborder="4" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (: This script loads product entities as-is.
@@ -520,7 +520,7 @@ let $docs := $doc/record
 let $count := fn:count($docs)
 return (for $d at $idx in $docs 
         let $uri := fn:concat("/product-",$idx,".xml")
-         return xdmp:document-insert($uri, &lt;product&gt;{$d/node()}&lt;/product&gt;, (), "product"),
+        return xdmp:document-insert($uri, &lt;product&gt;{$d/node()}&lt;/product&gt;, (), "product"),
         fn:concat("You just inserted ", $count, " product records into the database.")
        )
        </query><query name="collection count" focus="false" listorder="5" taborder="5" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";

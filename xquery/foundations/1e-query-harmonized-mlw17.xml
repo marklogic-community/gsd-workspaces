@@ -7,9 +7,9 @@
 cts:search(
   fn:collection("customer"), 
   cts:element-word-query(xs:QName("shipping-zip"),"36628") 
-    )</query><query name="shipping-zip xpath query" focus="false" listorder="3" taborder="3" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+)</query><query name="shipping-zip xpath query" focus="false" listorder="3" taborder="3" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
- :Show me any customer records having a shipping-zip equal to 36628
+ : Show me any customer records having a shipping-zip equal to 36628
  :
  : Select 
  : From Documents (The database)
@@ -23,12 +23,12 @@ cts:search(
 :)
 
 xdmp:http-get(fn:concat("http://localhost:8000/v1/search?q=alabama"), 
-                   &lt;options xmlns="xdmp:http"&gt;
-                    &lt;authentication&gt;
-                       &lt;username&gt;admin&lt;/username&gt;
-                       &lt;password&gt;admin&lt;/password&gt;
-                    &lt;/authentication&gt;
-                   &lt;/options&gt;)
+              &lt;options xmlns="xdmp:http"&gt;
+                &lt;authentication&gt;
+                  &lt;username&gt;admin&lt;/username&gt;
+                  &lt;password&gt;admin&lt;/password&gt;
+                &lt;/authentication&gt;
+              &lt;/options&gt;)
  
   
 (: Change alabama to 36628, then texas, view results :)</query><query name="REST POST structured-query" focus="false" listorder="6" taborder="6" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
@@ -54,28 +54,28 @@ let $structured-query :=
  
 return 
 xdmp:http-post(fn:concat("http://localhost:8000/v1/search"), 
-                   &lt;options xmlns="xdmp:http"&gt;
-                    &lt;authentication&gt;
-                       &lt;username&gt;admin&lt;/username&gt;
-                       &lt;password&gt;admin&lt;/password&gt;
-                    &lt;/authentication&gt;
-                      &lt;headers&gt;
-                       &lt;content-type&gt;application/json&lt;/content-type&gt;
-                    &lt;/headers&gt;
-                   &lt;/options&gt;,
-                   document{ $structured-query }
-                )(: [2] :)</query><query name="REST GET document" focus="false" listorder="7" taborder="7" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+               &lt;options xmlns="xdmp:http"&gt;
+                 &lt;authentication&gt;
+                   &lt;username&gt;admin&lt;/username&gt;
+                   &lt;password&gt;admin&lt;/password&gt;
+                 &lt;/authentication&gt;
+                   &lt;headers&gt;
+                     &lt;content-type&gt;application/json&lt;/content-type&gt;
+                   &lt;/headers&gt;
+               &lt;/options&gt;,
+               document{ $structured-query }
+)(: [2] :)</query><query name="REST POST document" focus="false" listorder="7" taborder="7" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
    Return a document/entity with REST
 :)
 
 xdmp:http-get(fn:concat("http://localhost:8000/v1/documents?uri=/denormalized/customer-1.xml"), 
-                   &lt;options xmlns="xdmp:http"&gt;
-                    &lt;authentication&gt;
-                       &lt;username&gt;admin&lt;/username&gt;
-                       &lt;password&gt;admin&lt;/password&gt;
-                    &lt;/authentication&gt;
-                   &lt;/options&gt;)</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">"
+              &lt;options xmlns="xdmp:http"&gt;
+                &lt;authentication&gt;
+                  &lt;username&gt;admin&lt;/username&gt;
+                  &lt;password&gt;admin&lt;/password&gt;
+                &lt;/authentication&gt;
+              &lt;/options&gt;)</query><query name="Intro" focus="true" listorder="1" taborder="1" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">"
 This workspace demonstrates searching and querying our harmonized documents.
 In addition, we start to explore querying our data via the REST API.
 "</query><query name="load customers, orders, products" focus="false" listorder="2" taborder="2" active="true" database="14942407515111994202" server="6240101570028256752" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
@@ -86,114 +86,114 @@ In addition, we start to explore querying our data via the REST API.
  
 let $cust-a-records :=
 &lt;dataset&gt;
-   &lt;customer&gt;
-     &lt;metadata&gt;
-       &lt;source&gt;POS&lt;/source&gt;
-       &lt;date&gt;2017-05-09-04:00&lt;/date&gt;
-       &lt;lineage&gt;v01 transform&lt;/lineage&gt;
-     &lt;/metadata&gt;
-     &lt;canonical&gt;
+  &lt;customer&gt;
+    &lt;metadata&gt;
+      &lt;source&gt;POS&lt;/source&gt;
+      &lt;date&gt;2017-05-09-04:00&lt;/date&gt;
+      &lt;lineage&gt;v01 transform&lt;/lineage&gt;
+    &lt;/metadata&gt;
+    &lt;canonical&gt;
       &lt;shipping-zip&gt;36628&lt;/shipping-zip&gt;
-     &lt;/canonical&gt;
-     &lt;source&gt;
-       &lt;customer_id&gt;1&lt;/customer_id&gt;
-       &lt;first_name&gt;Nicholas&lt;/first_name&gt;
-       &lt;last_name&gt;Wheeler&lt;/last_name&gt;
-       &lt;email&gt;nwheeler0@cdbaby.com&lt;/email&gt;
-       &lt;ssn&gt;803-28-0354&lt;/ssn&gt;
-       &lt;phone&gt;1-(915)325-2812&lt;/phone&gt;
-       &lt;billing_address&gt;
-         &lt;street&gt;46958 Farwell Trail&lt;/street&gt;
-         &lt;city&gt;El Paso&lt;/city&gt;
-         &lt;state&gt;Texas&lt;/state&gt;
-         &lt;zip&gt;79950&lt;/zip&gt;
-         &lt;latitude&gt;31.6948&lt;/latitude&gt;
-         &lt;longitude&gt;-106.3&lt;/longitude&gt;
-       &lt;/billing_address&gt;
-       &lt;shipping_address&gt;
-         &lt;street&gt;9 Thierer Place&lt;/street&gt;
-         &lt;city&gt;Mobile&lt;/city&gt;
-         &lt;state&gt;Alabama&lt;/state&gt;
-         &lt;zip&gt;36628&lt;/zip&gt;
-         &lt;latitude&gt;30.6589&lt;/latitude&gt;
-         &lt;longitude&gt;-88.178&lt;/longitude&gt;
-       &lt;/shipping_address&gt;
-       &lt;region&gt;justo&lt;/region&gt;
-       &lt;segment&gt;top&lt;/segment&gt;
-      &lt;/source&gt;
-     &lt;/customer&gt;
-   &lt;customer&gt;
-      &lt;metadata&gt;
-         &lt;source&gt;POS&lt;/source&gt;
-         &lt;date&gt;2017-05-09-04:00&lt;/date&gt;
-         &lt;lineage&gt;v01 transform&lt;/lineage&gt;
-     &lt;/metadata&gt;
-     &lt;canonical&gt;
-        &lt;shipping-zip&gt;39505&lt;/shipping-zip&gt;
-     &lt;/canonical&gt;
-     &lt;source&gt;
-        &lt;customer_id&gt;2&lt;/customer_id&gt;
-        &lt;first_name&gt;Richard&lt;/first_name&gt;
-        &lt;last_name&gt;Kennedy&lt;/last_name&gt;
-        &lt;email&gt;rkennedy1@apache.org&lt;/email&gt;
-        &lt;ssn&gt;253-66-8162&lt;/ssn&gt;
-        &lt;phone&gt;1-(815)551-8998&lt;/phone&gt;
-        &lt;billing_address&gt;
-           &lt;street&gt;01233 7th Parkway&lt;/street&gt;
-           &lt;city&gt;Rockford&lt;/city&gt;
-           &lt;state&gt;Illinois&lt;/state&gt;
-           &lt;zip&gt;61110&lt;/zip&gt;
-           &lt;latitude&gt;42.3254&lt;/latitude&gt;
-           &lt;longitude&gt;-89.1705&lt;/longitude&gt;
-        &lt;/billing_address&gt;
-        &lt;shipping_address&gt;
-           &lt;street&gt;19137 Superior Point&lt;/street&gt;
-           &lt;city&gt;Gulfport&lt;/city&gt;
-           &lt;state&gt;Mississippi&lt;/state&gt;
-           &lt;zip&gt;39505&lt;/zip&gt;
-           &lt;latitude&gt;30.4158&lt;/latitude&gt;
-           &lt;longitude&gt;-89.0684&lt;/longitude&gt;
-        &lt;/shipping_address&gt;
-        &lt;region&gt;in&lt;/region&gt;
-        &lt;segment&gt;regular&lt;/segment&gt;
-     &lt;/source&gt;
-    &lt;/customer&gt;
-    &lt;customer&gt;
-        &lt;metadata&gt;
-           &lt;source&gt;POS&lt;/source&gt;
-           &lt;date&gt;2017-05-09-04:00&lt;/date&gt;
-           &lt;lineage&gt;v01 transform&lt;/lineage&gt;
-        &lt;/metadata&gt;
-        &lt;canonical&gt;
-           &lt;shipping-zip&gt;23272&lt;/shipping-zip&gt;
-        &lt;/canonical&gt;
-        &lt;source&gt;
-           &lt;customer_id&gt;3&lt;/customer_id&gt;
-           &lt;first_name&gt;Bonnie&lt;/first_name&gt;
-           &lt;last_name&gt;Clark&lt;/last_name&gt;
-           &lt;email&gt;bclark2@example.com&lt;/email&gt;
-           &lt;ssn&gt;947-95-7536&lt;/ssn&gt;
-          &lt;phone&gt;1-(515)755-7166&lt;/phone&gt;
-          &lt;billing_address&gt;
-             &lt;street&gt;4 Red Cloud Plaza&lt;/street&gt;
-             &lt;city&gt;Des Moines&lt;/city&gt;
-             &lt;state&gt;Iowa&lt;/state&gt;
-             &lt;zip&gt;50305&lt;/zip&gt;
-             &lt;latitude&gt;41.6727&lt;/latitude&gt;
-             &lt;longitude&gt;-93.5722&lt;/longitude&gt;
-          &lt;/billing_address&gt;
-          &lt;shipping_address&gt;
-             &lt;street&gt;96328 Sutteridge Court&lt;/street&gt;
-             &lt;city&gt;Richmond&lt;/city&gt;
-             &lt;state&gt;Virginia&lt;/state&gt;
-             &lt;zip&gt;23272&lt;/zip&gt;
-             &lt;latitude&gt;37.5242&lt;/latitude&gt;
-             &lt;longitude&gt;-77.4932&lt;/longitude&gt;
-          &lt;/shipping_address&gt;
-          &lt;region&gt;velit&lt;/region&gt;
-          &lt;segment&gt;coupon&lt;/segment&gt;
-        &lt;/source&gt;
-      &lt;/customer&gt;
+    &lt;/canonical&gt;
+    &lt;source&gt;
+      &lt;customer_id&gt;1&lt;/customer_id&gt;
+      &lt;first_name&gt;Nicholas&lt;/first_name&gt;
+      &lt;last_name&gt;Wheeler&lt;/last_name&gt;
+      &lt;email&gt;nwheeler0@cdbaby.com&lt;/email&gt;
+      &lt;ssn&gt;803-28-0354&lt;/ssn&gt;
+      &lt;phone&gt;1-(915)325-2812&lt;/phone&gt;
+      &lt;billing_address&gt;
+        &lt;street&gt;46958 Farwell Trail&lt;/street&gt;
+        &lt;city&gt;El Paso&lt;/city&gt;
+        &lt;state&gt;Texas&lt;/state&gt;
+        &lt;zip&gt;79950&lt;/zip&gt;
+        &lt;latitude&gt;31.6948&lt;/latitude&gt;
+        &lt;longitude&gt;-106.3&lt;/longitude&gt;
+      &lt;/billing_address&gt;
+      &lt;shipping_address&gt;
+        &lt;street&gt;9 Thierer Place&lt;/street&gt;
+        &lt;city&gt;Mobile&lt;/city&gt;
+        &lt;state&gt;Alabama&lt;/state&gt;
+        &lt;zip&gt;36628&lt;/zip&gt;
+        &lt;latitude&gt;30.6589&lt;/latitude&gt;
+        &lt;longitude&gt;-88.178&lt;/longitude&gt;
+      &lt;/shipping_address&gt;
+      &lt;region&gt;justo&lt;/region&gt;
+      &lt;segment&gt;top&lt;/segment&gt;
+    &lt;/source&gt;
+  &lt;/customer&gt;
+  &lt;customer&gt;
+    &lt;metadata&gt;
+      &lt;source&gt;POS&lt;/source&gt;
+      &lt;date&gt;2017-05-09-04:00&lt;/date&gt;
+      &lt;lineage&gt;v01 transform&lt;/lineage&gt;
+    &lt;/metadata&gt;
+    &lt;canonical&gt;
+      &lt;shipping-zip&gt;39505&lt;/shipping-zip&gt;
+    &lt;/canonical&gt;
+    &lt;source&gt;
+      &lt;customer_id&gt;2&lt;/customer_id&gt;
+      &lt;first_name&gt;Richard&lt;/first_name&gt;
+      &lt;last_name&gt;Kennedy&lt;/last_name&gt;
+      &lt;email&gt;rkennedy1@apache.org&lt;/email&gt;
+      &lt;ssn&gt;253-66-8162&lt;/ssn&gt;
+      &lt;phone&gt;1-(815)551-8998&lt;/phone&gt;
+      &lt;billing_address&gt;
+        &lt;street&gt;01233 7th Parkway&lt;/street&gt;
+        &lt;city&gt;Rockford&lt;/city&gt;
+        &lt;state&gt;Illinois&lt;/state&gt;
+        &lt;zip&gt;61110&lt;/zip&gt;
+        &lt;latitude&gt;42.3254&lt;/latitude&gt;
+        &lt;longitude&gt;-89.1705&lt;/longitude&gt;
+      &lt;/billing_address&gt;
+      &lt;shipping_address&gt;
+        &lt;street&gt;19137 Superior Point&lt;/street&gt;
+        &lt;city&gt;Gulfport&lt;/city&gt;
+        &lt;state&gt;Mississippi&lt;/state&gt;
+        &lt;zip&gt;39505&lt;/zip&gt;
+        &lt;latitude&gt;30.4158&lt;/latitude&gt;
+        &lt;longitude&gt;-89.0684&lt;/longitude&gt;
+      &lt;/shipping_address&gt;
+      &lt;region&gt;in&lt;/region&gt;
+      &lt;segment&gt;regular&lt;/segment&gt;
+    &lt;/source&gt;
+  &lt;/customer&gt;
+  &lt;customer&gt;
+    &lt;metadata&gt;
+      &lt;source&gt;POS&lt;/source&gt;
+      &lt;date&gt;2017-05-09-04:00&lt;/date&gt;
+      &lt;lineage&gt;v01 transform&lt;/lineage&gt;
+    &lt;/metadata&gt;
+    &lt;canonical&gt;
+      &lt;shipping-zip&gt;23272&lt;/shipping-zip&gt;
+    &lt;/canonical&gt;
+    &lt;source&gt;
+      &lt;customer_id&gt;3&lt;/customer_id&gt;
+      &lt;first_name&gt;Bonnie&lt;/first_name&gt;
+      &lt;last_name&gt;Clark&lt;/last_name&gt;
+      &lt;email&gt;bclark2@example.com&lt;/email&gt;
+      &lt;ssn&gt;947-95-7536&lt;/ssn&gt;
+      &lt;phone&gt;1-(515)755-7166&lt;/phone&gt;
+      &lt;billing_address&gt;
+        &lt;street&gt;4 Red Cloud Plaza&lt;/street&gt;
+        &lt;city&gt;Des Moines&lt;/city&gt;
+        &lt;state&gt;Iowa&lt;/state&gt;
+        &lt;zip&gt;50305&lt;/zip&gt;
+        &lt;latitude&gt;41.6727&lt;/latitude&gt;
+        &lt;longitude&gt;-93.5722&lt;/longitude&gt;
+      &lt;/billing_address&gt;
+      &lt;shipping_address&gt;
+        &lt;street&gt;96328 Sutteridge Court&lt;/street&gt;
+        &lt;city&gt;Richmond&lt;/city&gt;
+        &lt;state&gt;Virginia&lt;/state&gt;
+        &lt;zip&gt;23272&lt;/zip&gt;
+        &lt;latitude&gt;37.5242&lt;/latitude&gt;
+        &lt;longitude&gt;-77.4932&lt;/longitude&gt;
+      &lt;/shipping_address&gt;
+      &lt;region&gt;velit&lt;/region&gt;
+      &lt;segment&gt;coupon&lt;/segment&gt;
+    &lt;/source&gt;
+  &lt;/customer&gt;
 &lt;/dataset&gt;
 
 let $cust-a-docs := $cust-a-records/customer
@@ -310,7 +310,7 @@ let $cust-b-records :=
       &lt;state&gt;Texas&lt;/state&gt;
       &lt;postal&gt;79405&lt;/postal&gt;
     &lt;/source&gt;
-    &lt;/customer&gt;
+  &lt;/customer&gt;
 &lt;/dataset&gt;
 
 let $cust-b-docs := $cust-b-records/customer

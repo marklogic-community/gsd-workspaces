@@ -29,11 +29,12 @@ cts:search(fn:collection("customer"),
 :)
 
 cts:search(fn:collection("customer"), 
-   cts:and-query(
-            (cts:element-query(xs:QName("city"), "mobile"),
-             cts:element-query(xs:QName("postal"), "36628"))
-           )
-   )</query><query name="and query 2" focus="false" listorder="7" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
+  cts:and-query(
+          (cts:element-query(xs:QName("city"), "mobile"),
+            cts:element-query(xs:QName("postal"), "36628")
+          )
+  )
+)</query><query name="and query 2" focus="false" listorder="7" taborder="7" active="true" database="8469375127942903998" server="12590722383439523806" database-name="Documents" server-name="App-Services" mode="xquery">xquery version "1.0-ml";
 (:
  : We can use cts:query constructors to build queries up
    that are more complex.
@@ -42,12 +43,12 @@ cts:search(fn:collection("customer"),
 :)
 
 cts:search(fn:collection("customer"), 
-   cts:and-query((
+  cts:and-query((
               cts:element-query(xs:QName("city"), "mobile"),
                 cts:or-query((
                   cts:element-query(xs:QName("postal"), "36628"),
                   cts:element-query(xs:QName("zip"), "36628")
-                  ))
+                ))
              )))
 
            
